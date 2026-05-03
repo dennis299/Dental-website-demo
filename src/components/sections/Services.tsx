@@ -85,11 +85,11 @@ export const Services = () => {
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground/70">
             Our treatments
           </div>
-          <h2 className="mt-5 text-4xl md:text-5xl font-bold tracking-display">
+          <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-bold tracking-display">
             Premium dentistry, tailored to you.
           </h2>
-          <p className="mt-4 text-lg text-foreground/70">
-            Every plan starts with a careful conversation about your smile, your concerns and your goals — so the care you receive feels personal from day one.
+          <p className="mt-4 text-base sm:text-lg text-foreground/70">
+            Every plan starts with a careful conversation about your smile, your concerns and your goals — so private dental care in Staffordshire feels personal from day one.
           </p>
         </div>
 
