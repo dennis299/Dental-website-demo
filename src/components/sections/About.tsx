@@ -1,4 +1,4 @@
-import waiting from "@/assets/waiting.jpg";
+import waiting from "@/assets/waiting-area.png";
 import { Check } from "lucide-react";
 
 const points = [
