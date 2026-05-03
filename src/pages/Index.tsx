@@ -35,6 +35,7 @@ const Index = () => {
           Book Appointment
         </a>
       </div>
+      <ScrollToTop />
     </div>
   );
 };
