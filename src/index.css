@@ -42,7 +42,8 @@
     --radius: 1rem;
 
     --gradient-hero: radial-gradient(ellipse at top right, hsl(75 70% 88% / 0.55), transparent 60%),
-                     radial-gradient(ellipse at bottom left, hsl(75 60% 94% / 0.5), transparent 55%);
+                     radial-gradient(ellipse at bottom left, hsl(28 45% 88% / 0.55), transparent 55%),
+                     linear-gradient(180deg, hsl(0 0% 100%), hsl(30 30% 97%));
     --gradient-soft: linear-gradient(180deg, hsl(0 0% 100%), hsl(75 40% 98%));
     --shadow-soft: 0 10px 40px -12px hsl(0 0% 0% / 0.08);
     --shadow-elegant: 0 30px 80px -30px hsl(75 40% 30% / 0.18);
