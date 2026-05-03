@@ -4,6 +4,7 @@ import reception from "@/assets/reception.jpg";
 import waiting from "@/assets/waiting.jpg";
 import before1 from "@/assets/before-1.jpg";
 import after1 from "@/assets/after-1.jpg";
+import team from "@/assets/dental-team.jpg";
 
 export const Hero = () => {
   const scrollTo = (id: string) => () => {
