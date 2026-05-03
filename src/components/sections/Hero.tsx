@@ -1,26 +1,42 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { Phone, Star, Users, Sparkles, Stethoscope, ArrowRight } from "lucide-react";
-import team from "@/assets/dental-team.jpg";
+import teamSm from "@/assets/dental-team-768.jpg";
+import teamMd from "@/assets/dental-team-1280.jpg";
+import teamLg from "@/assets/dental-team-1920.jpg";
 
 export const Hero = () => {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, -120]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+
   return (
-    <section className="relative min-h-[92vh] w-full overflow-hidden">
-      {/* Background image */}
-      <div className="absolute inset-0">
+    <section ref={ref} className="relative min-h-[92vh] w-full overflow-hidden">
+      {/* Background image with parallax + responsive srcset */}
+      <motion.div className="absolute inset-0 will-change-transform" style={{ y, scale }}>
         <img
-          src={team}
+          src={teamMd}
+          srcSet={`${teamSm} 768w, ${teamMd} 1280w, ${teamLg} 1920w`}
+          sizes="100vw"
           alt="Railway Dental clinical team"
           className="w-full h-full object-cover object-center"
-          loading="eager"
+          fetchPriority="high"
           decoding="async"
         />
-        {/* Gradient + tonal overlays for readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-black/65" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent" />
-      </div>
+      </motion.div>
 
-      {/* Content */}
-      <div className="relative z-10 container-wide flex min-h-[92vh] items-center py-28">
+      {/* Content fades + lifts on scroll */}
+      <motion.div
+        style={{ opacity }}
+        className="relative z-10 container-wide flex min-h-[92vh] items-center py-28"
+      >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -101,10 +117,10 @@ export const Hero = () => {
             ))}
           </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* Bottom blend into next section */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-background pointer-events-none" />
+      {/* Smooth blend into next section */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-background pointer-events-none z-[5]" />
     </section>
   );
 };
