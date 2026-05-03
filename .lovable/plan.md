@@ -1,62 +1,70 @@
 ## Goal
-Rebuild the "Meet the Team" section with real staff data, correctly mapped photos (verified against the reference screenshots), GDC numbers, and warm one-line descriptions — all in a responsive, premium card grid.
+Performance + SEO pass on the existing site. Zero visual or layout changes — only meta, schema, alt text, semantics, and small responsive/perf nudges.
 
-## Photo mapping (verified against reference screenshots image-15 / image-16)
+## 1. SEO — `index.html`
 
-| # | Name | Role | GDC | Source upload |
-|---|------|------|-----|---------------|
-| 1 | Kulveer Rooprai | Dentist | 245167 | image-7 (black turban, glasses, beard) |
-| 2 | Neethu Jinto | Hygienist | 307989 | image-9 (dark hair, navy top) |
-| 3 | Naman Bhushan | Hygienist | 307123 | image-12 (black scrubs, beard) |
-| 4 | Rebecca Nevill | Hygienist | 223218 | image-5 (blonde, navy top) |
-| 5 | Karen Briggs | Dental Nurse / Receptionist | 130601 | image-13 (blonde, green sweater + white collar) |
-| 6 | Nicola Green | Head Dental Nurse | 240497 | image-11 (brunette, sunglasses on head, green scrubs) |
-| 7 | Kerry Hales | Dental Nurse | 136306 | image-8 (blonde, green scrubs) |
-| 8 | Nina Porter | Dental Nurse | 170279 | image-14 (blonde, laughing, green top) |
-| 9 | Samantha Tarr | Dental Nurse | 313174 | image-10 (brunette, glasses, green scrubs) |
-| 10 | Mary-Jane Poxon | Compliance Manager | — | image-6 (messy blonde bun, black top) |
+Replace `<head>` with optimized meta + JSON-LD. Visible UI unchanged.
 
-## Section copy
+- **Title**: `Dentist in Penkridge | Railway Dental — Private Dental Clinic in Staffordshire`
+- **Meta description**: rewritten with target keywords, natural tone, ~160 chars.
+- Add `meta keywords`, `robots` (`index, follow, max-image-preview:large`), `theme-color`, `viewport-fit=cover`.
+- Add full Open Graph set (`og:site_name`, `og:url`, `og:locale=en_GB`) and Twitter card tags.
+- Add `crossorigin` to fontshare preconnect.
+- **JSON-LD `@type: Dentist`** schema: name, description, url, telephone (+44 1785 715545), priceRange, address (Penkridge, Staffordshire, GB), areaServed, aggregateRating 4.8 / 49, medicalSpecialty list, makesOffer for each treatment.
 
-- Eyebrow chip: "Meet the team"
-- Heading: **"Meet the Team Behind Your Smile"**
-- Intro: *"A friendly, experienced team dedicated to your comfort and long-term dental health."*
+## 2. SEO — semantic HTML & alt text
 
-## Warm one-liners (under each role)
+- `src/pages/Index.tsx`: wrap each section landmark already in place; ensure single `<h1>` lives in Hero (already true). No structural change.
+- `src/components/sections/Hero.tsx`: improve `alt` → `"Railway Dental clinical team in Penkridge, Staffordshire"`.
+- `src/components/sections/About.tsx`, `BeforeAfter.tsx`, `Team.tsx`: audit every `<img>` and add descriptive, keyword-aware `alt` (e.g. `"Invisalign before-and-after at Railway Dental, Penkridge"`, `"<Name> — <Role> at Railway Dental"`). No layout change.
+- `src/components/sections/Services.tsx`: heading already `<h3>` per card under section `<h2>` — verified hierarchy correct.
+- `src/components/sections/Footer.tsx`: confirm address/phone use semantic `<address>` + `tel:` link (add if missing) for local SEO; visual style unchanged.
 
-- Kulveer — "Gentle, modern dentistry with a focus on lasting results."
-- Neethu — "Calm, thorough hygiene care that keeps smiles healthy."
-- Naman — "Friendly, detail-focused care for healthier gums."
-- Rebecca — "Personalised hygiene advice tailored to every patient."
-- Karen — "A warm welcome at the door and steady hands at the chair."
-- Nicola — "Leads the nursing team with care, calm and precision."
-- Kerry — "Reassuring chairside support that puts patients at ease."
-- Nina — "Brings comfort and a smile to every appointment."
-- Samantha — "Attentive, kind care from start to finish."
-- Mary-Jane — "Ensures every standard of safety and care is upheld."
+## 3. Keyword integration (no tone change)
 
-## Implementation
+Lightly weave target phrases into existing copy where they already make sense — never stuffing:
+- Hero eyebrow already says "Penkridge" ✓
+- Services intro: append phrase mentioning "private dental care in Staffordshire" naturally.
+- About intro: add one sentence-ending mention of "dentist in Penkridge".
+- Footer tagline: include "Private dental clinic · Penkridge, Staffordshire".
 
-### 1. Add assets
-Copy each upload into `src/assets/team/` with descriptive filenames:
-`kulveer-rooprai.png`, `neethu-jinto.png`, `naman-bhushan.png`, `rebecca-nevill.png`, `karen-briggs.png`, `nicola-green.png`, `kerry-hales.png`, `nina-porter.png`, `samantha-tarr.png`, `mary-jane-poxon.png`.
+All edits are 1–6 word insertions in existing sentences — no rewrites.
 
-### 2. Rewrite `src/components/sections/Team.tsx`
-- Import each image as an ES module (typed bundling).
-- Replace the `team` array with the 10 real members `{ name, role, gdc?, bio, image }`.
-- Update layout:
-  - Heading + intro paragraph above the grid (max-w-2xl, centered or left-aligned to match existing sections).
-  - Grid: `grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5`.
-  - Card: `rounded-3xl bg-background border border-border shadow-card overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant`.
-  - Image wrapper: `aspect-[3/4] overflow-hidden bg-muted` containing `<img class="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" />`.
-  - Body padding `p-5`: name (`text-base font-bold`), role line (`text-xs font-medium text-foreground/60`) with GDC appended as `· GDC {n}` when present, then the warm bio (`text-sm text-foreground/70 mt-2 leading-relaxed`).
-- Remove all initials/avatar fallback markup.
+## 4. Mobile responsiveness nudges (no redesign)
 
-### 3. No other files change
-Section remains imported wherever it currently is in `Index.tsx`.
+Tiny scale tweaks to prevent text crowding on ≤375px without changing desktop:
 
-## Notes
-- Aspect ratio `3/4` with `object-cover object-top` keeps faces framed consistently across all 10 portraits.
-- Subtle hover: card lift + shadow + 3% image zoom — premium, not flashy.
-- Uses existing semantic tokens (`background`, `border`, `foreground`, `shadow-card`, `shadow-elegant`) — no hardcoded colors, consistent with the rest of the site.
-- Fully responsive: 1 col mobile → 2 sm → 3 lg → 4 xl.
+- `Hero.tsx` h1: `text-5xl md:text-6xl lg:text-7xl` → `text-4xl sm:text-5xl md:text-6xl lg:text-7xl`.
+- `Hero.tsx` lead `<p>`: `text-lg md:text-xl` → `text-base sm:text-lg md:text-xl`.
+- `Services.tsx`, `Team.tsx`, `Testimonials.tsx`, `About.tsx` section headings: `text-4xl md:text-5xl` → `text-3xl sm:text-4xl md:text-5xl`.
+- `container-wide` padding: confirm `px-4 sm:px-6 lg:px-8` (in `index.css`); add `sm:` step if missing.
+- Sticky mobile CTA: add `pb-[env(safe-area-inset-bottom)]` wrapper so it clears iOS home indicator.
+
+No font/color/spacing-system changes elsewhere.
+
+## 5. Performance
+
+- **Images**: add `loading="lazy"` + `decoding="async"` to every non-hero `<img>` (Team, BeforeAfter, About). Hero keeps `fetchpriority="high"`. Confirmed Team already lazy.
+- **Animations**: add `will-change-transform` to the few framer-motion containers that animate `y`/`scale` repeatedly (Hero parallax already has it; add to BeforeAfter slider handle if present). Keep all animations intact.
+- **Fonts**: already using `display=swap` ✓. Add `crossorigin` to preconnect (above).
+- **Route splitting**: heavy modal components already lazy via state. No code-split changes needed.
+- **CSS**: ensure `body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }` exists in `index.css`; add if missing.
+
+## 6. Files touched
+
+- `index.html` (full rewrite of `<head>`)
+- `src/index.css` (font-smoothing + container padding sm step, only if missing)
+- `src/pages/Index.tsx` (safe-area class on sticky CTA)
+- `src/components/sections/Hero.tsx` (heading scale, lead scale, alt text)
+- `src/components/sections/Services.tsx` (heading scale, intro keyword phrase)
+- `src/components/sections/About.tsx` (heading scale, alt text, keyword phrase)
+- `src/components/sections/BeforeAfter.tsx` (alt text, lazy/decoding attrs)
+- `src/components/sections/Testimonials.tsx` (heading scale)
+- `src/components/sections/Team.tsx` (heading scale; alt text already SEO-friendly)
+- `src/components/sections/Footer.tsx` (semantic `<address>`, tel link, tagline)
+
+## What is NOT changing
+- Color palette, gradients, shadows, typography family, section order
+- Card styles, button styles, modal styles
+- Any animation timing or removal
+- Component architecture
