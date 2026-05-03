@@ -1,159 +1,166 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import before1 from "@/assets/before-1.jpg";
-import after1 from "@/assets/after-1.jpg";
-import before2 from "@/assets/before-2.jpg";
-import after2 from "@/assets/after-2.jpg";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { Clock, Sparkles, Stethoscope } from "lucide-react";
+import case1Before from "@/assets/case1-before.jpg";
+import case1After from "@/assets/case1-after.jpg";
+import case2Before from "@/assets/case2-before.jpg";
+import case2After from "@/assets/case2-after.jpg";
+import case3Before from "@/assets/case3-before.jpg";
+import case3After from "@/assets/case3-after.jpg";
 
 type Case = {
+  title: string;
+  tag: string;
+  description: string;
   before: string;
   after: string;
-  title: string;
-  caption: string;
+  treatment: string;
+  duration: string;
+  result: string;
 };
 
 const cases: Case[] = [
   {
-    before: before1,
-    after: after1,
-    title: "Full smile restoration",
-    caption: "A complete restorative plan brought back this patient's bite, comfort and confidence — replacing worn upper teeth with natural-looking, durable restorations.",
+    title: "Full Mouth Restoration",
+    tag: "Restorative",
+    description: "A complete restorative plan rebuilt this patient's bite with natural-looking, durable restorations.",
+    before: case1Before,
+    after: case1After,
+    treatment: "Crowns & implants",
+    duration: "4 months",
+    result: "Restored bite, comfort and confidence",
   },
   {
-    before: before2,
-    after: after2,
-    title: "Cosmetic transformation",
-    caption: "Whitening combined with subtle cosmetic refinements transformed years of staining into a brighter, more even smile our patient is proud to share.",
+    title: "Whitening & Refinement",
+    tag: "Cosmetic Whitening",
+    description: "Years of staining lifted with professional whitening for a brighter, more even smile.",
+    before: case2Before,
+    after: case2After,
+    treatment: "Professional whitening",
+    duration: "3 weeks",
+    result: "Up to 8 shades brighter",
+  },
+  {
+    title: "Smile Alignment Transformation",
+    tag: "Invisalign",
+    description: "Discreet aligners gently corrected spacing and alignment for a more even, polished smile.",
+    before: case3Before,
+    after: case3After,
+    treatment: "Invisalign",
+    duration: "6 months",
+    result: "Straighter, more confident smile",
   },
 ];
 
-const Slider = ({ before, after }: { before: string; after: string }) => {
-  const [pos, setPos] = useState(50);
-  const ref = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
-
-  const update = useCallback((clientX: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const p = ((clientX - rect.left) / rect.width) * 100;
-    setPos(Math.max(0, Math.min(100, p)));
-  }, []);
-
-  useEffect(() => {
-    const move = (e: PointerEvent) => {
-      if (!dragging.current) return;
-      update(e.clientX);
-    };
-    const up = () => (dragging.current = false);
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-    return () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-    };
-  }, [update]);
-
+const ImageToggle = ({ before, after }: { before: string; after: string }) => {
+  const [showAfter, setShowAfter] = useState(false);
   return (
-    <div
-      ref={ref}
-      className="relative w-full aspect-[4/3] overflow-hidden rounded-[1.75rem] select-none cursor-ew-resize shadow-elegant"
-      onPointerDown={(e) => {
-        dragging.current = true;
-        update(e.clientX);
-      }}
-    >
-      <img src={after} alt="After treatment" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-      <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
-        <img src={before} alt="Before treatment" className="absolute inset-0 h-full object-cover" style={{ width: `${(100 / pos) * 100}%`, maxWidth: "none" }} draggable={false} />
+    <div>
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={showAfter ? "a" : "b"}
+            src={showAfter ? after : before}
+            alt={showAfter ? "After treatment" : "Before treatment"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </AnimatePresence>
+        <span className="absolute top-3 left-3 text-[10px] font-bold tracking-[0.15em] uppercase rounded-full bg-background/90 backdrop-blur px-3 py-1.5 shadow-card">
+          {showAfter ? "After" : "Before"}
+        </span>
       </div>
 
-      <span className="absolute top-4 left-4 text-[11px] font-semibold tracking-wider uppercase rounded-full bg-background/85 backdrop-blur px-3 py-1.5 shadow-card">Before</span>
-      <span className="absolute top-4 right-4 text-[11px] font-semibold tracking-wider uppercase rounded-full bg-primary text-primary-foreground px-3 py-1.5 shadow-card">After</span>
-
-      <div
-        className="absolute top-0 bottom-0 w-px bg-background pointer-events-none"
-        style={{ left: `${pos}%` }}
-      >
-        <div
-          role="slider"
-          aria-label="Before and after comparison"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(pos)}
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") setPos((p) => Math.max(0, p - 4));
-            if (e.key === "ArrowRight") setPos((p) => Math.min(100, p + 4));
-          }}
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-12 w-12 rounded-full bg-background border-2 border-primary shadow-elegant grid place-items-center pointer-events-auto cursor-ew-resize focus:outline-none focus:ring-4 focus:ring-primary/30"
-        >
-          <div className="flex gap-0.5">
-            <span className="block h-3 w-0.5 bg-foreground/50 rounded" />
-            <span className="block h-3 w-0.5 bg-foreground/50 rounded" />
-          </div>
-        </div>
+      <div className="mt-4 inline-flex w-full p-1 rounded-full bg-muted border border-border">
+        {(["Before", "After"] as const).map((label) => {
+          const active = (label === "After") === showAfter;
+          return (
+            <button
+              key={label}
+              onClick={() => setShowAfter(label === "After")}
+              className={`flex-1 px-4 py-2 text-sm font-semibold rounded-full transition-all ${
+                active ? "bg-background text-foreground shadow-card" : "text-foreground/55 hover:text-foreground"
+              }`}
+              aria-pressed={active}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 };
 
 export const BeforeAfter = () => {
-  const [active, setActive] = useState(0);
-  const c = cases[active];
   return (
     <section id="results" className="py-24 bg-gradient-soft">
       <div className="container-wide">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground/70">
-            Real patients, real results
+            Smile Transformations
           </div>
           <h2 className="mt-5 text-4xl md:text-5xl font-bold tracking-display">
-            Drag to see the transformation.
+            Real Results. <span className="text-foreground/55">Real Smiles.</span>
           </h2>
           <p className="mt-4 text-lg text-foreground/70">
-            Every smile is unique. These are real treatments completed at Railway Dental — slide the handle to compare before and after.
+            See how our treatments transform confidence and oral health.
           </p>
         </div>
 
-        <div className="mt-12 grid lg:grid-cols-[1.4fr,1fr] gap-10 items-center">
-          <motion.div
-            key={active}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Slider before={c.before} after={c.after} />
-          </motion.div>
-          <div>
-            <h3 className="text-2xl md:text-3xl font-bold tracking-display">{c.title}</h3>
-            <p className="mt-4 text-foreground/70 leading-relaxed">{c.caption}</p>
-
-            <div className="mt-8 flex gap-2">
-              {cases.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActive(i)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
-                    i === active
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background border-border hover:bg-muted"
-                  }`}
-                >
-                  Case {i + 1}
-                </button>
-              ))}
-            </div>
-
-            <a
-              href="#contact"
-              className="mt-8 inline-flex items-center justify-center rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition"
+        <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cases.map((c, i) => (
+            <motion.article
+              key={c.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, delay: i * 0.08 }}
+              className="rounded-3xl border border-border bg-background p-5 shadow-card hover:shadow-elegant transition-all"
             >
-              Start your smile journey
-            </a>
-          </div>
+              <ImageToggle before={c.before} after={c.after} />
+
+              <div className="mt-5 px-1">
+                <span className="inline-block text-[10px] font-bold tracking-[0.12em] uppercase text-foreground/50">
+                  {c.tag}
+                </span>
+                <h3 className="mt-1 text-xl font-bold tracking-tight">{c.title}</h3>
+                <p className="mt-2 text-sm text-foreground/65 leading-relaxed">{c.description}</p>
+
+                <ul className="mt-5 space-y-2.5 pt-5 border-t border-border text-sm">
+                  <Row icon={Stethoscope} label="Treatment" value={c.treatment} />
+                  <Row icon={Clock} label="Duration" value={c.duration} />
+                  <Row icon={Sparkles} label="Result" value={c.result} />
+                </ul>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+
+        <div className="mt-14 text-center">
+          <a
+            href="#contact"
+            className="inline-flex items-center justify-center rounded-full bg-foreground px-7 py-3.5 text-sm font-semibold text-background hover:opacity-90 transition"
+          >
+            Start your smile journey
+          </a>
         </div>
       </div>
     </section>
   );
 };
+
+const Row = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
+  <li className="flex items-start gap-3">
+    <span className="h-7 w-7 shrink-0 rounded-full bg-primary/15 grid place-items-center mt-0.5">
+      <Icon className="h-3.5 w-3.5" style={{ color: "hsl(75 50% 30%)" }} />
+    </span>
+    <span className="flex-1">
+      <span className="text-foreground/55 text-xs">{label}</span>
+      <div className="font-medium text-foreground/85">{value}</div>
+    </span>
+  </li>
+);
