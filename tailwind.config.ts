@@ -13,7 +13,12 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
+        link: "hsl(var(--link))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
