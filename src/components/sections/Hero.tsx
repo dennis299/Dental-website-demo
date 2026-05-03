@@ -1,47 +1,110 @@
-import { PulseFitHero } from "@/components/ui/pulse-fit-hero";
-import treatment from "@/assets/treatment-room.jpg";
-import reception from "@/assets/reception.jpg";
-import waiting from "@/assets/waiting.jpg";
-import before1 from "@/assets/before-1.jpg";
-import after1 from "@/assets/after-1.jpg";
+import { motion } from "framer-motion";
+import { Phone, Star, Users, Sparkles, Stethoscope, ArrowRight } from "lucide-react";
 import team from "@/assets/dental-team.jpg";
 
 export const Hero = () => {
-  const scrollTo = (id: string) => () => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
-    <div className="[&>section>header]:hidden">
-      <PulseFitHero
-        title={
-          <>
+    <section className="relative min-h-[92vh] w-full overflow-hidden">
+      {/* Background image */}
+      <div className="absolute inset-0">
+        <img
+          src={team}
+          alt="Railway Dental clinical team"
+          className="w-full h-full object-cover object-center"
+          loading="eager"
+          decoding="async"
+        />
+        {/* Gradient + tonal overlays for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-black/65" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 container-wide flex min-h-[92vh] items-center py-28">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-3xl"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
+            className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            Private & NHS dentistry in Penkridge
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="mt-6 text-5xl md:text-6xl lg:text-7xl font-bold tracking-display leading-[1.05] text-white"
+            style={{ textShadow: "0 2px 30px rgba(0,0,0,0.35)" }}
+          >
             Confident smiles,
-            <span className="block text-foreground/55">comforting care.</span>
-          </>
-        }
-        subtitle="Railway Dental is a friendly, modern practice in Penkridge offering individual treatment plans, gentle hygienist care and a calm, reassuring experience for the whole family."
-        primaryAction={{ label: "Book Appointment", onClick: scrollTo("contact") }}
-        secondaryAction={{ label: "Call Us Today", onClick: () => (window.location.href = "tel:+441785715545") }}
-        disclaimer="★ 4.8 Google rating · 49 reviews · Family-friendly · Modern treatment rooms"
-        socialProof={{
-          avatars: [
-            "https://i.pravatar.cc/150?img=32",
-            "https://i.pravatar.cc/150?img=47",
-            "https://i.pravatar.cc/150?img=12",
-            "https://i.pravatar.cc/150?img=68",
-          ],
-          text: "Trusted by families across Staffordshire",
-        }}
-        programs={[
-          { image: team, category: "Our Team", title: "Caring specialists", onClick: scrollTo("about") },
-          { image: reception, category: "Routine", title: "General check-ups", onClick: scrollTo("services") },
-          { image: treatment, category: "Wellness", title: "Hygienist visits", onClick: scrollTo("services") },
-          { image: after1, category: "Cosmetic", title: "Smile makeovers", onClick: scrollTo("results") },
-          { image: waiting, category: "Comfort", title: "Anxiety-free care", onClick: scrollTo("about") },
-          { image: before1, category: "Restore", title: "Restorative dentistry", onClick: scrollTo("services") },
-        ]}
-      />
-    </div>
+            <span className="block text-white/75">comforting care.</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+            className="mt-6 max-w-xl text-lg md:text-xl text-white/85 leading-relaxed"
+          >
+            A friendly, modern practice in Penkridge offering individual treatment plans, gentle hygienist care and a calm, reassuring experience for the whole family.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.35 }}
+            className="mt-9 flex flex-col sm:flex-row gap-3"
+          >
+            <a
+              href="#contact"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-elegant hover:-translate-y-0.5 transition-all"
+            >
+              Book Appointment
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+            <a
+              href="tel:+441785715545"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-md hover:bg-white/20 transition-all"
+            >
+              <Phone className="h-4 w-4" /> Call Us Today
+            </a>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.45 }}
+            className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl"
+          >
+            {[
+              { icon: Star, label: "4.8 Google", sub: "rating" },
+              { icon: Users, label: "49 reviews", sub: "verified" },
+              { icon: Sparkles, label: "Family", sub: "friendly care" },
+              { icon: Stethoscope, label: "Modern", sub: "treatment rooms" },
+            ].map((t, i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md p-3.5"
+              >
+                <t.icon className="h-4 w-4 text-primary" />
+                <div className="mt-1.5 text-sm font-semibold text-white">{t.label}</div>
+                <div className="text-xs text-white/70">{t.sub}</div>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Bottom blend into next section */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-background pointer-events-none" />
+    </section>
   );
 };
