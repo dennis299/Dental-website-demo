@@ -66,7 +66,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
-  img { content-visibility: auto; }
+  
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
     font-weight: 700;
