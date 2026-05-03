@@ -8,6 +8,7 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { Team } from "@/components/sections/Team";
 import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const Index = () => {
   return (
@@ -34,6 +35,7 @@ const Index = () => {
           Book Appointment
         </a>
       </div>
+      <ScrollToTop />
     </div>
   );
 };
