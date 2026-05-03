@@ -23,7 +23,7 @@ export const Hero = () => {
           src={teamMd}
           srcSet={`${teamSm} 768w, ${teamMd} 1280w, ${teamLg} 1920w`}
           sizes="100vw"
-          alt="Railway Dental clinical team"
+          alt="Railway Dental clinical team in Penkridge, Staffordshire"
           className="w-full h-full object-cover object-center"
           fetchPriority="high"
           decoding="async"
@@ -57,7 +57,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="mt-6 text-5xl md:text-6xl lg:text-7xl font-bold tracking-display leading-[1.05] text-white"
+            className="mt-6 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-display leading-[1.05] text-white"
             style={{ textShadow: "0 2px 30px rgba(0,0,0,0.35)" }}
           >
             Confident smiles,
@@ -68,7 +68,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.25 }}
-            className="mt-6 max-w-xl text-lg md:text-xl text-white/85 leading-relaxed"
+            className="mt-6 max-w-xl text-base sm:text-lg md:text-xl text-white/85 leading-relaxed"
           >
             A friendly, modern practice in Penkridge offering individual treatment plans, gentle hygienist care and a calm, reassuring experience for the whole family.
           </motion.p>

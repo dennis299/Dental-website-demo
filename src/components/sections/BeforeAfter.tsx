@@ -61,12 +61,14 @@ const ImageToggle = ({ before, after }: { before: string; after: string }) => {
           <motion.img
             key={showAfter ? "a" : "b"}
             src={showAfter ? after : before}
-            alt={showAfter ? "After treatment" : "Before treatment"}
+            alt={showAfter ? "After dental treatment at Railway Dental, Penkridge" : "Before dental treatment at Railway Dental, Penkridge"}
+            loading="lazy"
+            decoding="async"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover will-change-[opacity]"
           />
         </AnimatePresence>
         <span className="absolute top-3 left-3 text-[10px] font-bold tracking-[0.15em] uppercase rounded-full bg-background/90 backdrop-blur px-3 py-1.5 shadow-card">
@@ -103,11 +105,11 @@ export const BeforeAfter = () => {
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground/70">
             Smile Transformations
           </div>
-          <h2 className="mt-5 text-4xl md:text-5xl font-bold tracking-display">
+          <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-bold tracking-display">
             Real Results. <span className="text-foreground/55">Real Smiles.</span>
           </h2>
-          <p className="mt-4 text-lg text-foreground/70">
-            See how our treatments transform confidence and oral health.
+          <p className="mt-4 text-base sm:text-lg text-foreground/70">
+            See how our cosmetic, Invisalign and restorative treatments transform confidence and oral health.
           </p>
         </div>
 

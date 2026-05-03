@@ -14,7 +14,7 @@ export const About = () => {
       <div className="container-wide grid lg:grid-cols-2 gap-14 items-center">
         <div className="relative">
           <div className="rounded-[2rem] overflow-hidden shadow-elegant">
-            <img src={waiting} alt="Railway Dental waiting area in Penkridge" className="w-full h-[440px] lg:h-[520px] object-cover" />
+            <img src={waiting} alt="Modern, calming waiting area at Railway Dental — private dentist in Penkridge, Staffordshire" loading="lazy" decoding="async" className="w-full h-[440px] lg:h-[520px] object-cover" />
           </div>
           <div className="hidden md:grid absolute -bottom-8 -right-6 grid-cols-3 gap-3 bg-background rounded-2xl p-4 shadow-elegant border border-border">
             <Stat value="4.8" label="Google rating" />
@@ -26,11 +26,11 @@ export const About = () => {
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground/70">
             About Railway Dental
           </div>
-          <h2 className="mt-5 text-4xl md:text-5xl font-bold tracking-display">
+          <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-bold tracking-display">
             A practice built around how you feel in the chair.
           </h2>
-          <p className="mt-5 text-lg text-foreground/70 leading-relaxed">
-            For over two decades, Railway Dental has cared for families across Penkridge and Staffordshire. Our approach is simple: take time to listen, explain every option clearly and never rush a decision. Whether you're here for a routine check-up or considering a smile makeover, you'll always feel in safe hands.
+          <p className="mt-5 text-base sm:text-lg text-foreground/70 leading-relaxed">
+            For over two decades, Railway Dental has cared for families as a trusted dentist in Penkridge and across Staffordshire. Our approach is simple: take time to listen, explain every option clearly and never rush a decision. Whether you're here for a routine check-up or considering a smile makeover, you'll always feel in safe hands.
           </p>
           <ul className="mt-6 space-y-3">
             {points.map((p) => (
