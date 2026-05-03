@@ -1,70 +1,57 @@
 ## Goal
-Performance + SEO pass on the existing site. Zero visual or layout changes — only meta, schema, alt text, semantics, and small responsive/perf nudges.
+Add a minimal, premium "scroll to top" floating button — glass effect, brand-tinted, smooth scroll, fades in after ~25% scroll, never collides with the existing mobile sticky CTA.
 
-## 1. SEO — `index.html`
+## New file: `src/components/ScrollToTop.tsx`
 
-Replace `<head>` with optimized meta + JSON-LD. Visible UI unchanged.
+- Client component using `useState` + `useEffect` with a passive `scroll` listener.
+- Visibility threshold: visible when `window.scrollY > window.innerHeight * 0.25`.
+- Click handler: `window.scrollTo({ top: 0, behavior: "smooth" })`.
+- Listener uses `{ passive: true }` and is cleaned up on unmount; no rAF needed (single boolean state, only re-renders on threshold cross via guarded `setVisible`).
+- Reduced-motion: respects `prefers-reduced-motion` via existing CSS rule (smooth scroll already disabled there).
 
-- **Title**: `Dentist in Penkridge | Railway Dental — Private Dental Clinic in Staffordshire`
-- **Meta description**: rewritten with target keywords, natural tone, ~160 chars.
-- Add `meta keywords`, `robots` (`index, follow, max-image-preview:large`), `theme-color`, `viewport-fit=cover`.
-- Add full Open Graph set (`og:site_name`, `og:url`, `og:locale=en_GB`) and Twitter card tags.
-- Add `crossorigin` to fontshare preconnect.
-- **JSON-LD `@type: Dentist`** schema: name, description, url, telephone (+44 1785 715545), priceRange, address (Penkridge, Staffordshire, GB), areaServed, aggregateRating 4.8 / 49, medicalSpecialty list, makesOffer for each treatment.
+### Markup
+```tsx
+<button
+  type="button"
+  onClick={scrollUp}
+  aria-label="Scroll to top"
+  className={cn(
+    "fixed right-4 sm:right-6 z-40",
+    "bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+5rem))] md:bottom-6",
+    "h-11 w-11 rounded-full",
+    "bg-background/70 backdrop-blur-md border border-border",
+    "shadow-card hover:shadow-elegant",
+    "text-foreground/80 hover:text-foreground",
+    "transition-all duration-300 ease-out",
+    "hover:-translate-y-0.5 hover:scale-105",
+    visible
+      ? "opacity-100 translate-y-0 pointer-events-auto"
+      : "opacity-0 translate-y-2 pointer-events-none"
+  )}
+>
+  <ArrowUp className="h-4 w-4 mx-auto" strokeWidth={2.25} />
+</button>
+```
 
-## 2. SEO — semantic HTML & alt text
+### Why these choices
+- `bottom-[max(5.5rem,...)]` on mobile keeps it clear of the sticky "Book Appointment" CTA + iOS safe-area; `md:bottom-6` on desktop where no sticky CTA exists.
+- `bg-background/70 backdrop-blur-md border border-border` = glass effect using existing semantic tokens (no hardcoded colors).
+- `shadow-card → shadow-elegant` matches the depth language used by service cards.
+- `h-11 w-11` = 44px tap target (Apple HIG), unobtrusive.
+- Fade + slight Y-translate gives the "fade in/out" feel without extra keyframes.
 
-- `src/pages/Index.tsx`: wrap each section landmark already in place; ensure single `<h1>` lives in Hero (already true). No structural change.
-- `src/components/sections/Hero.tsx`: improve `alt` → `"Railway Dental clinical team in Penkridge, Staffordshire"`.
-- `src/components/sections/About.tsx`, `BeforeAfter.tsx`, `Team.tsx`: audit every `<img>` and add descriptive, keyword-aware `alt` (e.g. `"Invisalign before-and-after at Railway Dental, Penkridge"`, `"<Name> — <Role> at Railway Dental"`). No layout change.
-- `src/components/sections/Services.tsx`: heading already `<h3>` per card under section `<h2>` — verified hierarchy correct.
-- `src/components/sections/Footer.tsx`: confirm address/phone use semantic `<address>` + `tel:` link (add if missing) for local SEO; visual style unchanged.
+## Wire it up: `src/pages/Index.tsx`
 
-## 3. Keyword integration (no tone change)
+Import and mount once near the bottom (sibling to Footer + sticky CTA):
+```tsx
+import { ScrollToTop } from "@/components/ScrollToTop";
+...
+<ScrollToTop />
+```
 
-Lightly weave target phrases into existing copy where they already make sense — never stuffing:
-- Hero eyebrow already says "Penkridge" ✓
-- Services intro: append phrase mentioning "private dental care in Staffordshire" naturally.
-- About intro: add one sentence-ending mention of "dentist in Penkridge".
-- Footer tagline: include "Private dental clinic · Penkridge, Staffordshire".
+## Files touched
+- `src/components/ScrollToTop.tsx` (new)
+- `src/pages/Index.tsx` (1 import + 1 line)
 
-All edits are 1–6 word insertions in existing sentences — no rewrites.
-
-## 4. Mobile responsiveness nudges (no redesign)
-
-Tiny scale tweaks to prevent text crowding on ≤375px without changing desktop:
-
-- `Hero.tsx` h1: `text-5xl md:text-6xl lg:text-7xl` → `text-4xl sm:text-5xl md:text-6xl lg:text-7xl`.
-- `Hero.tsx` lead `<p>`: `text-lg md:text-xl` → `text-base sm:text-lg md:text-xl`.
-- `Services.tsx`, `Team.tsx`, `Testimonials.tsx`, `About.tsx` section headings: `text-4xl md:text-5xl` → `text-3xl sm:text-4xl md:text-5xl`.
-- `container-wide` padding: confirm `px-4 sm:px-6 lg:px-8` (in `index.css`); add `sm:` step if missing.
-- Sticky mobile CTA: add `pb-[env(safe-area-inset-bottom)]` wrapper so it clears iOS home indicator.
-
-No font/color/spacing-system changes elsewhere.
-
-## 5. Performance
-
-- **Images**: add `loading="lazy"` + `decoding="async"` to every non-hero `<img>` (Team, BeforeAfter, About). Hero keeps `fetchpriority="high"`. Confirmed Team already lazy.
-- **Animations**: add `will-change-transform` to the few framer-motion containers that animate `y`/`scale` repeatedly (Hero parallax already has it; add to BeforeAfter slider handle if present). Keep all animations intact.
-- **Fonts**: already using `display=swap` ✓. Add `crossorigin` to preconnect (above).
-- **Route splitting**: heavy modal components already lazy via state. No code-split changes needed.
-- **CSS**: ensure `body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }` exists in `index.css`; add if missing.
-
-## 6. Files touched
-
-- `index.html` (full rewrite of `<head>`)
-- `src/index.css` (font-smoothing + container padding sm step, only if missing)
-- `src/pages/Index.tsx` (safe-area class on sticky CTA)
-- `src/components/sections/Hero.tsx` (heading scale, lead scale, alt text)
-- `src/components/sections/Services.tsx` (heading scale, intro keyword phrase)
-- `src/components/sections/About.tsx` (heading scale, alt text, keyword phrase)
-- `src/components/sections/BeforeAfter.tsx` (alt text, lazy/decoding attrs)
-- `src/components/sections/Testimonials.tsx` (heading scale)
-- `src/components/sections/Team.tsx` (heading scale; alt text already SEO-friendly)
-- `src/components/sections/Footer.tsx` (semantic `<address>`, tel link, tagline)
-
-## What is NOT changing
-- Color palette, gradients, shadows, typography family, section order
-- Card styles, button styles, modal styles
-- Any animation timing or removal
-- Component architecture
+## Not changing
+- Existing sections, styles, sticky CTA, animations, design tokens.
