@@ -34,6 +34,7 @@ export const Hero = () => {
           text: "Trusted by families across Staffordshire",
         }}
         programs={[
+          { image: team, category: "Our Team", title: "Caring specialists", onClick: scrollTo("about") },
           { image: reception, category: "Routine", title: "General check-ups", onClick: scrollTo("services") },
           { image: treatment, category: "Wellness", title: "Hygienist visits", onClick: scrollTo("services") },
           { image: after1, category: "Cosmetic", title: "Smile makeovers", onClick: scrollTo("results") },
