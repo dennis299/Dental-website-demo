@@ -9,6 +9,7 @@ import { Team } from "@/components/sections/Team";
 import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { MobileCallBanner } from "@/components/MobileCallBanner";
 
 const Index = () => {
   return (
@@ -25,16 +26,7 @@ const Index = () => {
         <Contact />
       </main>
       <Footer />
-      {/* Sticky mobile CTA */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] pointer-events-none">
-        <a
-          href="#contact"
-          aria-label="Book a dental appointment at Railway Dental"
-          className="pointer-events-auto block w-full text-center rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-elegant"
-        >
-          Book Appointment
-        </a>
-      </div>
+      <MobileCallBanner />
       <ScrollToTop />
     </div>
   );
