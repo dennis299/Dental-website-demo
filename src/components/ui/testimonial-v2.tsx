@@ -31,7 +31,7 @@ export const TestimonialsColumn = (props: {
             {props.testimonials.map(({ text, image, name, role }, i) => (
               <a
                 key={i}
-                href="https://www.google.com/maps/place/Railway+Dental/@52.7238536,-2.1160982,17z/data=!3m1!4b1!4m6!3m5!1s0x48709d671bc45841:0x1cea0050f9aa7f20!8m2!3d52.7238536!4d-2.1160982!16s%2Fg%2F1tgnwnq1"
+                href="https://www.google.com/maps/search/?api=1&query=Evergreen+Dental+Marylebone+London"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Read ${name}'s review on Google`}
@@ -86,7 +86,7 @@ interface TestimonialsV2Props {
 export default function TestimonialsV2({
   badge = "Testimonials",
   title = "What our patients say",
-  subtitle = "Discover how families across Staffordshire trust Railway Dental for calm, expert care.",
+  subtitle = "Discover how families across London trust Evergreen Dental for calm, expert care.",
   testimonials,
   className,
 }: TestimonialsV2Props) {
