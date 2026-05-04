@@ -1,21 +1,21 @@
-import logo from "@/assets/logo.png";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export const Footer = () => {
   return (
     <footer className="border-t border-border bg-muted/30">
       <div className="container-wide py-14 grid md:grid-cols-4 gap-10">
         <div>
-          <img src={logo} alt="Railway Dental — private dental clinic in Penkridge, Staffordshire" loading="lazy" decoding="async" className="h-10 w-auto" />
+          <BrandLogo className="h-9 w-auto" />
           <p className="mt-4 text-sm text-foreground/65 leading-relaxed max-w-xs">
-            Private dental clinic · Penkridge, Staffordshire. A friendly, family-focused practice offering Invisalign, hygienist and cosmetic dental care.
+            Premium private dental care in central London. A modern, family-focused practice offering Invisalign, hygienist and cosmetic dental treatments.
           </p>
         </div>
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-foreground/50">Visit</div>
           <address className="mt-4 not-italic">
             <ul className="space-y-2 text-sm text-foreground/75">
-              <li>Clay Street, Penkridge</li>
-              <li>Staffordshire, ST19 5AF</li>
+              <li>42 Marylebone High Street</li>
+              <li>London, W1U 5HP</li>
               <li>United Kingdom</li>
             </ul>
           </address>
@@ -23,9 +23,10 @@ export const Footer = () => {
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-foreground/50">Contact</div>
           <ul className="mt-4 space-y-2 text-sm text-foreground/75">
-            <li><a className="hover:text-link" href="tel:+441785715545" aria-label="Call Railway Dental on 01785 715545">01785 715545</a></li>
-            <li><a className="hover:text-link" href="mailto:info@railwaydental.co.uk" aria-label="Email Railway Dental">info@railwaydental.co.uk</a></li>
-            <li>Mon–Fri · 9am – 5pm</li>
+            <li><a className="hover:text-link" href="tel:+442079460123" aria-label="Call Evergreen Dental on 020 7946 0123">020 7946 0123</a></li>
+            <li><a className="hover:text-link" href="mailto:hello@evergreendental.com" aria-label="Email Evergreen Dental">hello@evergreendental.com</a></li>
+            <li>Mon–Fri · 8:30am – 6:00pm</li>
+            <li>Saturday · 9:00am – 2:00pm</li>
           </ul>
         </div>
         <div>
@@ -40,7 +41,7 @@ export const Footer = () => {
       </div>
       <div className="border-t border-border">
         <div className="container-wide py-6 flex flex-col md:flex-row justify-between gap-3 text-xs text-foreground/55">
-          <div>© {new Date().getFullYear()} Railway Dental. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} Evergreen Dental. All rights reserved.</div>
           <div className="flex gap-5">
             <a href="#" className="hover:text-foreground">Privacy</a>
             <a href="#" className="hover:text-foreground">Cookies</a>

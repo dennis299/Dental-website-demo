@@ -26,7 +26,7 @@ export const ServiceModal = ({ service, open, onOpenChange, onBook }: Props) => 
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-xl bg-primary/15 grid place-items-center shrink-0">
-              <Icon className="h-5 w-5" style={{ color: "hsl(75 50% 30%)" }} />
+              <Icon className="h-5 w-5 text-primary" />
             </div>
             <DialogTitle className="text-2xl tracking-display">{service.title}</DialogTitle>
           </div>

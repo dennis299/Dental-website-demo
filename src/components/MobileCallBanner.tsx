@@ -25,15 +25,15 @@ export const MobileCallBanner = () => {
     >
       <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-background/85 backdrop-blur-md border border-border shadow-elegant p-1.5">
         <a
-          href="tel:+441785715545"
-          aria-label="Call Railway Dental on 01785 715545"
+          href="tel:+442079460123"
+          aria-label="Call Evergreen Dental on 020 7946 0123"
           className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-foreground/90 px-4 py-3 text-sm font-semibold text-background hover:bg-foreground transition-colors"
         >
           <Phone className="h-4 w-4" /> Call now
         </a>
         <a
           href="#contact"
-          aria-label="Book a dental appointment at Railway Dental"
+          aria-label="Book a dental appointment at Evergreen Dental"
           className="flex-1 inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft"
         >
           Book

@@ -1,6 +1,6 @@
-import logo from "@/assets/logo.png";
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const links = [
   { href: "#services", label: "Services" },
@@ -15,8 +15,8 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="container-wide flex h-20 items-center justify-between">
-        <a href="#" className="flex items-center gap-2" aria-label="Railway Dental home">
-          <img src={logo} alt="Railway Dental" className="h-10 w-auto" />
+        <a href="#" className="flex items-center gap-2" aria-label="Evergreen Dental home">
+          <BrandLogo className="h-9 w-auto" />
         </a>
         <nav className="hidden md:flex items-center gap-8">
           {links.map((l) => (
@@ -26,8 +26,8 @@ export const Header = () => {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-3">
-          <a href="tel:+441785715545" className="flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-foreground">
-            <Phone className="h-4 w-4" /> 01785 715545
+          <a href="tel:+442079460123" className="flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-foreground">
+            <Phone className="h-4 w-4" /> 020 7946 0123
           </a>
           <a
             href="#contact"
@@ -52,8 +52,8 @@ export const Header = () => {
                 {l.label}
               </a>
             ))}
-            <a href="tel:+441785715545" className="py-2 text-base font-medium flex items-center gap-2">
-              <Phone className="h-4 w-4" /> 01785 715545
+            <a href="tel:+442079460123" className="py-2 text-base font-medium flex items-center gap-2">
+              <Phone className="h-4 w-4" /> 020 7946 0123
             </a>
             <a href="#contact" onClick={() => setOpen(false)} className="mt-2 inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
               Book Appointment

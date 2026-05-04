@@ -1,33 +1,34 @@
-import kulveerImg from "@/assets/team/kulveer-rooprai.png";
-import neethuImg from "@/assets/team/neethu-jinto.png";
-import namanImg from "@/assets/team/naman-bhushan.png";
-import rebeccaImg from "@/assets/team/rebecca-nevill.png";
-import karenImg from "@/assets/team/karen-briggs.png";
-import nicolaImg from "@/assets/team/nicola-green.png";
-import kerryImg from "@/assets/team/kerry-hales.png";
-import ninaImg from "@/assets/team/nina-porter.png";
-import samanthaImg from "@/assets/team/samantha-tarr.png";
-import maryJaneImg from "@/assets/team/mary-jane-poxon.png";
+import alexImg from "@/assets/team/alex-morgan.jpg";
+import rachelImg from "@/assets/team/rachel-chen.jpg";
+import danielImg from "@/assets/team/daniel-park.jpg";
+import oliviaImg from "@/assets/team/olivia-bennett.jpg";
+import mayaImg from "@/assets/team/maya-johnson.jpg";
+import helenImg from "@/assets/team/helen-clarke.jpg";
+import sophieImg from "@/assets/team/sophie-williams.jpg";
+import isabellaImg from "@/assets/team/isabella-garcia.jpg";
+import emmaImg from "@/assets/team/emma-thompson.jpg";
+import omarImg from "@/assets/team/omar-rahman.jpg";
+import charlotteImg from "@/assets/team/charlotte-evans.jpg";
 
 type Member = {
   name: string;
   role: string;
-  gdc?: string;
   bio: string;
   image: string;
 };
 
 const team: Member[] = [
-  { name: "Kulveer Rooprai", role: "Dentist", gdc: "245167", bio: "Gentle, modern dentistry with a focus on lasting results.", image: kulveerImg },
-  { name: "Neethu Jinto", role: "Hygienist", gdc: "307989", bio: "Calm, thorough hygiene care that keeps smiles healthy.", image: neethuImg },
-  { name: "Naman Bhushan", role: "Hygienist", gdc: "307123", bio: "Friendly, detail-focused care for healthier gums.", image: namanImg },
-  { name: "Rebecca Nevill", role: "Hygienist", gdc: "223218", bio: "Personalised hygiene advice tailored to every patient.", image: rebeccaImg },
-  { name: "Karen Briggs", role: "Dental Nurse / Receptionist", gdc: "130601", bio: "A warm welcome at the door and steady hands at the chair.", image: karenImg },
-  { name: "Nicola Green", role: "Head Dental Nurse", gdc: "240497", bio: "Leads the nursing team with care, calm and precision.", image: nicolaImg },
-  { name: "Kerry Hales", role: "Dental Nurse", gdc: "136306", bio: "Reassuring chairside support that puts patients at ease.", image: kerryImg },
-  { name: "Nina Porter", role: "Dental Nurse", gdc: "170279", bio: "Brings comfort and a smile to every appointment.", image: ninaImg },
-  { name: "Samantha Tarr", role: "Dental Nurse", gdc: "313174", bio: "Attentive, kind care from start to finish.", image: samanthaImg },
-  { name: "Mary-Jane Poxon", role: "Compliance Manager", bio: "Ensures every standard of safety and care is upheld.", image: maryJaneImg },
+  { name: "Dr. Alex Morgan", role: "Principal Dentist", bio: "Gentle, modern dentistry with a focus on lasting results.", image: alexImg },
+  { name: "Dr. Rachel Chen", role: "Cosmetic Dentist", bio: "Specialist in smile design and minimally invasive aesthetics.", image: rachelImg },
+  { name: "Dr. Daniel Park", role: "Restorative Dentist", bio: "Calm, methodical care for crowns, implants and complex cases.", image: danielImg },
+  { name: "Olivia Bennett", role: "Lead Hygienist", bio: "Personalised hygiene programmes for healthier gums and brighter smiles.", image: oliviaImg },
+  { name: "Maya Johnson", role: "Hygienist", bio: "Friendly, detail-focused care that puts patients at ease.", image: mayaImg },
+  { name: "Omar Rahman", role: "Hygienist", bio: "Thorough cleans with practical, easy-to-follow home advice.", image: omarImg },
+  { name: "Helen Clarke", role: "Dental Nurse / Receptionist", bio: "A warm welcome at the door and steady hands at the chair.", image: helenImg },
+  { name: "Sophie Williams", role: "Head Dental Nurse", bio: "Leads the nursing team with care, calm and precision.", image: sophieImg },
+  { name: "Isabella Garcia", role: "Dental Nurse", bio: "Reassuring chairside support that puts patients at ease.", image: isabellaImg },
+  { name: "Emma Thompson", role: "Dental Nurse", bio: "Brings comfort and a smile to every appointment.", image: emmaImg },
+  { name: "Charlotte Evans", role: "Compliance Manager", bio: "Ensures every standard of safety and care is upheld.", image: charlotteImg },
 ];
 
 export const Team = () => {
@@ -55,7 +56,7 @@ export const Team = () => {
               <div className="aspect-[3/4] overflow-hidden bg-muted">
                 <img
                   src={m.image}
-                  alt={`${m.name} — ${m.role} at Railway Dental`}
+                  alt={`${m.name} — ${m.role} at Evergreen Dental`}
                   loading="lazy"
                   className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
                 />
@@ -64,7 +65,6 @@ export const Team = () => {
                 <h3 className="text-base font-bold">{m.name}</h3>
                 <div className="text-xs text-foreground/60 font-medium mt-1">
                   {m.role}
-                  {m.gdc && <> · GDC {m.gdc}</>}
                 </div>
                 <p className="text-sm text-foreground/70 mt-2 leading-relaxed">{m.bio}</p>
               </div>

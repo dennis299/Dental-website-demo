@@ -4,50 +4,52 @@
 
 @layer base {
   :root {
-    /* Brand: white-first, Railway Dental green, link blue, charcoal text */
+    /* Brand: Evergreen Dental — cool teal primary, soft gold accent, navy charcoal text */
     --background: 0 0% 100%;
-    --foreground: 0 0% 33%;
+    --foreground: 210 25% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 33%;
+    --card-foreground: 210 25% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 33%;
+    --popover-foreground: 210 25% 18%;
 
-    /* #B2D348 */
-    --primary: 75 59% 55%;
-    --primary-foreground: 0 0% 18%;
-    --primary-glow: 75 70% 70%;
+    /* Deep teal */
+    --primary: 184 65% 38%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 184 55% 60%;
 
-    /* secondary mirrors brand green */
-    --secondary: 75 60% 96%;
-    --secondary-foreground: 0 0% 25%;
+    --secondary: 184 50% 96%;
+    --secondary-foreground: 210 25% 22%;
 
-    --muted: 75 30% 97%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 200 25% 97%;
+    --muted-foreground: 210 15% 45%;
 
-    --accent: 75 60% 92%;
-    --accent-foreground: 0 0% 20%;
+    --accent: 42 78% 92%;
+    --accent-foreground: 210 25% 22%;
 
-    /* link / accent blue #0000EE */
-    --link: 240 100% 47%;
+    /* Soft gold accent for CTAs / stars */
+    --gold: 42 78% 55%;
+
+    /* Link color: deeper teal */
+    --link: 184 70% 32%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 75 20% 90%;
-    --input: 75 20% 90%;
-    --ring: 75 59% 55%;
+    --border: 200 20% 90%;
+    --input: 200 20% 90%;
+    --ring: 184 65% 38%;
 
-    --radius: 1rem;
+    --radius: 0.85rem;
 
-    --gradient-hero: radial-gradient(ellipse at top right, hsl(75 70% 88% / 0.55), transparent 60%),
-                     radial-gradient(ellipse at bottom left, hsl(28 45% 88% / 0.55), transparent 55%),
-                     linear-gradient(180deg, hsl(0 0% 100%), hsl(30 30% 97%));
-    --gradient-soft: linear-gradient(180deg, hsl(0 0% 100%), hsl(75 40% 98%));
-    --shadow-soft: 0 10px 40px -12px hsl(0 0% 0% / 0.08);
-    --shadow-elegant: 0 30px 80px -30px hsl(75 40% 30% / 0.18);
-    --shadow-card: 0 4px 24px -8px hsl(0 0% 0% / 0.06);
+    --gradient-hero: radial-gradient(ellipse at top right, hsl(184 65% 88% / 0.55), transparent 60%),
+                     radial-gradient(ellipse at bottom left, hsl(42 78% 90% / 0.5), transparent 55%),
+                     linear-gradient(180deg, hsl(0 0% 100%), hsl(200 30% 98%));
+    --gradient-soft: linear-gradient(180deg, hsl(0 0% 100%), hsl(184 40% 98%));
+    --shadow-soft: 0 10px 40px -12px hsl(210 40% 10% / 0.08);
+    --shadow-elegant: 0 30px 80px -30px hsl(184 60% 25% / 0.22);
+    --shadow-card: 0 4px 24px -8px hsl(210 30% 10% / 0.06);
   }
 }
 
@@ -71,7 +73,7 @@
     font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
     font-weight: 700;
     letter-spacing: -0.015em;
-    color: hsl(0 0% 20%);
+    color: hsl(210 30% 14%);
   }
   h1 { letter-spacing: -0.025em; }
   a { color: inherit; }
@@ -84,6 +86,7 @@
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .text-link { color: hsl(var(--link)); }
+  .text-gold { color: hsl(var(--gold)); }
   .container-narrow { @apply mx-auto w-full max-w-6xl px-6; }
   .container-wide { @apply mx-auto w-full max-w-7xl px-6; }
   .tracking-display { letter-spacing: -0.025em; }
