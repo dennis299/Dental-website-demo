@@ -61,7 +61,7 @@ const ImageToggle = ({ before, after }: { before: string; after: string }) => {
           <motion.img
             key={showAfter ? "a" : "b"}
             src={showAfter ? after : before}
-            alt={showAfter ? "After dental treatment at Railway Dental, Penkridge" : "Before dental treatment at Railway Dental, Penkridge"}
+            alt={showAfter ? "After dental treatment at Evergreen Dental" : "Before dental treatment at Evergreen Dental"}
             loading="lazy"
             decoding="async"
             initial={{ opacity: 0 }}
@@ -158,7 +158,7 @@ export const BeforeAfter = () => {
 const Row = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
   <li className="flex items-start gap-3">
     <span className="h-7 w-7 shrink-0 rounded-full bg-primary/15 grid place-items-center mt-0.5">
-      <Icon className="h-3.5 w-3.5" style={{ color: "hsl(75 50% 30%)" }} />
+      <Icon className="h-3.5 w-3.5 text-primary" />
     </span>
     <span className="flex-1">
       <span className="text-foreground/55 text-xs">{label}</span>

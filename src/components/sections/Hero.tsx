@@ -23,7 +23,7 @@ export const Hero = () => {
           src={teamMd}
           srcSet={`${teamSm} 768w, ${teamMd} 1280w, ${teamLg} 1920w`}
           sizes="100vw"
-          alt="Railway Dental clinical team in Penkridge, Staffordshire"
+          alt="The Evergreen Dental clinical team in a modern London practice"
           className="w-full h-full object-cover object-center"
           fetchPriority="high"
           decoding="async"
@@ -49,8 +49,8 @@ export const Hero = () => {
             transition={{ duration: 0.6, delay: 0.05 }}
             className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md"
           >
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            Private & NHS dentistry in Penkridge
+            <Sparkles className="h-3.5 w-3.5 text-gold" />
+            Premium private dentistry in London
           </motion.div>
 
           <motion.h1
@@ -70,7 +70,7 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.25 }}
             className="mt-6 max-w-xl text-base sm:text-lg md:text-xl text-white/85 leading-relaxed"
           >
-            A friendly, modern practice in Penkridge offering individual treatment plans, gentle hygienist care and a calm, reassuring experience for the whole family.
+            A modern practice with individual treatment plans, gentle hygienist care and a calm, reassuring experience for every member of the family.
           </motion.p>
 
           <motion.div
@@ -87,7 +87,7 @@ export const Hero = () => {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </a>
             <a
-              href="tel:+441785715545"
+              href="tel:+442079460123"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-md hover:bg-white/20 transition-all"
             >
               <Phone className="h-4 w-4" /> Call Us Today
@@ -101,8 +101,8 @@ export const Hero = () => {
             className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl"
           >
             {[
-              { icon: Star, label: "4.8 Google", sub: "rating" },
-              { icon: Users, label: "49 reviews", sub: "verified" },
+              { icon: Star, label: "4.9 Google", sub: "rating" },
+              { icon: Users, label: "120+ reviews", sub: "verified" },
               { icon: Sparkles, label: "Family", sub: "friendly care" },
               { icon: Stethoscope, label: "Modern", sub: "treatment rooms" },
             ].map((t, i) => (
@@ -110,7 +110,7 @@ export const Hero = () => {
                 key={i}
                 className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md p-3.5"
               >
-                <t.icon className="h-4 w-4 text-primary" />
+                <t.icon className="h-4 w-4 text-gold" />
                 <div className="mt-1.5 text-sm font-semibold text-white">{t.label}</div>
                 <div className="text-xs text-white/70">{t.sub}</div>
               </div>

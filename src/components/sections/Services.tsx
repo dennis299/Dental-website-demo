@@ -89,7 +89,7 @@ export const Services = () => {
             Premium dentistry, tailored to you.
           </h2>
           <p className="mt-4 text-base sm:text-lg text-foreground/70">
-            Every plan starts with a careful conversation about your smile, your concerns and your goals — so private dental care in Staffordshire feels personal from day one.
+            Every plan starts with a careful conversation about your smile, your concerns and your goals — so premium private dental care feels personal from day one.
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export const Services = () => {
               className="group relative text-left rounded-3xl border border-border bg-background p-6 shadow-card hover:shadow-elegant transition-all hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="h-12 w-12 rounded-2xl bg-primary/15 grid place-items-center">
-                <s.icon className="h-6 w-6" style={{ color: "hsl(75 50% 30%)" }} />
+                <s.icon className="h-6 w-6 text-primary" />
               </div>
               <h3 className="mt-5 text-lg font-bold">{s.title}</h3>
               <p className="mt-2 text-sm text-foreground/65 leading-relaxed">{s.description}</p>

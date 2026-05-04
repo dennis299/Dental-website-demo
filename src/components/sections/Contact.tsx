@@ -57,18 +57,18 @@ export const Contact = () => {
 
         <div className="space-y-4">
           <div className="rounded-3xl border border-border bg-gradient-soft p-7 shadow-card">
-            <h3 className="text-xl font-bold">Visit Railway Dental</h3>
+            <h3 className="text-xl font-bold">Visit Evergreen Dental</h3>
             <div className="mt-5 space-y-4 text-sm">
-              <Row icon={MapPin} title="Clay Street, Penkridge" sub="Staffordshire, ST19 5AF, United Kingdom" />
-              <Row icon={Phone} title={<a href="tel:+441785715545" className="hover:text-link">01785 715545</a>} sub="Reception, Mon–Fri" />
-              <Row icon={Mail} title={<a href="mailto:info@railwaydental.co.uk" className="hover:text-link">info@railwaydental.co.uk</a>} sub="We reply within one working day" />
-              <Row icon={Clock} title="Mon–Fri · 9:00am – 5:00pm" sub="Closed weekends" />
+              <Row icon={MapPin} title="42 Marylebone High Street" sub="London, W1U 5HP, United Kingdom" />
+              <Row icon={Phone} title={<a href="tel:+442079460123" className="hover:text-link">020 7946 0123</a>} sub="Reception, Mon–Sat" />
+              <Row icon={Mail} title={<a href="mailto:hello@evergreendental.com" className="hover:text-link">hello@evergreendental.com</a>} sub="We reply within one working day" />
+              <Row icon={Clock} title="Mon–Fri · 8:30am – 6:00pm" sub="Saturday · 9:00am – 2:00pm" />
             </div>
           </div>
           <div className="rounded-3xl overflow-hidden border border-border shadow-card">
             <iframe
-              title="Railway Dental location map"
-              src="https://www.google.com/maps?q=Railway%20Dental%20Clay%20Street%20Penkridge%20ST19%205AF&output=embed"
+              title="Evergreen Dental location map"
+              src="https://www.google.com/maps?q=Marylebone%20High%20Street%20London%20W1U&output=embed"
               className="w-full h-[320px] border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -99,7 +99,7 @@ const Select = ({ label, name, options }: { label: string; name: string; options
 const Row = ({ icon: Icon, title, sub }: { icon: any; title: React.ReactNode; sub: string }) => (
   <div className="flex items-start gap-3">
     <div className="h-10 w-10 rounded-full bg-primary/15 grid place-items-center shrink-0">
-      <Icon className="h-4 w-4" style={{ color: "hsl(75 50% 30%)" }} />
+      <Icon className="h-4 w-4 text-primary" />
     </div>
     <div>
       <div className="font-semibold">{title}</div>
