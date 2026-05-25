@@ -1,99 +1,66 @@
-## Rebrand: Railway Dental → Evergreen Dental
+# Sarah – Scripted Chat Assistant
 
-A pure visual/content rebrand. **Zero structural, animation, layout, or interaction changes.** Same components, same motion, same flows — only tokens, copy, names, and imagery swap out.
+A lightweight, fully scripted chat widget (no AI calls) that warms visitors up and funnels them into the existing `BookingModal`. Zero AI credits used.
 
-### New brand identity
+## Trigger & Placement
+- Mount globally inside `BookingProvider` so it can call `openBooking(treatment)`.
+- Auto-open after **6s on page load** OR when user scrolls **35%** of page height — whichever first.
+- Persist a `sessionStorage` flag (`sarah_dismissed`) so it doesn't re-pop after close in the same session.
+- Floating launcher button bottom-right always visible (small avatar + pulse dot).
+- **Desktop:** floating card (≈360px wide, bottom-right, 16px from edges).
+- **Mobile (<768px):** bottom-sheet that slides up from bottom, rounded top, ~85vh max, body scroll locked while open.
 
-- **Name:** Evergreen Dental
-- **Tagline mood:** Calm, clinical, premium
-- **Palette (slightly cooler/clinical vs. the current warm green):**
-  - Primary: deep teal `hsl(184 65% 38%)` with glow `hsl(184 55% 60%)`
-  - Accent: soft gold `hsl(42 78% 60%)` — used sparingly for CTAs/star ratings
-  - Backgrounds: near-white with cool tint, subtle teal-tinted gradients
-  - Text: deep navy charcoal `hsl(210 25% 18%)`
-- **Typography:** Keep Satoshi (premium, clean — already a great fit)
-- **Button shape variation:** Slightly less round — `--radius` from `1rem` → `0.85rem`, full-pill CTAs stay pill-shaped (preserves UX feel but adds a subtle distinction)
-- **Logo:** Inline SVG tooth/leaf mark (no external file) using the new primary color, rendered in `Header` and `Footer`
+## Persona & Style
+- Name: **Sarah**, Treatment Coordinator.
+- Generated avatar (warm, friendly headshot illustration) saved to `src/assets/sarah-avatar.jpg`.
+- Header: avatar, "Sarah", "Treatment Coordinator · Online" with green dot, close (×) button.
+- Chat bubbles: assistant on left with avatar, user on right (primary color). Soft shadows, rounded-2xl, design tokens only.
+- Typing indicator: "Sarah is typing…" with 3 animated dots, shown 800–1500ms (randomized) before each bot message.
 
-### Color token swap (single source: `src/index.css`)
+## Scripted Flow (state machine)
 
-```text
---primary:     184 65% 38%   (was 75 59% 55%)
---primary-glow:184 55% 60%
---secondary:   184 50% 96%
---muted:       200 25% 97%
---accent:      42 78% 92%
---ring:        184 65% 38%
---border:      200 20% 90%
---gradient-hero: cool teal + soft gold radials over near-white
---gradient-soft: white → faint teal
---shadow-elegant: tinted with teal instead of olive
---radius: 0.85rem
-```
+States: `ask_name → ask_treatment → treatment_info → ask_email → ask_phone → ready_to_book → done`
 
-All hardcoded `hsl(75 …)` colors inside components (Services icons, BeforeAfter row icons, About check, Contact rows, TrustBar icons, star color) get swapped to either `hsl(var(--primary))` or the new accent gold so they auto-theme going forward.
+1. **ask_name** — Free-text input (only place typing is allowed).
+   - Bot: "👋 Hi there! Welcome to Evergreen Dental. I'm Sarah, your treatment coordinator. Before we begin, may I have your first name?"
+2. **ask_treatment** — Buttons only (no text input).
+   - Bot: "Nice to meet you, {name} 😊  What treatment are you interested in today?"
+   - Options (mapped to existing `TREATMENTS`):
+     - Invisalign → "Invisalign"
+     - Veneers / Smile Makeover → "Cosmetic Dentistry"
+     - Teeth Whitening → "Cosmetic Dentistry"
+     - Dental Implants → "Restorative Dentistry"
+     - General Consultation → "General Dentistry"
+3. **treatment_info** — Pre-written warm paragraph per option + two buttons: **Book Consultation**, **View Before & After** (the latter closes chat and scrolls to `#results`).
+4. **ask_email** — Email input with validation.
+5. **ask_phone** — Phone input with validation.
+   - Bot: "Perfect! Let's get your consultation scheduled."
+   - Button: **Continue to Booking**.
+6. **ready_to_book** — Clicking opens the existing `BookingModal` via `openBooking(treatment)` with name/email/phone/treatment pre-filled. Chat stays mounted, page does not scroll.
+7. **done** — Brief thank-you message, chat collapses to launcher.
 
-### Content / copy changes
+All copy stored in a single `script.ts` constants file for easy editing.
 
-| File | Change |
-|---|---|
-| `index.html` | Title, description, OG tags, canonical → Evergreen Dental |
-| `Header.tsx` | Logo SVG, alt text, phone `020 7946 0123`, aria-labels |
-| `Hero.tsx` | "Evergreen Dental", new badge "Premium private dentistry", alt text, phone |
-| `TrustBar.tsx` | Location → "London" / generic postcode |
-| `About.tsx` | Brand name, alt text |
-| `BeforeAfter.tsx` | Alt text |
-| `Testimonials.tsx` | Generic names (Sarah → Sophia A., etc.), generic city roles |
-| `Team.tsx` | Replace all 10 members with generic names (Dr. Alex Morgan, Dr. Rachel Chen, Dr. Daniel Park, Hygienist Olivia Bennett, …), drop GDC numbers, swap to new generic portrait images |
-| `Contact.tsx` | Address, phone, email `hello@evergreendental.com`, iframe map → generic London address |
-| `Footer.tsx` | Brand, address, contact, copyright |
-| `MobileCallBanner.tsx` | New phone number + aria-label |
-| `services/BookingModal.tsx` | Toast copy stays generic (already fine) |
+## Booking Modal Pre-fill
+- Extend `BookingProvider.openBooking` signature to accept an optional `prefill` object: `{ name, email, phone, treatment }`.
+- `BookingModal` resets form `defaultValues` from prefill on open (in addition to current `preselect`).
+- No DB schema or business-logic changes — same `bookings` insert.
 
-### Imagery (AI-generated via imagegen, royalty-safe)
+## Files
 
-All replaced; same filenames kept where possible to minimize import churn — or new files with updated imports.
+**New**
+- `src/components/chat/SarahChat.tsx` — widget UI, state machine, triggers, typing indicator.
+- `src/components/chat/script.ts` — all bot copy, treatment info blurbs, button labels.
+- `src/components/chat/ChatBubble.tsx`, `TypingIndicator.tsx`, `ChatLauncher.tsx` — small presentational pieces.
+- `src/assets/sarah-avatar.jpg` — generated coordinator avatar.
 
-- `dental-team-{768,1280,1920}.jpg` → modern dental team in a bright clinic (hero)
-- `waiting-area.png` → calm, modern waiting room with cool/teal accents
-- `case1/2/3-{before,after}.jpg` → generic dental before/after stock-style shots
-- `team/*.png` → 10 new generic portrait headshots (5 women, 5 men, varied ethnicities), consistent neutral background, soft clinical lighting
-- `logo.png` → no longer used; replaced by inline SVG component `src/components/BrandLogo.tsx`
+**Edited**
+- `src/components/services/BookingProvider.tsx` — add `prefill` arg; mount `<SarahChat />` alongside `<BookingModal />`.
+- `src/components/services/BookingModal.tsx` — accept & apply `prefill` to form defaults on open.
 
-Old assets are removed once imports are updated.
-
-### Files to edit
-
-- `src/index.css` (tokens + gradients + shadows + radius)
-- `index.html` (SEO meta)
-- `src/components/sections/Header.tsx`
-- `src/components/sections/Hero.tsx`
-- `src/components/sections/TrustBar.tsx`
-- `src/components/sections/About.tsx`
-- `src/components/sections/BeforeAfter.tsx`
-- `src/components/sections/Testimonials.tsx`
-- `src/components/sections/Team.tsx`
-- `src/components/sections/Contact.tsx`
-- `src/components/sections/Footer.tsx`
-- `src/components/sections/Services.tsx` (icon color tokens)
-- `src/components/services/ServiceModal.tsx` (icon color token)
-- `src/components/MobileCallBanner.tsx` (phone)
-
-### Files to create
-
-- `src/components/BrandLogo.tsx` — inline SVG mark (used by Header + Footer)
-- New imagery in `src/assets/` and `src/assets/team/` via image generation
-
-### What is explicitly NOT touched
-
-- Section order in `Index.tsx`
-- All Framer Motion animations (Hero parallax, Services stagger, BeforeAfter crossfade, Testimonials marquee)
-- Modal flows (`ServiceModal`, `BookingModal`)
-- Scroll behavior, `ScrollToTop`, sticky `MobileCallBanner` logic
-- Component structure, spacing, hierarchy, breakpoints
-- Form fields, validation, toast logic
-- Tailwind config animations/keyframes
-
-### Result
-
-A second, visibly distinct demo (cool teal + gold, navy text, slightly tighter radius, Evergreen Dental brand) that behaves identically to the original — same premium feel, same conversion paths, no real-person likenesses.
+## Tech notes
+- Radix Dialog not used — custom positioned container (Radix forces centered overlay, wrong for bottom-right widget). Body-scroll lock only applied for mobile bottom-sheet open state.
+- Framer Motion for open/close + message enter animations (already in project).
+- All colors via semantic tokens (`bg-card`, `text-foreground`, `bg-primary`, etc.).
+- Accessible: `role="dialog"`, `aria-label`, ESC to close, focus management on open, Enter to submit text inputs.
+- No new dependencies, no edge functions, no AI gateway calls.
