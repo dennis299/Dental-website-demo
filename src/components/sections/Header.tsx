@@ -1,6 +1,7 @@
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
+import { useBooking } from "@/components/services/BookingProvider";
 
 const links = [
   { href: "#services", label: "Services" },
@@ -12,6 +13,7 @@ const links = [
 
 export const Header = () => {
   const [open, setOpen] = useState(false);
+  const { openBooking } = useBooking();
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="container-wide flex h-20 items-center justify-between">
@@ -29,12 +31,13 @@ export const Header = () => {
           <a href="tel:+442079460123" className="flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-foreground">
             <Phone className="h-4 w-4" /> 020 7946 0123
           </a>
-          <a
-            href="#contact"
+          <button
+            type="button"
+            onClick={() => openBooking()}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft hover:shadow-elegant transition-all hover:-translate-y-0.5"
           >
             Book Appointment
-          </a>
+          </button>
         </div>
         <button
           className="md:hidden p-2 rounded-lg hover:bg-muted"
@@ -55,9 +58,13 @@ export const Header = () => {
             <a href="tel:+442079460123" className="py-2 text-base font-medium flex items-center gap-2">
               <Phone className="h-4 w-4" /> 020 7946 0123
             </a>
-            <a href="#contact" onClick={() => setOpen(false)} className="mt-2 inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+            <button
+              type="button"
+              onClick={() => { setOpen(false); openBooking(); }}
+              className="mt-2 inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+            >
               Book Appointment
-            </a>
+            </button>
           </div>
         </div>
       )}
