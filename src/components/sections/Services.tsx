@@ -5,7 +5,7 @@ import {
   AlignHorizontalDistributeCenter, Activity, Siren, ArrowUpRight,
 } from "lucide-react";
 import { ServiceModal, type ServiceData } from "@/components/services/ServiceModal";
-import { BookingModal } from "@/components/services/BookingModal";
+import { useBooking } from "@/components/services/BookingProvider";
 
 const services: ServiceData[] = [
   {
@@ -64,8 +64,7 @@ const services: ServiceData[] = [
 export const Services = () => {
   const [selected, setSelected] = useState<ServiceData | null>(null);
   const [serviceOpen, setServiceOpen] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [preselect, setPreselect] = useState<string | undefined>();
+  const { openBooking } = useBooking();
 
   const openService = (s: ServiceData) => {
     setSelected(s);
@@ -74,8 +73,7 @@ export const Services = () => {
 
   const handleBook = (title: string) => {
     setServiceOpen(false);
-    setPreselect(title);
-    setTimeout(() => setBookingOpen(true), 150);
+    setTimeout(() => openBooking(title), 150);
   };
 
   return (
@@ -124,12 +122,6 @@ export const Services = () => {
         open={serviceOpen}
         onOpenChange={setServiceOpen}
         onBook={handleBook}
-      />
-      <BookingModal
-        open={bookingOpen}
-        onOpenChange={setBookingOpen}
-        treatments={services.map((s) => s.title)}
-        preselect={preselect}
       />
     </section>
   );
