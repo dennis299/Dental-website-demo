@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { BookingModal } from "@/components/services/BookingModal";
+import { SarahChat } from "@/components/chat/SarahChat";
 
 export const TREATMENTS = [
   "General Dentistry",
@@ -12,8 +13,14 @@ export const TREATMENTS = [
   "Emergency Care",
 ];
 
+export type BookingPrefill = {
+  name?: string;
+  email?: string;
+  phone?: string;
+};
+
 type BookingContextValue = {
-  openBooking: (preselect?: string) => void;
+  openBooking: (preselect?: string, prefill?: BookingPrefill) => void;
 };
 
 const BookingContext = createContext<BookingContextValue | null>(null);
@@ -27,9 +34,11 @@ export const useBooking = () => {
 export const BookingProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [preselect, setPreselect] = useState<string | undefined>();
+  const [prefill, setPrefill] = useState<BookingPrefill | undefined>();
 
-  const openBooking = useCallback((p?: string) => {
+  const openBooking = useCallback((p?: string, pf?: BookingPrefill) => {
     setPreselect(p);
+    setPrefill(pf);
     setOpen(true);
   }, []);
 
@@ -41,7 +50,9 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
         onOpenChange={setOpen}
         treatments={TREATMENTS}
         preselect={preselect}
+        prefill={prefill}
       />
+      <SarahChat />
     </BookingContext.Provider>
   );
 };
