@@ -144,15 +144,27 @@ export const BeforeAfter = () => {
           ))}
         </div>
 
-        <div className="mt-14 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 rounded-3xl border border-border bg-background shadow-card px-6 py-12 sm:px-12 sm:py-14 text-center"
+        >
+          <h3 className="text-3xl sm:text-4xl font-bold tracking-display">
+            Ready To Transform Your Smile?
+          </h3>
+          <p className="mt-4 text-base sm:text-lg text-foreground/65 max-w-xl mx-auto">
+            Book a consultation today and discover your personalized treatment plan.
+          </p>
           <button
             type="button"
             onClick={() => openBooking()}
-            className="inline-flex items-center justify-center rounded-full bg-foreground px-7 py-3.5 text-sm font-semibold text-background hover:opacity-90 transition"
+            className="mt-8 inline-flex items-center justify-center rounded-full bg-foreground px-8 py-4 text-sm font-semibold text-background shadow-elegant hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300"
           >
-            Start your smile journey
+            Book Now
           </button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
