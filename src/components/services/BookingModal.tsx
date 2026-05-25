@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -40,8 +41,28 @@ export const BookingModal = ({ open, onOpenChange, treatments, preselect }: Prop
   }, [open, preselect, setValue]);
 
   const onSubmit = async (values: FormValues) => {
-    await new Promise((r) => setTimeout(r, 400));
-    toast({ title: "Request sent", description: "We'll be in touch shortly to confirm your appointment." });
+    const { error } = await supabase.from("bookings").insert({
+      name: values.name,
+      phone: values.phone,
+      email: values.email,
+      treatment: values.treatment || null,
+      preferred_datetime: new Date(values.datetime).toISOString(),
+      message: values.message || null,
+    });
+
+    if (error) {
+      toast({
+        title: "Something went wrong",
+        description: "Please try again or call us directly.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Request sent",
+      description: "We'll be in touch shortly to confirm your appointment.",
+    });
     reset();
     onOpenChange(false);
   };
