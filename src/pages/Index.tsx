@@ -10,25 +10,28 @@ import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { MobileCallBanner } from "@/components/MobileCallBanner";
+import { BookingProvider } from "@/components/services/BookingProvider";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main>
-        <Hero />
-        <TrustBar />
-        <Services />
-        <About />
-        <BeforeAfter />
-        <Testimonials />
-        <Team />
-        <Contact />
-      </main>
-      <Footer />
-      <MobileCallBanner />
-      <ScrollToTop />
-    </div>
+    <BookingProvider>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main>
+          <Hero />
+          <TrustBar />
+          <Services />
+          <About />
+          <BeforeAfter />
+          <Testimonials />
+          <Team />
+          <Contact />
+        </main>
+        <Footer />
+        <MobileCallBanner />
+        <ScrollToTop />
+      </div>
+    </BookingProvider>
   );
 };
 
