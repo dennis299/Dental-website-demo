@@ -4,8 +4,10 @@ import { Phone, Star, Users, Sparkles, Stethoscope, ArrowRight } from "lucide-re
 import teamSm from "@/assets/dental-team-768.jpg";
 import teamMd from "@/assets/dental-team-1280.jpg";
 import teamLg from "@/assets/dental-team-1920.jpg";
+import { useBooking } from "@/components/services/BookingProvider";
 
 export const Hero = () => {
+  const { openBooking } = useBooking();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -79,13 +81,14 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.35 }}
             className="mt-9 flex flex-col sm:flex-row gap-3"
           >
-            <a
-              href="#contact"
+            <button
+              type="button"
+              onClick={() => openBooking()}
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-elegant hover:-translate-y-0.5 transition-all"
             >
               Book Appointment
               <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </a>
+            </button>
             <a
               href="tel:+442079460123"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-md hover:bg-white/20 transition-all"
