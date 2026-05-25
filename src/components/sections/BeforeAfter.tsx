@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { useBooking } from "@/components/services/BookingProvider";
 import { Clock, Sparkles, Stethoscope } from "lucide-react";
 import case1Before from "@/assets/case1-before.jpg";
 import case1After from "@/assets/case1-after.jpg";
@@ -98,6 +99,7 @@ const ImageToggle = ({ before, after }: { before: string; after: string }) => {
 };
 
 export const BeforeAfter = () => {
+  const { openBooking } = useBooking();
   return (
     <section id="results" className="py-24 bg-gradient-soft">
       <div className="container-wide">
@@ -143,12 +145,13 @@ export const BeforeAfter = () => {
         </div>
 
         <div className="mt-14 text-center">
-          <a
-            href="#contact"
+          <button
+            type="button"
+            onClick={() => openBooking()}
             className="inline-flex items-center justify-center rounded-full bg-foreground px-7 py-3.5 text-sm font-semibold text-background hover:opacity-90 transition"
           >
             Start your smile journey
-          </a>
+          </button>
         </div>
       </div>
     </section>

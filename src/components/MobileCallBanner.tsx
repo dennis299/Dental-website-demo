@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBooking } from "@/components/services/BookingProvider";
 
 export const MobileCallBanner = () => {
+  const { openBooking } = useBooking();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -31,13 +33,14 @@ export const MobileCallBanner = () => {
         >
           <Phone className="h-4 w-4" /> Call now
         </a>
-        <a
-          href="#contact"
+        <button
+          type="button"
+          onClick={() => openBooking()}
           aria-label="Book a dental appointment at Evergreen Dental"
           className="flex-1 inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft"
         >
           Book
-        </a>
+        </button>
       </div>
     </div>
   );

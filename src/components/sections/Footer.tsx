@@ -1,6 +1,8 @@
 import { BrandLogo } from "@/components/BrandLogo";
+import { useBooking } from "@/components/services/BookingProvider";
 
 export const Footer = () => {
+  const { openBooking } = useBooking();
   return (
     <footer className="border-t border-border bg-muted/30">
       <div className="container-wide py-14 grid md:grid-cols-4 gap-10">
@@ -35,7 +37,7 @@ export const Footer = () => {
             <li><a href="#services" className="hover:text-link">Treatments</a></li>
             <li><a href="#results" className="hover:text-link">Before & after</a></li>
             <li><a href="#reviews" className="hover:text-link">Reviews</a></li>
-            <li><a href="#contact" className="hover:text-link">Book appointment</a></li>
+            <li><button type="button" onClick={() => openBooking()} className="hover:text-link text-left">Book appointment</button></li>
           </ul>
         </div>
       </div>
