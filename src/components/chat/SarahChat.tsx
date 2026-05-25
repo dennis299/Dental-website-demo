@@ -5,9 +5,10 @@ import sarahAvatar from "@/assets/sarah-avatar.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useBooking } from "@/components/services/BookingProvider";
+import { supabase } from "@/integrations/supabase/client";
 import {
   COPY,
+  TIME_SLOTS,
   TREATMENT_INFO,
   TREATMENT_MAP,
   TREATMENT_OPTIONS,
@@ -20,8 +21,13 @@ type Step =
   | "treatment_info"
   | "ask_email"
   | "ask_phone"
-  | "ready_to_book"
-  | "done";
+  | "ask_date"
+  | "ask_time"
+  | "ask_notes"
+  | "confirm"
+  | "submitting"
+  | "done"
+  | "error";
 
 type Msg =
   | { id: string; from: "bot"; text: string }
@@ -32,19 +38,40 @@ const delay = () => 800 + Math.random() * 700;
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 const isPhone = (v: string) => v.replace(/\D/g, "").length >= 7;
 
+const formatWhen = (date: string, time: string) => {
+  try {
+    const d = new Date(`${date}T${time}:00`);
+    return d.toLocaleString(undefined, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return `${date} ${time}`;
+  }
+};
+
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+type Data = {
+  name: string;
+  treatment?: TreatmentKey;
+  email?: string;
+  phone?: string;
+  date?: string;
+  time?: string;
+  notes?: string;
+};
+
 export const SarahChat = () => {
-  const { openBooking } = useBooking();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
   const [step, setStep] = useState<Step>("ask_name");
   const [input, setInput] = useState("");
-  const [data, setData] = useState<{
-    name: string;
-    treatment?: TreatmentKey;
-    email?: string;
-    phone?: string;
-  }>({ name: "" });
+  const [data, setData] = useState<Data>({ name: "" });
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const greetedRef = useRef(false);
@@ -97,7 +124,7 @@ export const SarahChat = () => {
 
   // Focus input when relevant
   useEffect(() => {
-    if (open && (step === "ask_name" || step === "ask_email" || step === "ask_phone")) {
+    if (open && (step === "ask_name" || step === "ask_email" || step === "ask_phone" || step === "ask_notes")) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open, step]);
@@ -118,10 +145,19 @@ export const SarahChat = () => {
     sessionStorage.setItem("sarah_dismissed", "1");
   };
 
+  const resetChat = async () => {
+    setData({ name: "" });
+    setMessages([]);
+    setStep("ask_name");
+    greetedRef.current = false;
+    await sendBot(COPY.greeting);
+    greetedRef.current = true;
+  };
+
   const handleTextSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const v = input.trim();
-    if (!v) return;
+    if (!v && step !== "ask_notes") return;
     setInput("");
 
     if (step === "ask_name") {
@@ -151,9 +187,27 @@ export const SarahChat = () => {
         return;
       }
       setData((d) => ({ ...d, phone: v }));
-      setStep("ready_to_book");
-      await sendBot(COPY.perfect);
+      setStep("ask_date");
+      await sendBot(COPY.askDate);
+    } else if (step === "ask_notes") {
+      sendUser(v || "(no notes)");
+      setData((d) => ({ ...d, notes: v || undefined }));
+      await goToConfirm({ ...data, notes: v || undefined });
     }
+  };
+
+  const goToConfirm = async (d: Data) => {
+    setStep("confirm");
+    const when = formatWhen(d.date!, d.time!);
+    await sendBot(
+      COPY.confirm({
+        name: d.name,
+        treatment: d.treatment ?? "General Consultation",
+        email: d.email ?? "",
+        phone: d.phone ?? "",
+        when,
+      }),
+    );
   };
 
   const pickTreatment = async (t: TreatmentKey) => {
@@ -164,7 +218,7 @@ export const SarahChat = () => {
   };
 
   const goBook = async () => {
-    sendUser("Book Consultation");
+    sendUser("Book with me");
     setStep("ask_email");
     await sendBot(COPY.askEmail(data.name));
   };
@@ -177,19 +231,69 @@ export const SarahChat = () => {
     }, 200);
   };
 
-  const openBookingNow = async () => {
-    sendUser("Continue to Booking");
-    const mapped = data.treatment ? TREATMENT_MAP[data.treatment] : undefined;
-    openBooking(mapped, {
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
+  const pickDate = async (date: string) => {
+    if (date < todayISO()) {
+      await sendBot(COPY.invalidDate);
+      return;
+    }
+    const pretty = new Date(`${date}T00:00:00`).toLocaleDateString(undefined, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
     });
-    setStep("done");
-    await sendBot(COPY.done);
+    sendUser(pretty);
+    setData((d) => ({ ...d, date }));
+    setStep("ask_time");
+    await sendBot(COPY.askTime);
   };
 
-  const textInputActive = step === "ask_name" || step === "ask_email" || step === "ask_phone";
+  const pickTime = async (time: string) => {
+    sendUser(time);
+    setData((d) => ({ ...d, time }));
+    setStep("ask_notes");
+    await sendBot(COPY.askNotes);
+  };
+
+  const skipNotes = async () => {
+    sendUser("Skip");
+    await goToConfirm({ ...data, notes: undefined });
+  };
+
+  const submitBooking = async () => {
+    sendUser("Confirm booking");
+    setStep("submitting");
+    await sendBot(COPY.submitting);
+
+    const treatmentValue = data.treatment ? TREATMENT_MAP[data.treatment] : null;
+    const preferred = new Date(`${data.date}T${data.time}:00`).toISOString();
+
+    const { error } = await supabase.from("bookings").insert({
+      name: data.name,
+      phone: data.phone!,
+      email: data.email!,
+      treatment: treatmentValue,
+      preferred_datetime: preferred,
+      message: data.notes ?? null,
+    });
+
+    if (error) {
+      setStep("error");
+      await sendBot(COPY.errorRetry);
+      return;
+    }
+
+    setStep("done");
+    await sendBot(COPY.success(formatWhen(data.date!, data.time!), data.phone!));
+  };
+
+  const editDetails = async () => {
+    sendUser("Edit details");
+    setStep("ask_date");
+    await sendBot("No problem — let's pick a different date.");
+  };
+
+  const textInputActive =
+    step === "ask_name" || step === "ask_email" || step === "ask_phone" || step === "ask_notes";
   const placeholder =
     step === "ask_name"
       ? "Type your first name…"
@@ -197,6 +301,8 @@ export const SarahChat = () => {
       ? "you@example.com"
       : step === "ask_phone"
       ? "Your phone number"
+      : step === "ask_notes"
+      ? "Any notes for the team…"
       : "";
 
   return (
@@ -254,9 +360,7 @@ export const SarahChat = () => {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className={cn(
                 "fixed z-50 bg-card text-card-foreground shadow-elegant border border-border flex flex-col overflow-hidden",
-                // Desktop: floating card bottom-right
                 "md:bottom-5 md:right-5 md:w-[380px] md:h-[560px] md:rounded-2xl",
-                // Mobile: bottom sheet
                 "inset-x-0 bottom-0 max-h-[85vh] h-[85vh] rounded-t-3xl md:inset-x-auto md:max-h-none",
               )}
             >
@@ -308,7 +412,7 @@ export const SarahChat = () => {
                     )}
                     <div
                       className={cn(
-                        "max-w-[78%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm",
+                        "max-w-[78%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm whitespace-pre-line",
                         m.from === "user"
                           ? "bg-primary text-primary-foreground rounded-br-sm"
                           : "bg-card text-card-foreground border border-border rounded-bl-sm",
@@ -368,7 +472,7 @@ export const SarahChat = () => {
                 {!typing && step === "treatment_info" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     <Button size="sm" onClick={goBook} className="rounded-full">
-                      Book Consultation
+                      Book with me
                     </Button>
                     <Button
                       size="sm"
@@ -381,10 +485,62 @@ export const SarahChat = () => {
                   </div>
                 )}
 
-                {!typing && step === "ready_to_book" && (
+                {!typing && step === "ask_date" && (
+                  <div className="pt-1 pl-9">
+                    <Input
+                      type="date"
+                      min={todayISO()}
+                      onChange={(e) => e.target.value && pickDate(e.target.value)}
+                      className="rounded-full max-w-[220px]"
+                    />
+                  </div>
+                )}
+
+                {!typing && step === "ask_time" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
-                    <Button size="sm" onClick={openBookingNow} className="rounded-full shadow-elegant">
-                      Continue to Booking →
+                    {TIME_SLOTS.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => pickTime(t)}
+                        className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {!typing && step === "ask_notes" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" variant="outline" onClick={skipNotes} className="rounded-full">
+                      Skip
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "confirm" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" onClick={submitBooking} className="rounded-full shadow-elegant">
+                      Confirm booking
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={editDetails} className="rounded-full">
+                      Edit details
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "error" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" onClick={submitBooking} className="rounded-full">
+                      Try again
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "done" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" variant="outline" onClick={resetChat} className="rounded-full">
+                      Book another time
                     </Button>
                   </div>
                 )}
@@ -402,13 +558,22 @@ export const SarahChat = () => {
                       type={step === "ask_email" ? "email" : step === "ask_phone" ? "tel" : "text"}
                       className="rounded-full"
                     />
-                    <Button type="submit" size="icon" className="rounded-full shrink-0" disabled={!input.trim()}>
+                    <Button
+                      type="submit"
+                      size="icon"
+                      className="rounded-full shrink-0"
+                      disabled={step !== "ask_notes" && !input.trim()}
+                    >
                       <Send className="h-4 w-4" />
                     </Button>
                   </form>
                 ) : (
                   <p className="text-xs text-center text-muted-foreground py-2">
-                    {step === "done" ? "Thanks for chatting 💙" : "Tap a button above to continue"}
+                    {step === "submitting"
+                      ? "Booking your appointment…"
+                      : step === "done"
+                      ? "Thanks for chatting 💙"
+                      : "Tap a button above to continue"}
                   </p>
                 )}
               </div>
