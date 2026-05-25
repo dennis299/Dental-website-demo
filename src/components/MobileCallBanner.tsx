@@ -33,13 +33,14 @@ export const MobileCallBanner = () => {
         >
           <Phone className="h-4 w-4" /> Call now
         </a>
-        <a
-          href="#contact"
+        <button
+          type="button"
+          onClick={() => openBooking()}
           aria-label="Book a dental appointment at Evergreen Dental"
           className="flex-1 inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft"
         >
           Book
-        </a>
+        </button>
       </div>
     </div>
   );
