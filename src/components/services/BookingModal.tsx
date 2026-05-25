@@ -27,9 +27,10 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   treatments: string[];
   preselect?: string;
+  prefill?: { name?: string; email?: string; phone?: string };
 };
 
-export const BookingModal = ({ open, onOpenChange, treatments, preselect }: Props) => {
+export const BookingModal = ({ open, onOpenChange, treatments, preselect, prefill }: Props) => {
   const { toast } = useToast();
   const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -37,8 +38,14 @@ export const BookingModal = ({ open, onOpenChange, treatments, preselect }: Prop
   });
 
   useEffect(() => {
-    if (open) setValue("treatment", preselect ?? "");
-  }, [open, preselect, setValue]);
+    if (open) {
+      setValue("treatment", preselect ?? "");
+      if (prefill?.name) setValue("name", prefill.name);
+      if (prefill?.email) setValue("email", prefill.email);
+      if (prefill?.phone) setValue("phone", prefill.phone);
+    }
+  }, [open, preselect, prefill, setValue]);
+
 
   const onSubmit = async (values: FormValues) => {
     const { error } = await supabase.from("bookings").insert({
