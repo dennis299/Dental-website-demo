@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBooking } from "@/components/services/BookingProvider";
 
 export const MobileCallBanner = () => {
+  const { openBooking } = useBooking();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
