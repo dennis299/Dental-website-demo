@@ -40,6 +40,15 @@ export const TREATMENT_INFO: Record<TreatmentKey, string> = {
     "A great place to start! We'll do a friendly check-up, listen to your goals, and build a treatment plan tailored to you — no pressure, ever.",
 };
 
+export const TIME_SLOTS = [
+  "09:00",
+  "10:30",
+  "12:00",
+  "14:00",
+  "15:30",
+  "17:00",
+];
+
 export const COPY = {
   greeting:
     "👋 Hi there! Welcome to Evergreen Dental. I'm Sarah, your treatment coordinator. Before we begin, may I have your first name?",
@@ -48,9 +57,18 @@ export const COPY = {
   askEmail: (name: string) =>
     `Great choice, ${name}! Could I grab your email so we can send your consultation details?`,
   askPhone: "And the best phone number to reach you on?",
-  perfect: "Perfect! Let's get your consultation scheduled.",
-  done: "All set! Your booking form is open — fill in your preferred date & time and we'll confirm shortly. 💙",
+  askDate: "Perfect. What date would suit you best for your consultation?",
+  askTime: "Lovely — and which time works for you?",
+  askNotes: "Anything you'd like us to know in advance? (Optional — feel free to skip)",
+  confirm: (s: { name: string; treatment: string; email: string; phone: string; when: string }) =>
+    `Just to confirm, ${s.name}:\n\n• Treatment: ${s.treatment}\n• When: ${s.when}\n• Email: ${s.email}\n• Phone: ${s.phone}\n\nShall I book this in for you?`,
+  submitting: "Booking your appointment now…",
+  success: (when: string, phone: string) =>
+    `🎉 You're all booked in for ${when}! Our team will call ${phone} shortly to confirm. Looking forward to meeting you 💙`,
+  errorRetry:
+    "Oh no — something went wrong on our end. Want me to try again, or you can call us directly.",
   invalidEmail: "Hmm, that doesn't look like a valid email — mind trying again?",
   invalidPhone: "Could you double-check that phone number for me?",
   invalidName: "I didn't catch that — what's your first name?",
+  invalidDate: "Please pick a date that's today or later.",
 };

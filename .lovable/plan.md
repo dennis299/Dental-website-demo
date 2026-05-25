@@ -1,66 +1,41 @@
-# Sarah – Scripted Chat Assistant
+## Goal
+Let Sarah (the chatbot) complete the booking itself, so the visitor never has to open the booking modal.
 
-A lightweight, fully scripted chat widget (no AI calls) that warms visitors up and funnels them into the existing `BookingModal`. Zero AI credits used.
+## New conversational flow
+Sarah will collect everything needed for a booking inside the chat, then insert the row into the `bookings` table and show a success message.
 
-## Trigger & Placement
-- Mount globally inside `BookingProvider` so it can call `openBooking(treatment)`.
-- Auto-open after **6s on page load** OR when user scrolls **35%** of page height — whichever first.
-- Persist a `sessionStorage` flag (`sarah_dismissed`) so it doesn't re-pop after close in the same session.
-- Floating launcher button bottom-right always visible (small avatar + pulse dot).
-- **Desktop:** floating card (≈360px wide, bottom-right, 16px from edges).
-- **Mobile (<768px):** bottom-sheet that slides up from bottom, rounded top, ~85vh max, body scroll locked while open.
+Steps (state machine):
+1. `ask_name` — first name (already exists)
+2. `ask_treatment` — quick-reply buttons (already exists)
+3. `treatment_info` — short blurb + "Book with me" / "See before & after" (already exists, button copy updated)
+4. `ask_email` — validated email
+5. `ask_phone` — validated phone
+6. `ask_date` — date picker (native `<input type="date">` rendered inside the chat)
+7. `ask_time` — quick-reply time slots (e.g. 9:00, 10:30, 12:00, 14:00, 15:30, 17:00) + "Other time" → free text
+8. `ask_notes` — optional message, with a "Skip" button
+9. `confirm` — Sarah summarises: name, treatment, email, phone, date/time + "Confirm booking" / "Edit details" buttons
+10. `submitting` — disable inputs, show "Booking your appointment…" with typing indicator
+11. `done` — success bubble: "You're booked in for {date} at {time}. We'll call {phone} to confirm." + a "Book another time" reset button
 
-## Persona & Style
-- Name: **Sarah**, Treatment Coordinator.
-- Generated avatar (warm, friendly headshot illustration) saved to `src/assets/sarah-avatar.jpg`.
-- Header: avatar, "Sarah", "Treatment Coordinator · Online" with green dot, close (×) button.
-- Chat bubbles: assistant on left with avatar, user on right (primary color). Soft shadows, rounded-2xl, design tokens only.
-- Typing indicator: "Sarah is typing…" with 3 animated dots, shown 800–1500ms (randomized) before each bot message.
+## Submission
+- On `Confirm booking`, call `supabase.from("bookings").insert({...})` directly from the chat component.
+- Combine date + time into an ISO `preferred_datetime`.
+- `treatment` uses the same `TREATMENT_MAP` mapping already in `script.ts`.
+- On error: show a friendly bubble ("Something went wrong — want me to try again?") with a retry button. Existing RLS policy ("Anyone can submit a booking" with `status = 'new'`) already permits this insert; no DB changes.
 
-## Scripted Flow (state machine)
+## UI / UX
+- Reuse existing chat bubble + typing indicator styles. No new dependencies.
+- Date input and time chips render inline as bot-side controls, matching the existing quick-reply button styling.
+- Validation errors are spoken by Sarah in-chat (no toasts), same pattern as the current invalid-email/phone flow.
+- Add an "Edit" affordance at the confirm step that jumps back to the relevant field.
+- Keep auto-trigger (6s / 35% scroll), mobile bottom sheet, scroll lock, and accessibility behaviour unchanged.
 
-States: `ask_name → ask_treatment → treatment_info → ask_email → ask_phone → ready_to_book → done`
-
-1. **ask_name** — Free-text input (only place typing is allowed).
-   - Bot: "👋 Hi there! Welcome to Evergreen Dental. I'm Sarah, your treatment coordinator. Before we begin, may I have your first name?"
-2. **ask_treatment** — Buttons only (no text input).
-   - Bot: "Nice to meet you, {name} 😊  What treatment are you interested in today?"
-   - Options (mapped to existing `TREATMENTS`):
-     - Invisalign → "Invisalign"
-     - Veneers / Smile Makeover → "Cosmetic Dentistry"
-     - Teeth Whitening → "Cosmetic Dentistry"
-     - Dental Implants → "Restorative Dentistry"
-     - General Consultation → "General Dentistry"
-3. **treatment_info** — Pre-written warm paragraph per option + two buttons: **Book Consultation**, **View Before & After** (the latter closes chat and scrolls to `#results`).
-4. **ask_email** — Email input with validation.
-5. **ask_phone** — Phone input with validation.
-   - Bot: "Perfect! Let's get your consultation scheduled."
-   - Button: **Continue to Booking**.
-6. **ready_to_book** — Clicking opens the existing `BookingModal` via `openBooking(treatment)` with name/email/phone/treatment pre-filled. Chat stays mounted, page does not scroll.
-7. **done** — Brief thank-you message, chat collapses to launcher.
-
-All copy stored in a single `script.ts` constants file for easy editing.
-
-## Booking Modal Pre-fill
-- Extend `BookingProvider.openBooking` signature to accept an optional `prefill` object: `{ name, email, phone, treatment }`.
-- `BookingModal` resets form `defaultValues` from prefill on open (in addition to current `preselect`).
-- No DB schema or business-logic changes — same `bookings` insert.
+## Booking modal
+- Keep `BookingModal` + `BookingProvider.openBooking` in place — they're still used by Hero, Header, Services, Footer, MobileCallBanner, BeforeAfter "Book Now" buttons.
+- Sarah no longer calls `openBooking`. The `prefill` plumbing stays (harmless) in case we want it later.
 
 ## Files
+- **Edit** `src/components/chat/SarahChat.tsx` — add new steps, date/time controls, confirmation, direct Supabase insert, submitting/done/error states.
+- **Edit** `src/components/chat/script.ts` — add copy for the new steps (askDate, askTime, askNotes, confirmTemplate, submitting, success, errorRetry) and a `TIME_SLOTS` array.
 
-**New**
-- `src/components/chat/SarahChat.tsx` — widget UI, state machine, triggers, typing indicator.
-- `src/components/chat/script.ts` — all bot copy, treatment info blurbs, button labels.
-- `src/components/chat/ChatBubble.tsx`, `TypingIndicator.tsx`, `ChatLauncher.tsx` — small presentational pieces.
-- `src/assets/sarah-avatar.jpg` — generated coordinator avatar.
-
-**Edited**
-- `src/components/services/BookingProvider.tsx` — add `prefill` arg; mount `<SarahChat />` alongside `<BookingModal />`.
-- `src/components/services/BookingModal.tsx` — accept & apply `prefill` to form defaults on open.
-
-## Tech notes
-- Radix Dialog not used — custom positioned container (Radix forces centered overlay, wrong for bottom-right widget). Body-scroll lock only applied for mobile bottom-sheet open state.
-- Framer Motion for open/close + message enter animations (already in project).
-- All colors via semantic tokens (`bg-card`, `text-foreground`, `bg-primary`, etc.).
-- Accessible: `role="dialog"`, `aria-label`, ESC to close, focus management on open, Enter to submit text inputs.
-- No new dependencies, no edge functions, no AI gateway calls.
+No database, RLS, or other component changes required.
