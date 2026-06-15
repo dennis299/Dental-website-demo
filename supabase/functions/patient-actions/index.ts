@@ -111,6 +111,12 @@ Deno.serve(async (req) => {
       if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
       const email = (body.email as string).toLowerCase().trim()
 
+      const limited = await rateLimit([
+        { bucket: `pa:lookup:ip:${ip}`, max: 5, windowSec: 60 },
+        { bucket: `pa:lookup:email:${email}`, max: 10, windowSec: 3600 },
+      ])
+      if (limited) return limited
+
       const { data: patient, error: pErr } = await supabase
         .from('patients')
         .select('name')
