@@ -208,26 +208,7 @@ export const SarahChat = () => {
     greetedRef.current = true;
   };
 
-  // Send confirmation email (fire-and-forget; chat continues either way)
-  const sendConfirmationEmail = async (kind: "booking" | "reschedule" | "cancellation", payload: Record<string, unknown>) => {
-    try {
-      await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName:
-            kind === "booking"
-              ? "booking-confirmation"
-              : kind === "reschedule"
-              ? "booking-reschedule"
-              : "booking-cancellation",
-          recipientEmail: data.email,
-          idempotencyKey: `${kind}-${payload.bookingId ?? Date.now()}`,
-          templateData: payload,
-        },
-      });
-    } catch {
-      // best-effort
-    }
-  };
+  // Email is sent server-side by the patient-actions edge function.
 
   const lookupEmail = async (email: string) => {
     const { data: rpc, error } = await supabase.functions.invoke("patient-actions", {
@@ -237,11 +218,9 @@ export const SarahChat = () => {
     return rpc as {
       found: boolean;
       name?: string;
-      phone?: string;
       has_active_booking?: boolean;
       next_appointment_at?: string;
       next_treatment?: string | null;
-      next_booking_id?: string;
     } | null;
   };
 
