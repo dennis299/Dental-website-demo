@@ -372,7 +372,7 @@ Deno.serve(async (req) => {
 
       const { error: upErr } = await supabase
         .from('bookings')
-        .update({ preferred_datetime: body.newDatetime, status: 'rescheduled' })
+        .update({ preferred_datetime: body.newDatetime })
         .eq('id', booking.id)
       if (upErr) return json({ error: 'reschedule_failed' }, 500)
 
