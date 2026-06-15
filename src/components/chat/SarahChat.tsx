@@ -716,6 +716,14 @@ export const SarahChat = () => {
                   </motion.div>
                 )}
 
+                {!typing && step === "ask_otp" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" variant="outline" onClick={resendOtp} className="rounded-full">
+                      Resend code
+                    </Button>
+                  </div>
+                )}
+
                 {!typing && step === "returning_menu" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     <Button size="sm" onClick={startReschedule} className="rounded-full">Reschedule</Button>
@@ -842,7 +850,10 @@ export const SarahChat = () => {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder={placeholder}
-                      type={step === "ask_email" ? "email" : step === "ask_phone" ? "tel" : "text"}
+                      type={step === "ask_email" ? "email" : step === "ask_phone" ? "tel" : step === "ask_otp" ? "text" : "text"}
+                      inputMode={step === "ask_otp" ? "numeric" : undefined}
+                      autoComplete={step === "ask_otp" ? "one-time-code" : undefined}
+                      maxLength={step === "ask_otp" ? 6 : undefined}
                       className="rounded-full"
                     />
                     <Button
