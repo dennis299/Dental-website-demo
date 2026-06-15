@@ -27,7 +27,7 @@ export const TREATMENT_OPTIONS: TreatmentKey[] = [
 
 export const TREATMENT_INFO: Record<TreatmentKey, string> = {
   "Invisalign":
-    "Invisalign is a discreet and comfortable way to straighten your smile without traditional braces. Most patients begin with a quick smile assessment to see if they're a good candidate.",
+    "Invisalign is a discreet and comfortable way to straighten your smile without traditional braces.",
   "Veneers":
     "Porcelain veneers are ultra-thin shells custom-crafted to transform the shape, colour and symmetry of your smile — beautifully natural and long-lasting.",
   "Teeth Whitening":
@@ -40,14 +40,36 @@ export const TREATMENT_INFO: Record<TreatmentKey, string> = {
     "A great place to start! We'll do a friendly check-up, listen to your goals, and build a treatment plan tailored to you — no pressure, ever.",
 };
 
-export const TIME_SLOTS = [
-  "09:00",
-  "10:30",
-  "12:00",
-  "14:00",
-  "15:30",
-  "17:00",
-];
+// Rich, multi-step Invisalign explanation
+export const INVISALIGN_WHY =
+  "✨ Why patients love Invisalign:\n\n• Nearly invisible — most people won't notice you're wearing them\n• Removable for eating, drinking and brushing\n• Predictable results with a digital smile preview before you start\n• Comfortable smooth aligners — no metal brackets or wires";
+
+export const INVISALIGN_STEPS =
+  "Here's your Invisalign journey, step by step:\n\n1. In-clinic consultation & 3D scan (free)\n2. Custom treatment plan + digital smile preview\n3. Receive your set of clear aligners\n4. Quick check-ins every 6–8 weeks\n5. Reveal your new smile + retainers to keep it perfect\n\nEveryone starts with a quick in-person consultation so our clinicians can confirm Invisalign is the right fit for you. Shall I book yours?";
+
+// Clinic hours: Mon–Fri 8:30–18:00, Sat 09:00–14:00, Sun closed
+const WEEKDAY_SLOTS = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00"];
+const SATURDAY_SLOTS = ["09:00", "10:00", "11:00", "12:00", "13:00"];
+
+export const getTimeSlots = (dateISO: string): string[] => {
+  const d = new Date(`${dateISO}T00:00:00`);
+  const day = d.getDay(); // 0 Sun, 6 Sat
+  if (day === 0) return [];
+  const base = day === 6 ? SATURDAY_SLOTS : WEEKDAY_SLOTS;
+
+  // If today, filter out slots earlier than now + 1h
+  const today = new Date();
+  const isToday = d.toDateString() === today.toDateString();
+  if (!isToday) return base;
+
+  const cutoff = new Date(today.getTime() + 60 * 60 * 1000);
+  return base.filter((t) => {
+    const [h, m] = t.split(":").map(Number);
+    const slot = new Date(d);
+    slot.setHours(h, m, 0, 0);
+    return slot >= cutoff;
+  });
+};
 
 export const COPY = {
   greeting:
@@ -57,7 +79,8 @@ export const COPY = {
   askEmail: (name: string) =>
     `Great choice, ${name}! Could I grab your email so we can send your consultation details?`,
   askPhone: "And the best phone number to reach you on?",
-  askDate: "Perfect. What date would suit you best for your consultation?",
+  askDate:
+    "Perfect. What date would suit you best for your consultation?\n\n(We're open Mon–Fri 8:30am–6pm and Saturdays 9am–2pm. Closed Sundays.)",
   askTime: "Lovely — and which time works for you?",
   askNotes: "Anything you'd like us to know in advance? (Optional — feel free to skip)",
   confirm: (s: { name: string; treatment: string; email: string; phone: string; when: string }) =>
@@ -71,4 +94,8 @@ export const COPY = {
   invalidPhone: "Could you double-check that phone number for me?",
   invalidName: "I didn't catch that — what's your first name?",
   invalidDate: "Please pick a date that's today or later.",
+  closedSunday:
+    "We're closed on Sundays 🙏 — would Saturday or a weekday work instead?",
+  noSlotsToday:
+    "It's getting a bit late for today — could you pick another day so we can give you our full attention?",
 };

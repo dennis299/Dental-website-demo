@@ -1,17 +1,20 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle, X, Send } from "lucide-react";
 import sarahAvatar from "@/assets/sarah-avatar.jpg";
+import invisalignImg from "@/assets/invisalign.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import {
   COPY,
-  TIME_SLOTS,
+  INVISALIGN_STEPS,
+  INVISALIGN_WHY,
   TREATMENT_INFO,
   TREATMENT_MAP,
   TREATMENT_OPTIONS,
+  getTimeSlots,
   type TreatmentKey,
 } from "./script";
 
@@ -29,12 +32,15 @@ type Step =
   | "done"
   | "error";
 
-type Msg =
-  | { id: string; from: "bot"; text: string }
-  | { id: string; from: "user"; text: string };
+type Msg = {
+  id: string;
+  from: "bot" | "user";
+  text: string;
+  image?: string;
+};
 
 const uid = () => Math.random().toString(36).slice(2);
-const delay = () => 800 + Math.random() * 700;
+const delay = () => 700 + Math.random() * 600;
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 const isPhone = (v: string) => v.replace(/\D/g, "").length >= 7;
 
@@ -76,7 +82,6 @@ export const SarahChat = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const greetedRef = useRef(false);
 
-  // Auto-trigger: 6s OR 35% scroll
   useEffect(() => {
     if (sessionStorage.getItem("sarah_dismissed")) return;
     let opened = false;
@@ -97,7 +102,6 @@ export const SarahChat = () => {
     };
   }, []);
 
-  // Body scroll lock on mobile when open
   useEffect(() => {
     if (!open) return;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -109,7 +113,6 @@ export const SarahChat = () => {
     };
   }, [open]);
 
-  // Initial greeting
   useEffect(() => {
     if (open && !greetedRef.current) {
       greetedRef.current = true;
@@ -117,23 +120,21 @@ export const SarahChat = () => {
     }
   }, [open]);
 
-  // Autoscroll
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
-  // Focus input when relevant
   useEffect(() => {
     if (open && (step === "ask_name" || step === "ask_email" || step === "ask_phone" || step === "ask_notes")) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open, step]);
 
-  const sendBot = async (text: string) => {
+  const sendBot = async (text: string, image?: string) => {
     setTyping(true);
     await new Promise((r) => setTimeout(r, delay()));
     setTyping(false);
-    setMessages((m) => [...m, { id: uid(), from: "bot", text }]);
+    setMessages((m) => [...m, { id: uid(), from: "bot", text, image }]);
   };
 
   const sendUser = (text: string) => {
@@ -214,11 +215,17 @@ export const SarahChat = () => {
     sendUser(t);
     setData((d) => ({ ...d, treatment: t }));
     setStep("treatment_info");
-    await sendBot(TREATMENT_INFO[t]);
+    if (t === "Invisalign") {
+      await sendBot(TREATMENT_INFO[t], invisalignImg);
+      await sendBot(INVISALIGN_WHY);
+      await sendBot(INVISALIGN_STEPS);
+    } else {
+      await sendBot(TREATMENT_INFO[t]);
+    }
   };
 
   const goBook = async () => {
-    sendUser("Book with me");
+    sendUser(data.treatment === "Invisalign" ? "Book my consultation" : "Book with me");
     setStep("ask_email");
     await sendBot(COPY.askEmail(data.name));
   };
@@ -236,13 +243,23 @@ export const SarahChat = () => {
       await sendBot(COPY.invalidDate);
       return;
     }
-    const pretty = new Date(`${date}T00:00:00`).toLocaleDateString(undefined, {
+    const d = new Date(`${date}T00:00:00`);
+    if (d.getDay() === 0) {
+      await sendBot(COPY.closedSunday);
+      return;
+    }
+    const slots = getTimeSlots(date);
+    if (slots.length === 0) {
+      await sendBot(COPY.noSlotsToday);
+      return;
+    }
+    const pretty = d.toLocaleDateString(undefined, {
       weekday: "long",
       day: "numeric",
       month: "long",
     });
     sendUser(pretty);
-    setData((d) => ({ ...d, date }));
+    setData((dd) => ({ ...dd, date }));
     setStep("ask_time");
     await sendBot(COPY.askTime);
   };
@@ -292,6 +309,11 @@ export const SarahChat = () => {
     await sendBot("No problem — let's pick a different date.");
   };
 
+  const activeTimeSlots = useMemo(
+    () => (data.date ? getTimeSlots(data.date) : []),
+    [data.date],
+  );
+
   const textInputActive =
     step === "ask_name" || step === "ask_email" || step === "ask_phone" || step === "ask_notes";
   const placeholder =
@@ -307,7 +329,7 @@ export const SarahChat = () => {
 
   return (
     <>
-      {/* Launcher */}
+      {/* Launcher — pinned bottom-right */}
       <AnimatePresence>
         {!open && (
           <motion.button
@@ -318,7 +340,7 @@ export const SarahChat = () => {
             transition={{ duration: 0.25 }}
             onClick={() => setOpen(true)}
             aria-label="Open chat with Sarah"
-            className="fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-full bg-primary text-primary-foreground pl-2 pr-4 py-2 shadow-elegant hover:-translate-y-0.5 transition-transform"
+            className="fixed bottom-5 right-5 left-auto z-40 flex items-center gap-3 rounded-full bg-primary text-primary-foreground pl-2 pr-4 py-2 shadow-elegant hover:-translate-y-0.5 transition-transform"
           >
             <span className="relative inline-block">
               <img
@@ -341,7 +363,6 @@ export const SarahChat = () => {
       <AnimatePresence>
         {open && (
           <>
-            {/* Mobile backdrop */}
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
@@ -360,8 +381,10 @@ export const SarahChat = () => {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className={cn(
                 "fixed z-50 bg-card text-card-foreground shadow-elegant border border-border flex flex-col overflow-hidden",
-                "md:bottom-5 md:right-5 md:w-[380px] md:h-[560px] md:rounded-2xl",
-                "inset-x-0 bottom-0 max-h-[85vh] h-[85vh] rounded-t-3xl md:inset-x-auto md:max-h-none",
+                // mobile: full-width bottom sheet
+                "bottom-0 left-0 right-0 h-[85vh] max-h-[85vh] rounded-t-3xl",
+                // desktop: pinned bottom-right panel
+                "md:left-auto md:right-5 md:bottom-5 md:w-[380px] md:h-[560px] md:max-h-none md:rounded-2xl",
               )}
             >
               {/* Header */}
@@ -412,13 +435,23 @@ export const SarahChat = () => {
                     )}
                     <div
                       className={cn(
-                        "max-w-[78%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm whitespace-pre-line",
+                        "max-w-[78%] rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-line overflow-hidden",
                         m.from === "user"
-                          ? "bg-primary text-primary-foreground rounded-br-sm"
+                          ? "bg-primary text-primary-foreground rounded-br-sm px-3.5 py-2"
                           : "bg-card text-card-foreground border border-border rounded-bl-sm",
                       )}
                     >
-                      {m.text}
+                      {m.image && (
+                        <img
+                          src={m.image}
+                          alt=""
+                          loading="lazy"
+                          className="w-full h-auto block"
+                        />
+                      )}
+                      {m.text && (
+                        <div className={cn(m.from === "bot" && "px-3.5 py-2")}>{m.text}</div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
@@ -454,7 +487,6 @@ export const SarahChat = () => {
                   </motion.div>
                 )}
 
-                {/* Quick reply buttons */}
                 {!typing && step === "ask_treatment" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     {TREATMENT_OPTIONS.map((t) => (
@@ -472,7 +504,7 @@ export const SarahChat = () => {
                 {!typing && step === "treatment_info" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     <Button size="sm" onClick={goBook} className="rounded-full">
-                      Book with me
+                      {data.treatment === "Invisalign" ? "Book my consultation" : "Book with me"}
                     </Button>
                     <Button
                       size="sm"
@@ -498,7 +530,7 @@ export const SarahChat = () => {
 
                 {!typing && step === "ask_time" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
-                    {TIME_SLOTS.map((t) => (
+                    {activeTimeSlots.map((t) => (
                       <button
                         key={t}
                         onClick={() => pickTime(t)}
