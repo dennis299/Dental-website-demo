@@ -230,7 +230,9 @@ export const SarahChat = () => {
   };
 
   const lookupEmail = async (email: string) => {
-    const { data: rpc, error } = await supabase.rpc("get_patient_by_email", { _email: email });
+    const { data: rpc, error } = await supabase.functions.invoke("patient-actions", {
+      body: { action: "lookup", email },
+    });
     if (error) return null;
     return rpc as {
       found: boolean;
@@ -495,12 +497,15 @@ export const SarahChat = () => {
     sendUser("Confirm");
     setStep("submitting");
     const newISO = new Date(`${data.date}T${data.time}:00`).toISOString();
-    const { data: ok, error } = await supabase.rpc("reschedule_booking", {
-      _email: data.email,
-      _booking_id: existing.bookingId,
-      _new_datetime: newISO,
+    const { data: res, error } = await supabase.functions.invoke("patient-actions", {
+      body: {
+        action: "reschedule",
+        email: data.email,
+        bookingId: existing.bookingId,
+        newDatetime: newISO,
+      },
     });
-    if (error || !ok) {
+    if (error || !(res as any)?.success) {
       setStep("error");
       await sendBot(COPY.errorRetry);
       return;
@@ -520,11 +525,14 @@ export const SarahChat = () => {
     if (!existing) return;
     sendUser("Yes, cancel");
     setStep("submitting");
-    const { data: ok, error } = await supabase.rpc("cancel_booking", {
-      _email: data.email,
-      _booking_id: existing.bookingId,
+    const { data: res, error } = await supabase.functions.invoke("patient-actions", {
+      body: {
+        action: "cancel",
+        email: data.email,
+        bookingId: existing.bookingId,
+      },
     });
-    if (error || !ok) {
+    if (error || !(res as any)?.success) {
       setStep("error");
       await sendBot(COPY.errorRetry);
       return;
