@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-const SITE = "https://premium-smile-guide.lovable.app";
+const SITE = "https://my-dental.space";
 
 type Props = {
   title: string;

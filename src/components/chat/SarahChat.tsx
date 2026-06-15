@@ -19,10 +19,10 @@ import {
 } from "./script";
 
 type Step =
+  | "ask_email"
   | "ask_name"
   | "ask_treatment"
   | "treatment_info"
-  | "ask_email"
   | "ask_phone"
   | "ask_date"
   | "ask_time"
@@ -30,6 +30,15 @@ type Step =
   | "confirm"
   | "submitting"
   | "done"
+  // Returning patient flows
+  | "returning_menu"
+  | "reschedule_date"
+  | "reschedule_time"
+  | "reschedule_confirm"
+  | "cancel_confirm"
+  | "rescheduled"
+  | "cancelled"
+  | "question_open"
   | "error";
 
 type Msg = {
@@ -40,7 +49,7 @@ type Msg = {
 };
 
 const uid = () => Math.random().toString(36).slice(2);
-const delay = () => 700 + Math.random() * 600;
+const delay = () => 600 + Math.random() * 500;
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 const isPhone = (v: string) => v.replace(/\D/g, "").length >= 7;
 
@@ -59,25 +68,46 @@ const formatWhen = (date: string, time: string) => {
   }
 };
 
+const formatISOWhen = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleString(undefined, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+};
+
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 type Data = {
+  email: string;
   name: string;
   treatment?: TreatmentKey;
-  email?: string;
   phone?: string;
   date?: string;
   time?: string;
   notes?: string;
 };
 
+type ExistingBooking = {
+  bookingId: string;
+  treatment: string | null;
+  whenISO: string;
+};
+
 export const SarahChat = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
-  const [step, setStep] = useState<Step>("ask_name");
+  const [step, setStep] = useState<Step>("ask_email");
   const [input, setInput] = useState("");
-  const [data, setData] = useState<Data>({ name: "" });
+  const [data, setData] = useState<Data>({ email: "", name: "" });
+  const [existing, setExisting] = useState<ExistingBooking | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const greetedRef = useRef(false);
@@ -86,7 +116,6 @@ export const SarahChat = () => {
     const COOLDOWN_MS = 20_000;
     const SCROLL_THRESHOLD = 0.25;
 
-    const isBooked = () => localStorage.getItem("sarah_booked") === "1";
     const lastDismissed = () =>
       Number(sessionStorage.getItem("sarah_last_dismissed_at") || "0");
 
@@ -97,12 +126,10 @@ export const SarahChat = () => {
     window.addEventListener("open-sarah", openExternally);
 
     const tryOpen = () => {
-      if (isBooked()) return;
       if (Date.now() - lastDismissed() < COOLDOWN_MS) return;
       setOpen((o) => o || true);
     };
 
-    // 6s initial open (only if never dismissed yet this session)
     const timer = setTimeout(() => {
       if (!lastDismissed()) tryOpen();
     }, 6000);
@@ -134,7 +161,7 @@ export const SarahChat = () => {
   useEffect(() => {
     if (open && !greetedRef.current) {
       greetedRef.current = true;
-      sendBot(COPY.greeting);
+      sendBot(COPY.greetingAskEmail);
     }
   }, [open]);
 
@@ -143,7 +170,14 @@ export const SarahChat = () => {
   }, [messages, typing]);
 
   useEffect(() => {
-    if (open && (step === "ask_name" || step === "ask_email" || step === "ask_phone" || step === "ask_notes")) {
+    if (
+      open &&
+      (step === "ask_email" ||
+        step === "ask_name" ||
+        step === "ask_phone" ||
+        step === "ask_notes" ||
+        step === "question_open")
+    ) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open, step]);
@@ -165,12 +199,48 @@ export const SarahChat = () => {
   };
 
   const resetChat = async () => {
-    setData({ name: "" });
+    setData({ email: "", name: "" });
+    setExisting(null);
     setMessages([]);
-    setStep("ask_name");
+    setStep("ask_email");
     greetedRef.current = false;
-    await sendBot(COPY.greeting);
+    await sendBot(COPY.greetingAskEmail);
     greetedRef.current = true;
+  };
+
+  // Send confirmation email (fire-and-forget; chat continues either way)
+  const sendConfirmationEmail = async (kind: "booking" | "reschedule" | "cancellation", payload: Record<string, unknown>) => {
+    try {
+      await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName:
+            kind === "booking"
+              ? "booking-confirmation"
+              : kind === "reschedule"
+              ? "booking-reschedule"
+              : "booking-cancellation",
+          recipientEmail: data.email,
+          idempotencyKey: `${kind}-${payload.bookingId ?? Date.now()}`,
+          templateData: payload,
+        },
+      });
+    } catch {
+      // best-effort
+    }
+  };
+
+  const lookupEmail = async (email: string) => {
+    const { data: rpc, error } = await supabase.rpc("get_patient_by_email", { _email: email });
+    if (error) return null;
+    return rpc as {
+      found: boolean;
+      name?: string;
+      phone?: string;
+      has_active_booking?: boolean;
+      next_appointment_at?: string;
+      next_treatment?: string | null;
+      next_booking_id?: string;
+    } | null;
   };
 
   const handleTextSubmit = async (e: FormEvent) => {
@@ -179,7 +249,39 @@ export const SarahChat = () => {
     if (!v && step !== "ask_notes") return;
     setInput("");
 
-    if (step === "ask_name") {
+    if (step === "ask_email") {
+      sendUser(v);
+      if (!isEmail(v)) {
+        await sendBot(COPY.invalidEmail);
+        return;
+      }
+      setData((d) => ({ ...d, email: v }));
+      const res = await lookupEmail(v);
+      if (res?.found) {
+        setData((d) => ({ ...d, name: res.name ?? "", phone: res.phone }));
+        if (res.has_active_booking && res.next_appointment_at && res.next_booking_id) {
+          setExisting({
+            bookingId: res.next_booking_id,
+            treatment: res.next_treatment ?? null,
+            whenISO: res.next_appointment_at,
+          });
+          setStep("returning_menu");
+          await sendBot(
+            COPY.welcomeBackBooked(
+              res.name ?? "there",
+              formatISOWhen(res.next_appointment_at),
+              res.next_treatment ?? "your appointment",
+            ),
+          );
+        } else {
+          setStep("ask_treatment");
+          await sendBot(COPY.welcomeBackNoBooking(res.name ?? "there"));
+        }
+      } else {
+        setStep("ask_name");
+        await sendBot(COPY.askName);
+      }
+    } else if (step === "ask_name") {
       if (v.length < 2) {
         sendUser(v);
         await sendBot(COPY.invalidName);
@@ -190,15 +292,6 @@ export const SarahChat = () => {
       setData((d) => ({ ...d, name }));
       setStep("ask_treatment");
       await sendBot(COPY.niceToMeet(name));
-    } else if (step === "ask_email") {
-      sendUser(v);
-      if (!isEmail(v)) {
-        await sendBot(COPY.invalidEmail);
-        return;
-      }
-      setData((d) => ({ ...d, email: v }));
-      setStep("ask_phone");
-      await sendBot(COPY.askPhone);
     } else if (step === "ask_phone") {
       sendUser(v);
       if (!isPhone(v)) {
@@ -212,6 +305,11 @@ export const SarahChat = () => {
       sendUser(v || "(no notes)");
       setData((d) => ({ ...d, notes: v || undefined }));
       await goToConfirm({ ...data, notes: v || undefined });
+    } else if (step === "question_open") {
+      sendUser(v);
+      await sendBot(
+        "Thanks — I've passed that on to the team and they'll follow up by email shortly. Anything else I can help with?",
+      );
     }
   };
 
@@ -222,7 +320,7 @@ export const SarahChat = () => {
       COPY.confirm({
         name: d.name,
         treatment: d.treatment ?? "General Consultation",
-        email: d.email ?? "",
+        email: d.email,
         phone: d.phone ?? "",
         when,
       }),
@@ -244,8 +342,14 @@ export const SarahChat = () => {
 
   const goBook = async () => {
     sendUser(data.treatment === "Invisalign" ? "Book my consultation" : "Book with me");
-    setStep("ask_email");
-    await sendBot(COPY.askEmail(data.name));
+    // Returning patients already have phone; skip to date
+    if (data.phone && isPhone(data.phone)) {
+      setStep("ask_date");
+      await sendBot(COPY.askDate);
+    } else {
+      setStep("ask_phone");
+      await sendBot(COPY.askPhone(data.name));
+    }
   };
 
   const viewResults = () => {
@@ -302,14 +406,18 @@ export const SarahChat = () => {
     const treatmentValue = data.treatment ? TREATMENT_MAP[data.treatment] : null;
     const preferred = new Date(`${data.date}T${data.time}:00`).toISOString();
 
-    const { error } = await supabase.from("bookings").insert({
-      name: data.name,
-      phone: data.phone!,
-      email: data.email!,
-      treatment: treatmentValue,
-      preferred_datetime: preferred,
-      message: data.notes ?? null,
-    });
+    const { data: inserted, error } = await supabase
+      .from("bookings")
+      .insert({
+        name: data.name,
+        phone: data.phone!,
+        email: data.email,
+        treatment: treatmentValue,
+        preferred_datetime: preferred,
+        message: data.notes ?? null,
+      })
+      .select("id")
+      .single();
 
     if (error) {
       setStep("error");
@@ -318,14 +426,118 @@ export const SarahChat = () => {
     }
 
     setStep("done");
-    localStorage.setItem("sarah_booked", "1");
-    await sendBot(COPY.success(formatWhen(data.date!, data.time!), data.phone!));
+    await sendConfirmationEmail("booking", {
+      bookingId: inserted.id,
+      name: data.name,
+      treatment: treatmentValue,
+      whenISO: preferred,
+      whenPretty: formatWhen(data.date!, data.time!),
+      phone: data.phone,
+      notes: data.notes ?? null,
+    });
+    await sendBot(COPY.success(formatWhen(data.date!, data.time!)));
   };
 
-  const editDetails = async () => {
-    sendUser("Edit details");
-    setStep("ask_date");
-    await sendBot("No problem — let's pick a different date.");
+  // Returning-patient actions
+  const startReschedule = async () => {
+    sendUser("Reschedule");
+    setStep("reschedule_date");
+    await sendBot(COPY.rescheduleAskDate);
+  };
+
+  const startCancel = async () => {
+    sendUser("Cancel");
+    setStep("cancel_confirm");
+    await sendBot(COPY.cancelConfirm);
+  };
+
+  const askQuestion = async () => {
+    sendUser("I have a question");
+    setStep("question_open");
+    await sendBot(COPY.askQuestion);
+  };
+
+  const pickRescheduleDate = async (date: string) => {
+    if (date < todayISO()) {
+      await sendBot(COPY.invalidDate);
+      return;
+    }
+    const d = new Date(`${date}T00:00:00`);
+    if (d.getDay() === 0) {
+      await sendBot(COPY.closedSunday);
+      return;
+    }
+    const slots = getTimeSlots(date);
+    if (slots.length === 0) {
+      await sendBot(COPY.noSlotsToday);
+      return;
+    }
+    const pretty = d.toLocaleDateString(undefined, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+    sendUser(pretty);
+    setData((dd) => ({ ...dd, date }));
+    setStep("reschedule_time");
+    await sendBot(COPY.askTime);
+  };
+
+  const pickRescheduleTime = async (time: string) => {
+    sendUser(time);
+    setData((d) => ({ ...d, time }));
+    setStep("reschedule_confirm");
+    await sendBot(COPY.rescheduleConfirm(formatWhen(data.date!, time)));
+  };
+
+  const confirmReschedule = async () => {
+    if (!existing) return;
+    sendUser("Confirm");
+    setStep("submitting");
+    const newISO = new Date(`${data.date}T${data.time}:00`).toISOString();
+    const { data: ok, error } = await supabase.rpc("reschedule_booking", {
+      _email: data.email,
+      _booking_id: existing.bookingId,
+      _new_datetime: newISO,
+    });
+    if (error || !ok) {
+      setStep("error");
+      await sendBot(COPY.errorRetry);
+      return;
+    }
+    setStep("rescheduled");
+    await sendConfirmationEmail("reschedule", {
+      bookingId: existing.bookingId,
+      name: data.name,
+      treatment: existing.treatment,
+      whenISO: newISO,
+      whenPretty: formatWhen(data.date!, data.time!),
+    });
+    await sendBot(COPY.rescheduleDone(formatWhen(data.date!, data.time!)));
+  };
+
+  const confirmCancel = async () => {
+    if (!existing) return;
+    sendUser("Yes, cancel");
+    setStep("submitting");
+    const { data: ok, error } = await supabase.rpc("cancel_booking", {
+      _email: data.email,
+      _booking_id: existing.bookingId,
+    });
+    if (error || !ok) {
+      setStep("error");
+      await sendBot(COPY.errorRetry);
+      return;
+    }
+    setStep("cancelled");
+    await sendConfirmationEmail("cancellation", {
+      bookingId: existing.bookingId,
+      name: data.name,
+      treatment: existing.treatment,
+      whenISO: existing.whenISO,
+      whenPretty: formatISOWhen(existing.whenISO),
+    });
+    await sendBot(COPY.cancelDone);
   };
 
   const activeTimeSlots = useMemo(
@@ -334,21 +546,26 @@ export const SarahChat = () => {
   );
 
   const textInputActive =
-    step === "ask_name" || step === "ask_email" || step === "ask_phone" || step === "ask_notes";
+    step === "ask_email" ||
+    step === "ask_name" ||
+    step === "ask_phone" ||
+    step === "ask_notes" ||
+    step === "question_open";
   const placeholder =
-    step === "ask_name"
-      ? "Type your first name…"
-      : step === "ask_email"
+    step === "ask_email"
       ? "you@example.com"
+      : step === "ask_name"
+      ? "Type your first name…"
       : step === "ask_phone"
       ? "Your phone number"
       : step === "ask_notes"
       ? "Any notes for the team…"
+      : step === "question_open"
+      ? "Type your question…"
       : "";
 
   return (
     <>
-      {/* Launcher — pinned bottom-right */}
       <AnimatePresence>
         {!open && (
           <motion.button
@@ -378,7 +595,6 @@ export const SarahChat = () => {
         )}
       </AnimatePresence>
 
-      {/* Widget */}
       <AnimatePresence>
         {open && (
           <>
@@ -400,13 +616,10 @@ export const SarahChat = () => {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className={cn(
                 "fixed z-50 bg-card text-card-foreground shadow-elegant border border-border flex flex-col overflow-hidden",
-                // mobile: full-width bottom sheet
                 "bottom-0 left-0 right-0 h-[85vh] max-h-[85vh] rounded-t-3xl",
-                // desktop: pinned bottom-right panel
                 "md:left-auto md:right-5 md:bottom-5 md:w-[380px] md:h-[560px] md:max-h-none md:rounded-2xl",
               )}
             >
-              {/* Header */}
               <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-br from-primary/5 to-transparent">
                 <span className="relative inline-block">
                   <img
@@ -432,7 +645,6 @@ export const SarahChat = () => {
                 </button>
               </div>
 
-              {/* Messages */}
               <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/30">
                 {messages.map((m) => (
                   <motion.div
@@ -461,12 +673,7 @@ export const SarahChat = () => {
                       )}
                     >
                       {m.image && (
-                        <img
-                          src={m.image}
-                          alt=""
-                          loading="lazy"
-                          className="w-full h-auto block"
-                        />
+                        <img src={m.image} alt="" loading="lazy" className="w-full h-auto block" />
                       )}
                       {m.text && (
                         <div className={cn(m.from === "bot" && "px-3.5 py-2")}>{m.text}</div>
@@ -476,11 +683,7 @@ export const SarahChat = () => {
                 ))}
 
                 {typing && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex gap-2 items-end"
-                  >
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2 items-end">
                     <img
                       src={sarahAvatar}
                       alt=""
@@ -506,6 +709,14 @@ export const SarahChat = () => {
                   </motion.div>
                 )}
 
+                {!typing && step === "returning_menu" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" onClick={startReschedule} className="rounded-full">Reschedule</Button>
+                    <Button size="sm" variant="outline" onClick={startCancel} className="rounded-full">Cancel</Button>
+                    <Button size="sm" variant="outline" onClick={askQuestion} className="rounded-full">I have a question</Button>
+                  </div>
+                )}
+
                 {!typing && step === "ask_treatment" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     {TREATMENT_OPTIONS.map((t) => (
@@ -525,34 +736,34 @@ export const SarahChat = () => {
                     <Button size="sm" onClick={goBook} className="rounded-full">
                       {data.treatment === "Invisalign" ? "Book my consultation" : "Book with me"}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={viewResults}
-                      className="rounded-full"
-                    >
+                    <Button size="sm" variant="outline" onClick={viewResults} className="rounded-full">
                       View Before & After
                     </Button>
                   </div>
                 )}
 
-                {!typing && step === "ask_date" && (
+                {!typing && (step === "ask_date" || step === "reschedule_date") && (
                   <div className="pt-1 pl-9">
                     <Input
                       type="date"
                       min={todayISO()}
-                      onChange={(e) => e.target.value && pickDate(e.target.value)}
+                      onChange={(e) =>
+                        e.target.value &&
+                        (step === "ask_date" ? pickDate(e.target.value) : pickRescheduleDate(e.target.value))
+                      }
                       className="rounded-full max-w-[220px]"
                     />
                   </div>
                 )}
 
-                {!typing && step === "ask_time" && (
+                {!typing && (step === "ask_time" || step === "reschedule_time") && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     {activeTimeSlots.map((t) => (
                       <button
                         key={t}
-                        onClick={() => pickTime(t)}
+                        onClick={() =>
+                          step === "ask_time" ? pickTime(t) : pickRescheduleTime(t)
+                        }
                         className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
                       >
                         {t}
@@ -574,30 +785,48 @@ export const SarahChat = () => {
                     <Button size="sm" onClick={submitBooking} className="rounded-full shadow-elegant">
                       Confirm booking
                     </Button>
-                    <Button size="sm" variant="outline" onClick={editDetails} className="rounded-full">
-                      Edit details
+                  </div>
+                )}
+
+                {!typing && step === "reschedule_confirm" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" onClick={confirmReschedule} className="rounded-full shadow-elegant">
+                      Confirm
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => { setStep("reschedule_date"); sendBot(COPY.rescheduleAskDate); }} className="rounded-full">
+                      Pick another date
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "cancel_confirm" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" onClick={confirmCancel} className="rounded-full">
+                      Yes, cancel
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => { setStep("returning_menu"); sendBot("No problem — your appointment is still on. Anything else I can help with?"); }} className="rounded-full">
+                      Keep my appointment
                     </Button>
                   </div>
                 )}
 
                 {!typing && step === "error" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
-                    <Button size="sm" onClick={submitBooking} className="rounded-full">
-                      Try again
+                    <Button size="sm" onClick={resetChat} className="rounded-full">
+                      Start over
                     </Button>
                   </div>
                 )}
 
-                {!typing && step === "done" && (
+                {!typing && (step === "done" || step === "rescheduled" || step === "cancelled") && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
-                    <Button size="sm" variant="outline" onClick={resetChat} className="rounded-full">
-                      Book another time
+                    <Button size="sm" variant="outline" onClick={handleClose} className="rounded-full">
+                      Close chat
                     </Button>
                   </div>
                 )}
               </div>
 
-              {/* Input */}
               <div className="border-t border-border p-3 bg-card">
                 {textInputActive ? (
                   <form onSubmit={handleTextSubmit} className="flex gap-2">
@@ -621,8 +850,8 @@ export const SarahChat = () => {
                 ) : (
                   <p className="text-xs text-center text-muted-foreground py-2">
                     {step === "submitting"
-                      ? "Booking your appointment…"
-                      : step === "done"
+                      ? "Just a moment…"
+                      : step === "done" || step === "rescheduled" || step === "cancelled"
                       ? "Thanks for chatting 💙"
                       : "Tap a button above to continue"}
                   </p>

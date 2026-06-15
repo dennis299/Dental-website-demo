@@ -48,16 +48,33 @@ export const BookingModal = ({ open, onOpenChange, treatments, preselect, prefil
 
 
   const onSubmit = async (values: FormValues) => {
-    const { error } = await supabase.from("bookings").insert({
-      name: values.name,
-      phone: values.phone,
-      email: values.email,
-      treatment: values.treatment || null,
-      preferred_datetime: new Date(values.datetime).toISOString(),
-      message: values.message || null,
-    });
+    // Block double-booking: if the email already has a future appointment, refuse.
+    const { data: lookup } = await supabase.rpc("get_patient_by_email", { _email: values.email });
+    const found = (lookup as { found?: boolean; has_active_booking?: boolean } | null) ?? null;
+    if (found?.found && found.has_active_booking) {
+      toast({
+        title: "You already have a booking",
+        description: "Please use the chat to reschedule or cancel your existing appointment first.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    if (error) {
+    const preferred = new Date(values.datetime).toISOString();
+    const { data: inserted, error } = await supabase
+      .from("bookings")
+      .insert({
+        name: values.name,
+        phone: values.phone,
+        email: values.email,
+        treatment: values.treatment || null,
+        preferred_datetime: preferred,
+        message: values.message || null,
+      })
+      .select("id")
+      .single();
+
+    if (error || !inserted) {
       toast({
         title: "Something went wrong",
         description: "Please try again or call us directly.",
@@ -66,9 +83,35 @@ export const BookingModal = ({ open, onOpenChange, treatments, preselect, prefil
       return;
     }
 
+    // Fire-and-forget confirmation email
+    supabase.functions
+      .invoke("send-transactional-email", {
+        body: {
+          templateName: "booking-confirmation",
+          recipientEmail: values.email,
+          idempotencyKey: `booking-${inserted.id}`,
+          templateData: {
+            bookingId: inserted.id,
+            name: values.name,
+            treatment: values.treatment || "General Consultation",
+            whenISO: preferred,
+            whenPretty: new Date(preferred).toLocaleString(undefined, {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            phone: values.phone,
+            notes: values.message ?? null,
+          },
+        },
+      })
+      .catch(() => {});
+
     toast({
-      title: "Request sent",
-      description: "We'll be in touch shortly to confirm your appointment.",
+      title: "Booking confirmed",
+      description: "Check your inbox — we've just sent a confirmation with all the details.",
     });
     reset();
     onOpenChange(false);
