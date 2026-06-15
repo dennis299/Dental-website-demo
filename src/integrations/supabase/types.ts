@@ -181,6 +181,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_hits: {
+        Row: {
+          bucket: string
+          hit_at: string
+          id: number
+        }
+        Insert: {
+          bucket: string
+          hit_at?: string
+          id?: number
+        }
+        Update: {
+          bucket?: string
+          hit_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -213,6 +231,10 @@ export type Database = {
       cancel_booking: {
         Args: { _booking_id: string; _email: string }
         Returns: boolean
+      }
+      check_rate_limit: {
+        Args: { _bucket: string; _max_hits: number; _window_seconds: number }
+        Returns: Json
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }
