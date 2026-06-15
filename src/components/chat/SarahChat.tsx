@@ -83,27 +83,36 @@ export const SarahChat = () => {
   const greetedRef = useRef(false);
 
   useEffect(() => {
+    const COOLDOWN_MS = 20_000;
+    const SCROLL_THRESHOLD = 0.25;
+
+    const isBooked = () => localStorage.getItem("sarah_booked") === "1";
+    const lastDismissed = () =>
+      Number(sessionStorage.getItem("sarah_last_dismissed_at") || "0");
+
     const openExternally = () => {
-      sessionStorage.removeItem("sarah_dismissed");
+      sessionStorage.removeItem("sarah_last_dismissed_at");
       setOpen(true);
     };
     window.addEventListener("open-sarah", openExternally);
 
-    if (sessionStorage.getItem("sarah_dismissed")) {
-      return () => window.removeEventListener("open-sarah", openExternally);
-    }
-    let opened = false;
-    const trigger = () => {
-      if (opened) return;
-      opened = true;
-      setOpen(true);
+    const tryOpen = () => {
+      if (isBooked()) return;
+      if (Date.now() - lastDismissed() < COOLDOWN_MS) return;
+      setOpen((o) => o || true);
     };
-    const timer = setTimeout(trigger, 6000);
+
+    // 6s initial open (only if never dismissed yet this session)
+    const timer = setTimeout(() => {
+      if (!lastDismissed()) tryOpen();
+    }, 6000);
+
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (max > 0 && window.scrollY / max >= 0.35) trigger();
+      if (max > 0 && window.scrollY / max >= SCROLL_THRESHOLD) tryOpen();
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
