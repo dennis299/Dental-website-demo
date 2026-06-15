@@ -143,6 +143,48 @@ Deno.serve(async (req) => {
   // Create Supabase client with service role (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+  // Defense-in-depth rate limiting. Caller is already restricted to service-role,
+  // but caps per-recipient and per-template prevent a compromised caller (or buggy
+  // loop) from blasting a single inbox or burning the sending domain reputation.
+  const normalizedRecipient = effectiveRecipient.toLowerCase()
+  const rateLimits = [
+    { bucket: `email:recipient:${normalizedRecipient}`, max: 20, windowSec: 3600 },
+    { bucket: `email:template:${templateName}`, max: 200, windowSec: 3600 },
+  ]
+  for (const l of rateLimits) {
+    const { data, error } = await supabase.rpc('check_rate_limit', {
+      _bucket: l.bucket,
+      _max_hits: l.max,
+      _window_seconds: l.windowSec,
+    })
+    if (error) {
+      console.error('rate_limit_check_failed', { bucket: l.bucket, error })
+      continue // fail-open on infra error
+    }
+    if (data && (data as any).allowed === false) {
+      const retry = (data as any).retry_after ?? l.windowSec
+      console.warn('email_rate_limited', { bucket: l.bucket, templateName })
+      await supabase.from('email_send_log').insert({
+        message_id: messageId,
+        template_name: templateName,
+        recipient_email: effectiveRecipient,
+        status: 'failed',
+        error_message: `rate_limited:${l.bucket}`,
+      })
+      return new Response(
+        JSON.stringify({ error: 'rate_limited', retry_after: retry }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+            'Retry-After': String(retry),
+          },
+        },
+      )
+    }
+  }
+
   // 2. Check suppression list (fail-closed: if we can't verify, don't send)
   const { data: suppressed, error: suppressionError } = await supabase
     .from('suppressed_emails')
