@@ -505,14 +505,14 @@ export const SarahChat = () => {
   };
 
   const confirmReschedule = async () => {
-    if (!existing) return;
+    if (!existing || !sessionToken) return;
     sendUser("Confirm");
     setStep("submitting");
     const newISO = new Date(`${data.date}T${data.time}:00`).toISOString();
     const { data: res, error } = await supabase.functions.invoke("patient-actions", {
       body: {
         action: "reschedule",
-        email: data.email,
+        sessionToken,
         newDatetime: newISO,
       },
     });
@@ -526,13 +526,13 @@ export const SarahChat = () => {
   };
 
   const confirmCancel = async () => {
-    if (!existing) return;
+    if (!existing || !sessionToken) return;
     sendUser("Yes, cancel");
     setStep("submitting");
     const { data: res, error } = await supabase.functions.invoke("patient-actions", {
       body: {
         action: "cancel",
-        email: data.email,
+        sessionToken,
       },
     });
     if (error || !(res as any)?.success) {
@@ -551,6 +551,7 @@ export const SarahChat = () => {
 
   const textInputActive =
     step === "ask_email" ||
+    step === "ask_otp" ||
     step === "ask_name" ||
     step === "ask_phone" ||
     step === "ask_notes" ||
@@ -558,6 +559,8 @@ export const SarahChat = () => {
   const placeholder =
     step === "ask_email"
       ? "you@example.com"
+      : step === "ask_otp"
+      ? "6-digit code"
       : step === "ask_name"
       ? "Type your first name…"
       : step === "ask_phone"
