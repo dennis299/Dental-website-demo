@@ -204,6 +204,7 @@ export const SarahChat = () => {
   const resetChat = async () => {
     setData({ email: "", name: "" });
     setExisting(null);
+    setSessionToken(null);
     setMessages([]);
     setStep("ask_email");
     greetedRef.current = false;
@@ -211,20 +212,34 @@ export const SarahChat = () => {
     greetedRef.current = true;
   };
 
-  // Email is sent server-side by the patient-actions edge function.
-
-  const lookupEmail = async (email: string) => {
-    const { data: rpc, error } = await supabase.functions.invoke("patient-actions", {
-      body: { action: "lookup", email },
+  // Ask the server to email a 6-digit verification code. Server is
+  // intentionally vague about whether the address belongs to a patient,
+  // so we always advance to the OTP step.
+  const requestOtp = async (email: string): Promise<boolean> => {
+    const { error } = await supabase.functions.invoke("patient-actions", {
+      body: { action: "request_otp", email },
     });
-    if (error) return null;
-    return rpc as {
-      found: boolean;
-      name?: string;
-      has_active_booking?: boolean;
-      next_appointment_at?: string;
-      next_treatment?: string | null;
-    } | null;
+    return !error;
+  };
+
+  // Submit the OTP. On success the server returns patient state (if any)
+  // plus a short-lived session token used for subsequent mutations.
+  const verifyOtp = async (email: string, otp: string) => {
+    const { data: res, error } = await supabase.functions.invoke("patient-actions", {
+      body: { action: "lookup", email, otp },
+    });
+    if (error) return { ok: false as const, status: (error as any)?.context?.status };
+    return {
+      ok: true as const,
+      payload: res as {
+        found: boolean;
+        name?: string;
+        has_active_booking?: boolean;
+        next_appointment_at?: string;
+        next_treatment?: string | null;
+        session_token: string;
+      },
+    };
   };
 
   const handleTextSubmit = async (e: FormEvent) => {
@@ -240,8 +255,27 @@ export const SarahChat = () => {
         return;
       }
       setData((d) => ({ ...d, email: v }));
-      const res = await lookupEmail(v);
-      if (res?.found) {
+      const ok = await requestOtp(v);
+      if (!ok) {
+        await sendBot(COPY.errorRetry);
+        return;
+      }
+      setStep("ask_otp");
+      await sendBot(COPY.otpSent(v));
+    } else if (step === "ask_otp") {
+      sendUser(v.replace(/\d/g, "•"));
+      if (!isOtp(v)) {
+        await sendBot(COPY.invalidOtp);
+        return;
+      }
+      const result = await verifyOtp(data.email, v);
+      if (!result.ok || !result.payload) {
+        await sendBot(COPY.invalidOtp);
+        return;
+      }
+      const res = result.payload;
+      setSessionToken(res.session_token);
+      if (res.found) {
         setData((d) => ({ ...d, name: res.name ?? "" }));
         if (res.has_active_booking && res.next_appointment_at) {
           setExisting({
@@ -262,6 +296,7 @@ export const SarahChat = () => {
         }
       } else {
         setStep("ask_name");
+        await sendBot(COPY.newPatientAfterOtp);
         await sendBot(COPY.askName);
       }
     } else if (step === "ask_name") {
@@ -294,6 +329,12 @@ export const SarahChat = () => {
         "Thanks — I've passed that on to the team and they'll follow up by email shortly. Anything else I can help with?",
       );
     }
+  };
+
+  const resendOtp = async () => {
+    sendUser("Resend code");
+    const ok = await requestOtp(data.email);
+    await sendBot(ok ? COPY.otpResent : COPY.errorRetry);
   };
 
   const goToConfirm = async (d: Data) => {
