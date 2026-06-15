@@ -20,6 +20,7 @@ import {
 
 type Step =
   | "ask_email"
+  | "ask_otp"
   | "ask_name"
   | "ask_treatment"
   | "treatment_info"
@@ -52,6 +53,7 @@ const uid = () => Math.random().toString(36).slice(2);
 const delay = () => 600 + Math.random() * 500;
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 const isPhone = (v: string) => v.replace(/\D/g, "").length >= 7;
+const isOtp = (v: string) => /^\d{6}$/.test(v.trim());
 
 const formatWhen = (date: string, time: string) => {
   try {
