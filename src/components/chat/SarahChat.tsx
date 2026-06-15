@@ -318,6 +318,7 @@ export const SarahChat = () => {
     }
 
     setStep("done");
+    localStorage.setItem("sarah_booked", "1");
     await sendBot(COPY.success(formatWhen(data.date!, data.time!), data.phone!));
   };
 
