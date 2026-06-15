@@ -251,6 +251,13 @@ Deno.serve(async (req) => {
       if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
       const email = (body.email as string).toLowerCase().trim()
 
+      const limited = await rateLimit([
+        { bucket: `pa:cancel:ip:${ip}`, max: 3, windowSec: 60 },
+        { bucket: `pa:write:ip:${ip}`, max: 10, windowSec: 3600 },
+        { bucket: `pa:write:email:${email}`, max: 5, windowSec: 3600 },
+      ])
+      if (limited) return limited
+
       const { data: booking, error: bErr } = await supabase
         .from('bookings')
         .select('id, name')
