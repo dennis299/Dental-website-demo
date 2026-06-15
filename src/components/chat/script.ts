@@ -72,6 +72,16 @@ export const getTimeSlots = (dateISO: string): string[] => {
 export const COPY = {
   greetingAskEmail:
     "👋 Hi! Welcome to Evergreen Dental. I'm Sarah, your treatment coordinator. To get started, what's your email address?",
+  otpSent: (email: string) =>
+    `For your security, I've just emailed a 6-digit verification code to ${email}. Pop it in below and we'll get going.`,
+  otpResent:
+    "I've sent a fresh code — please check your inbox (and your spam folder, just in case).",
+  invalidOtp:
+    "That code doesn't look right. Please double-check the email and try again — codes are 6 digits.",
+  otpLocked:
+    "Too many attempts. I'll need to send you a fresh code — just tap Resend.",
+  newPatientAfterOtp:
+    "Thanks — you're verified ✅ I don't see an existing appointment for you yet. Let's get one set up!",
   welcomeBackBooked: (name: string, when: string, treatment: string) =>
     `Welcome back, ${name}! 💙\n\nI can see you already have an appointment booked:\n\n• ${treatment}\n• ${when}\n\nWhat would you like to do?`,
   welcomeBackNoBooking: (name: string) =>

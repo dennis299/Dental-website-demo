@@ -20,6 +20,7 @@ import {
 
 type Step =
   | "ask_email"
+  | "ask_otp"
   | "ask_name"
   | "ask_treatment"
   | "treatment_info"
@@ -52,6 +53,7 @@ const uid = () => Math.random().toString(36).slice(2);
 const delay = () => 600 + Math.random() * 500;
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 const isPhone = (v: string) => v.replace(/\D/g, "").length >= 7;
+const isOtp = (v: string) => /^\d{6}$/.test(v.trim());
 
 const formatWhen = (date: string, time: string) => {
   try {
@@ -107,6 +109,7 @@ export const SarahChat = () => {
   const [input, setInput] = useState("");
   const [data, setData] = useState<Data>({ email: "", name: "" });
   const [existing, setExisting] = useState<ExistingBooking | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const greetedRef = useRef(false);
@@ -172,6 +175,7 @@ export const SarahChat = () => {
     if (
       open &&
       (step === "ask_email" ||
+        step === "ask_otp" ||
         step === "ask_name" ||
         step === "ask_phone" ||
         step === "ask_notes" ||
@@ -200,6 +204,7 @@ export const SarahChat = () => {
   const resetChat = async () => {
     setData({ email: "", name: "" });
     setExisting(null);
+    setSessionToken(null);
     setMessages([]);
     setStep("ask_email");
     greetedRef.current = false;
@@ -207,20 +212,34 @@ export const SarahChat = () => {
     greetedRef.current = true;
   };
 
-  // Email is sent server-side by the patient-actions edge function.
-
-  const lookupEmail = async (email: string) => {
-    const { data: rpc, error } = await supabase.functions.invoke("patient-actions", {
-      body: { action: "lookup", email },
+  // Ask the server to email a 6-digit verification code. Server is
+  // intentionally vague about whether the address belongs to a patient,
+  // so we always advance to the OTP step.
+  const requestOtp = async (email: string): Promise<boolean> => {
+    const { error } = await supabase.functions.invoke("patient-actions", {
+      body: { action: "request_otp", email },
     });
-    if (error) return null;
-    return rpc as {
-      found: boolean;
-      name?: string;
-      has_active_booking?: boolean;
-      next_appointment_at?: string;
-      next_treatment?: string | null;
-    } | null;
+    return !error;
+  };
+
+  // Submit the OTP. On success the server returns patient state (if any)
+  // plus a short-lived session token used for subsequent mutations.
+  const verifyOtp = async (email: string, otp: string) => {
+    const { data: res, error } = await supabase.functions.invoke("patient-actions", {
+      body: { action: "lookup", email, otp },
+    });
+    if (error) return { ok: false as const, status: (error as any)?.context?.status };
+    return {
+      ok: true as const,
+      payload: res as {
+        found: boolean;
+        name?: string;
+        has_active_booking?: boolean;
+        next_appointment_at?: string;
+        next_treatment?: string | null;
+        session_token: string;
+      },
+    };
   };
 
   const handleTextSubmit = async (e: FormEvent) => {
@@ -236,8 +255,27 @@ export const SarahChat = () => {
         return;
       }
       setData((d) => ({ ...d, email: v }));
-      const res = await lookupEmail(v);
-      if (res?.found) {
+      const ok = await requestOtp(v);
+      if (!ok) {
+        await sendBot(COPY.errorRetry);
+        return;
+      }
+      setStep("ask_otp");
+      await sendBot(COPY.otpSent(v));
+    } else if (step === "ask_otp") {
+      sendUser(v.replace(/\d/g, "•"));
+      if (!isOtp(v)) {
+        await sendBot(COPY.invalidOtp);
+        return;
+      }
+      const result = await verifyOtp(data.email, v);
+      if (!result.ok || !result.payload) {
+        await sendBot(COPY.invalidOtp);
+        return;
+      }
+      const res = result.payload;
+      setSessionToken(res.session_token);
+      if (res.found) {
         setData((d) => ({ ...d, name: res.name ?? "" }));
         if (res.has_active_booking && res.next_appointment_at) {
           setExisting({
@@ -258,6 +296,7 @@ export const SarahChat = () => {
         }
       } else {
         setStep("ask_name");
+        await sendBot(COPY.newPatientAfterOtp);
         await sendBot(COPY.askName);
       }
     } else if (step === "ask_name") {
@@ -290,6 +329,12 @@ export const SarahChat = () => {
         "Thanks — I've passed that on to the team and they'll follow up by email shortly. Anything else I can help with?",
       );
     }
+  };
+
+  const resendOtp = async () => {
+    sendUser("Resend code");
+    const ok = await requestOtp(data.email);
+    await sendBot(ok ? COPY.otpResent : COPY.errorRetry);
   };
 
   const goToConfirm = async (d: Data) => {
@@ -460,14 +505,14 @@ export const SarahChat = () => {
   };
 
   const confirmReschedule = async () => {
-    if (!existing) return;
+    if (!existing || !sessionToken) return;
     sendUser("Confirm");
     setStep("submitting");
     const newISO = new Date(`${data.date}T${data.time}:00`).toISOString();
     const { data: res, error } = await supabase.functions.invoke("patient-actions", {
       body: {
         action: "reschedule",
-        email: data.email,
+        sessionToken,
         newDatetime: newISO,
       },
     });
@@ -481,13 +526,13 @@ export const SarahChat = () => {
   };
 
   const confirmCancel = async () => {
-    if (!existing) return;
+    if (!existing || !sessionToken) return;
     sendUser("Yes, cancel");
     setStep("submitting");
     const { data: res, error } = await supabase.functions.invoke("patient-actions", {
       body: {
         action: "cancel",
-        email: data.email,
+        sessionToken,
       },
     });
     if (error || !(res as any)?.success) {
@@ -506,6 +551,7 @@ export const SarahChat = () => {
 
   const textInputActive =
     step === "ask_email" ||
+    step === "ask_otp" ||
     step === "ask_name" ||
     step === "ask_phone" ||
     step === "ask_notes" ||
@@ -513,6 +559,8 @@ export const SarahChat = () => {
   const placeholder =
     step === "ask_email"
       ? "you@example.com"
+      : step === "ask_otp"
+      ? "6-digit code"
       : step === "ask_name"
       ? "Type your first name…"
       : step === "ask_phone"
@@ -668,6 +716,14 @@ export const SarahChat = () => {
                   </motion.div>
                 )}
 
+                {!typing && step === "ask_otp" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" variant="outline" onClick={resendOtp} className="rounded-full">
+                      Resend code
+                    </Button>
+                  </div>
+                )}
+
                 {!typing && step === "returning_menu" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     <Button size="sm" onClick={startReschedule} className="rounded-full">Reschedule</Button>
@@ -794,7 +850,10 @@ export const SarahChat = () => {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder={placeholder}
-                      type={step === "ask_email" ? "email" : step === "ask_phone" ? "tel" : "text"}
+                      type={step === "ask_email" ? "email" : step === "ask_phone" ? "tel" : step === "ask_otp" ? "text" : "text"}
+                      inputMode={step === "ask_otp" ? "numeric" : undefined}
+                      autoComplete={step === "ask_otp" ? "one-time-code" : undefined}
+                      maxLength={step === "ask_otp" ? 6 : undefined}
                       className="rounded-full"
                     />
                     <Button
