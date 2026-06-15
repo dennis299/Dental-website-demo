@@ -32,14 +32,35 @@ const ServiceDetail = () => {
         title={`${t.name} in London | Evergreen Dental`}
         description={`${t.short} Transparent pricing from ${t.priceFrom}. Book a free consultation with Evergreen Dental in Marylebone.`}
         path={`/services/${t.slug}`}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "MedicalProcedure",
-          name: t.name,
-          description: t.short,
-          provider: { "@type": "Dentist", name: "Evergreen Dental" },
-        }}
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "MedicalProcedure",
+            name: t.name,
+            description: t.short,
+            provider: { "@type": "Dentist", name: "Evergreen Dental" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://my-dental.space/" },
+              { "@type": "ListItem", position: 2, name: "Services", item: "https://my-dental.space/services" },
+              { "@type": "ListItem", position: 3, name: t.name, item: `https://my-dental.space/services/${t.slug}` },
+            ],
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: t.faqs.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          },
+        ]}
       />
+
 
       {/* Hero */}
       <section className="bg-gradient-hero border-b border-border/60">
