@@ -16,37 +16,81 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          confirmation_token: string
           created_at: string
           email: string
           id: string
           message: string | null
           name: string
+          patient_id: string | null
           phone: string
           preferred_datetime: string
           status: string
           treatment: string | null
         }
         Insert: {
+          confirmation_token?: string
           created_at?: string
           email: string
           id?: string
           message?: string | null
           name: string
+          patient_id?: string | null
           phone: string
           preferred_datetime: string
           status?: string
           treatment?: string | null
         }
         Update: {
+          confirmation_token?: string
           created_at?: string
           email?: string
           id?: string
           message?: string | null
           name?: string
+          patient_id?: string | null
           phone?: string
           preferred_datetime?: string
           status?: string
           treatment?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          last_booking_at: string | null
+          name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          last_booking_at?: string | null
+          name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          last_booking_at?: string | null
+          name?: string
+          phone?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -55,7 +99,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cancel_booking: {
+        Args: { _booking_id: string; _email: string }
+        Returns: boolean
+      }
+      get_patient_by_email: { Args: { _email: string }; Returns: Json }
+      reschedule_booking: {
+        Args: { _booking_id: string; _email: string; _new_datetime: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
