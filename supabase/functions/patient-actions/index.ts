@@ -42,6 +42,45 @@ Deno.serve(async (req) => {
   if (!url || !key) return json({ error: 'server_misconfigured' }, 500)
   const supabase = createClient(url, key)
 
+  // Best-effort client IP for per-IP throttling.
+  const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim()
+    || req.headers.get('cf-connecting-ip')
+    || 'unknown'
+
+  // Returns a 429 Response if over any supplied limit, otherwise null.
+  // Fails open on infrastructure error so legit users aren't blocked.
+  const rateLimit = async (
+    limits: Array<{ bucket: string; max: number; windowSec: number }>,
+  ): Promise<Response | null> => {
+    for (const l of limits) {
+      const { data, error } = await supabase.rpc('check_rate_limit', {
+        _bucket: l.bucket,
+        _max_hits: l.max,
+        _window_seconds: l.windowSec,
+      })
+      if (error) {
+        console.error('rate_limit_check_failed', { bucket: l.bucket, error })
+        continue
+      }
+      if (data && (data as any).allowed === false) {
+        const retry = (data as any).retry_after ?? l.windowSec
+        console.warn('rate_limited', { bucket: l.bucket, ip })
+        return new Response(
+          JSON.stringify({ error: 'rate_limited', retry_after: retry }),
+          {
+            status: 429,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json',
+              'Retry-After': String(retry),
+            },
+          },
+        )
+      }
+    }
+    return null
+  }
+
   // Helper — send a booking email via the locked-down service-role function.
   const sendEmail = async (
     templateName: 'booking-confirmation' | 'booking-reschedule' | 'booking-cancellation',
@@ -71,6 +110,12 @@ Deno.serve(async (req) => {
     if (action === 'lookup') {
       if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
       const email = (body.email as string).toLowerCase().trim()
+
+      const limited = await rateLimit([
+        { bucket: `pa:lookup:ip:${ip}`, max: 5, windowSec: 60 },
+        { bucket: `pa:lookup:email:${email}`, max: 10, windowSec: 3600 },
+      ])
+      if (limited) return limited
 
       const { data: patient, error: pErr } = await supabase
         .from('patients')
@@ -111,6 +156,14 @@ Deno.serve(async (req) => {
       if (!phone || phone.length < 7 || phone.length > 20) return json({ error: 'invalid_phone' }, 400)
       if (!isEmail(email)) return json({ error: 'invalid_email' }, 400)
       if (!isFutureIso(body.preferredDatetime)) return json({ error: 'invalid_datetime' }, 400)
+
+      const limited = await rateLimit([
+        { bucket: `pa:book:ip:${ip}`, max: 3, windowSec: 60 },
+        { bucket: `pa:write:ip:${ip}`, max: 10, windowSec: 3600 },
+        { bucket: `pa:write:email:${email.toLowerCase()}`, max: 5, windowSec: 3600 },
+      ])
+      if (limited) return limited
+
 
       // One active booking per patient.
       const { data: existing, error: exErr } = await supabase
@@ -157,6 +210,13 @@ Deno.serve(async (req) => {
       if (!isFutureIso(body.newDatetime)) return json({ error: 'invalid_datetime' }, 400)
       const email = (body.email as string).toLowerCase().trim()
 
+      const limited = await rateLimit([
+        { bucket: `pa:reschedule:ip:${ip}`, max: 3, windowSec: 60 },
+        { bucket: `pa:write:ip:${ip}`, max: 10, windowSec: 3600 },
+        { bucket: `pa:write:email:${email}`, max: 5, windowSec: 3600 },
+      ])
+      if (limited) return limited
+
       const { data: booking, error: bErr } = await supabase
         .from('bookings')
         .select('id, name, treatment')
@@ -190,6 +250,13 @@ Deno.serve(async (req) => {
     if (action === 'cancel') {
       if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
       const email = (body.email as string).toLowerCase().trim()
+
+      const limited = await rateLimit([
+        { bucket: `pa:cancel:ip:${ip}`, max: 3, windowSec: 60 },
+        { bucket: `pa:write:ip:${ip}`, max: 10, windowSec: 3600 },
+        { bucket: `pa:write:email:${email}`, max: 5, windowSec: 3600 },
+      ])
+      if (limited) return limited
 
       const { data: booking, error: bErr } = await supabase
         .from('bookings')
