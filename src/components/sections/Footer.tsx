@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { BrandLogo } from "@/components/BrandLogo";
 import { useBooking } from "@/components/services/BookingProvider";
+import meridianLogo from "@/assets/meridian-logo.png.asset.json";
 
 export const Footer = () => {
   const { openBooking } = useBooking();
@@ -53,15 +54,22 @@ export const Footer = () => {
             <span>GDC registered clinicians</span>
           </div>
         </div>
-        <div className="container-wide pb-6 text-xs text-foreground/55">
-          Built by{" "}
+        <div className="container-wide pb-6 flex items-center gap-2 text-xs text-foreground/55">
+          <span>Built by</span>
           <a
             href="https://www.instagram.com/meridiantech.ai/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-foreground/80 hover:text-foreground transition underline-offset-4 hover:underline"
+            aria-label="MTS / Revenue Infrastructure on Instagram"
+            className="inline-flex items-center gap-2 font-medium text-foreground/80 hover:text-foreground transition"
           >
-            MTS / Revenue Infrastructure
+            <img
+              src={meridianLogo.url}
+              alt="MTS / Revenue Infrastructure logo"
+              className="h-5 w-5 rounded-sm"
+              loading="lazy"
+            />
+            <span className="underline-offset-4 hover:underline">MTS / Revenue Infrastructure</span>
           </a>
         </div>
       </div>
