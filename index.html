@@ -4,12 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Evergreen Dental — Premium Private Dentistry in London</title>
-    <meta name="description" content="Evergreen Dental is a modern private dental practice offering preventive, cosmetic and restorative care. Calm, premium dentistry for the whole family.">
+    <meta name="description" content="Evergreen Dental is a modern private dental practice in London offering Invisalign, veneers, whitening, implants and family dentistry. Calm, premium care." />
     <meta name="author" content="Evergreen Dental" />
-    <link rel="canonical" href="https://evergreendental.example.com/" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Evergreen Dental" />
+    <meta property="og:title" content="Evergreen Dental — Premium Private Dentistry in London" />
+    <meta property="og:description" content="Modern private dental practice in London — Invisalign, veneers, whitening, implants and family dentistry." />
+    <meta property="og:url" content="https://my-dental.space/" />
+    <meta property="og:image" content="https://my-dental.space/og-image.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Evergreen Dental — Premium Private Dentistry in London" />
+    <meta name="twitter:description" content="Modern private dental practice in London — Invisalign, veneers, whitening, implants and family dentistry." />
+    <meta name="twitter:image" content="https://my-dental.space/og-image.jpg" />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
     <link rel="preconnect" href="https://api.fontshare.com" />
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
@@ -21,19 +30,30 @@
       imagesizes="100vw"
       fetchpriority="high"
     />
-    
-    
-    
-    
-    <meta property="og:title" content="Evergreen Dental — Premium Private Dentistry in London">
-  <meta name="twitter:title" content="Evergreen Dental — Premium Private Dentistry in London">
-  <meta property="og:description" content="Evergreen Dental is a modern private dental practice offering preventive, cosmetic and restorative care. Calm, premium dentistry for the whole family.">
-  <meta name="twitter:description" content="Evergreen Dental is a modern private dental practice offering preventive, cosmetic and restorative care. Calm, premium dentistry for the whole family.">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/019261d2-f802-4432-b4c7-606acc740399/id-preview-f7e3ad80--21330c9f-ce98-40b6-924e-2edf163dc301.lovable.app-1777899387509.png">
-  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/019261d2-f802-4432-b4c7-606acc740399/id-preview-f7e3ad80--21330c9f-ce98-40b6-924e-2edf163dc301.lovable.app-1777899387509.png">
-</head>
 
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Dentist",
+        "name": "Evergreen Dental",
+        "url": "https://my-dental.space/",
+        "image": "https://my-dental.space/og-image.jpg",
+        "telephone": "+44-20-7946-0123",
+        "priceRange": "££-£££",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "42 Marylebone High Street",
+          "addressLocality": "London",
+          "postalCode": "W1U 5HP",
+          "addressCountry": "GB"
+        },
+        "openingHoursSpecification": [
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:30", "closes": "18:00" },
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:00", "closes": "14:00" }
+        ]
+      }
+    </script>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
