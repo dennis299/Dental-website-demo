@@ -1,41 +1,55 @@
-## Goal
-Let Sarah (the chatbot) complete the booking itself, so the visitor never has to open the booking modal.
+## 1. Position Sarah on the right
 
-## New conversational flow
-Sarah will collect everything needed for a booking inside the chat, then insert the row into the `bookings` table and show a success message.
+The launcher and panel already use `right-5`, but the screenshot shows the panel on the left — caused by the mobile-first classes `inset-x-0 bottom-0` not being properly reset on desktop (`md:inset-x-auto` is being overridden in some viewports). Fix by:
 
-Steps (state machine):
-1. `ask_name` — first name (already exists)
-2. `ask_treatment` — quick-reply buttons (already exists)
-3. `treatment_info` — short blurb + "Book with me" / "See before & after" (already exists, button copy updated)
-4. `ask_email` — validated email
-5. `ask_phone` — validated phone
-6. `ask_date` — date picker (native `<input type="date">` rendered inside the chat)
-7. `ask_time` — quick-reply time slots (e.g. 9:00, 10:30, 12:00, 14:00, 15:30, 17:00) + "Other time" → free text
-8. `ask_notes` — optional message, with a "Skip" button
-9. `confirm` — Sarah summarises: name, treatment, email, phone, date/time + "Confirm booking" / "Edit details" buttons
-10. `submitting` — disable inputs, show "Booking your appointment…" with typing indicator
-11. `done` — success bubble: "You're booked in for {date} at {time}. We'll call {phone} to confirm." + a "Book another time" reset button
+- Splitting mobile vs desktop classes cleanly: use `right-0 left-0 bottom-0` for mobile (`max-md:`) and `md:left-auto md:right-5 md:bottom-5` for desktop.
+- Same treatment for the launcher to guarantee bottom-right on all breakpoints.
 
-## Submission
-- On `Confirm booking`, call `supabase.from("bookings").insert({...})` directly from the chat component.
-- Combine date + time into an ISO `preferred_datetime`.
-- `treatment` uses the same `TREATMENT_MAP` mapping already in `script.ts`.
-- On error: show a friendly bubble ("Something went wrong — want me to try again?") with a retry button. Existing RLS policy ("Anyone can submit a booking" with `status = 'new'`) already permits this insert; no DB changes.
+## 2. Realistic availability (no Sunday, day-aware hours)
 
-## UI / UX
-- Reuse existing chat bubble + typing indicator styles. No new dependencies.
-- Date input and time chips render inline as bot-side controls, matching the existing quick-reply button styling.
-- Validation errors are spoken by Sarah in-chat (no toasts), same pattern as the current invalid-email/phone flow.
-- Add an "Edit" affordance at the confirm step that jumps back to the relevant field.
-- Keep auto-trigger (6s / 35% scroll), mobile bottom sheet, scroll lock, and accessibility behaviour unchanged.
+Clinic hours (from footer): Mon–Fri 8:30am–6:00pm, Sat 9:00am–2:00pm, Sunday closed.
 
-## Booking modal
-- Keep `BookingModal` + `BookingProvider.openBooking` in place — they're still used by Hero, Header, Services, Footer, MobileCallBanner, BeforeAfter "Book Now" buttons.
-- Sarah no longer calls `openBooking`. The `prefill` plumbing stays (harmless) in case we want it later.
+Changes in `SarahChat.tsx` + `script.ts`:
 
-## Files
-- **Edit** `src/components/chat/SarahChat.tsx` — add new steps, date/time controls, confirmation, direct Supabase insert, submitting/done/error states.
-- **Edit** `src/components/chat/script.ts` — add copy for the new steps (askDate, askTime, askNotes, confirmTemplate, submitting, success, errorRetry) and a `TIME_SLOTS` array.
+- **Date picker**: add an `onChange` validator. If the picked date is a Sunday → reject with a friendly message ("We're closed on Sundays — would Saturday or Monday work?") and don't advance.
+- Keep `min={todayISO()}` and also block past dates.
+- **Time slots become dynamic** based on the selected weekday:
+  - Mon–Fri: `["09:00","10:30","12:00","14:00","15:30","17:00"]`
+  - Sat: `["09:00","10:00","11:00","12:00","13:00"]`
+  - Sun: n/a (date rejected)
+- Replace the static `TIME_SLOTS` export with a `getTimeSlots(dateISO)` helper.
+- Also filter out times earlier than "now + 1h" when the chosen date is today, so same-day bookings stay realistic.
 
-No database, RLS, or other component changes required.
+## 3. Enhanced Invisalign flow (image + why + steps + consultation CTA)
+
+When the user picks **Invisalign**:
+
+1. Sarah sends an Invisalign photo (generated asset `src/assets/invisalign.jpg`, ~1024×768, clean studio shot of clear aligners — generated with imagegen).
+2. Sarah follows with a short multi-part message:
+   - **Why Invisalign is a great choice** (3 bullet points: nearly invisible, removable, predictable results).
+   - **Your journey, step by step**:
+     1. Free in-clinic consultation & 3D scan
+     2. Custom treatment plan + digital smile preview
+     3. Receive your aligner sets
+     4. Check-ins every 6–8 weeks
+     5. Reveal + retainers to keep your new smile
+   - **Note**: "Everyone starts with a quick in-person consultation so we can check your suitability."
+3. Quick replies: **"Book my consultation"** (continues to email step) and **"View Before & After"** (existing behaviour).
+
+Implementation details:
+- Add a new step `treatment_info_invisalign` (or branch inside `treatment_info`) that renders an image bubble above the text.
+- Extend the `Msg` type with an optional `image?: string` field; render `<img>` inside bot bubbles when present.
+- Add `INVISALIGN_DETAIL` copy to `script.ts` with the structured content above.
+- Other treatments keep current short blurb behaviour (no change).
+
+## Files touched
+
+- `src/components/chat/SarahChat.tsx` — positioning, date/time validation, dynamic time slots, image-bubble support, Invisalign branch.
+- `src/components/chat/script.ts` — `getTimeSlots(dateISO)`, Invisalign rich content, Sunday/closed copy.
+- `src/assets/invisalign.jpg` — generated illustrative photo of clear aligners on a clean background.
+
+## Out of scope
+
+- No DB/schema changes (`bookings` table already supports everything).
+- No changes to `BookingModal`/`BookingProvider`.
+- No admin-side availability config — hard-coded to the clinic's published hours; can be made data-driven later if you want.
