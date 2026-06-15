@@ -157,6 +157,14 @@ Deno.serve(async (req) => {
       if (!isEmail(email)) return json({ error: 'invalid_email' }, 400)
       if (!isFutureIso(body.preferredDatetime)) return json({ error: 'invalid_datetime' }, 400)
 
+      const limited = await rateLimit([
+        { bucket: `pa:book:ip:${ip}`, max: 3, windowSec: 60 },
+        { bucket: `pa:write:ip:${ip}`, max: 10, windowSec: 3600 },
+        { bucket: `pa:write:email:${email.toLowerCase()}`, max: 5, windowSec: 3600 },
+      ])
+      if (limited) return limited
+
+
       // One active booking per patient.
       const { data: existing, error: exErr } = await supabase
         .from('bookings')
