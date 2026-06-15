@@ -25,9 +25,16 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// Auth: this function must NEVER be called directly by anon/authenticated users
+// (that would let any visitor send branded emails to arbitrary recipients).
+// It is only callable by server-side code holding the service-role key.
+
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -48,6 +55,22 @@ Deno.serve(async (req) => {
       }
     )
   }
+
+  // Service-role-only gate: reject any caller that isn't the backend.
+  const authHeader = req.headers.get('Authorization') ?? ''
+  const bearer = authHeader.toLowerCase().startsWith('bearer ')
+    ? authHeader.slice(7).trim()
+    : ''
+  if (!bearer || !timingSafeEqual(bearer, supabaseServiceKey)) {
+    return new Response(
+      JSON.stringify({ error: 'Forbidden' }),
+      {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
 
   // Parse request body
   let templateName: string

@@ -95,7 +95,6 @@ type Data = {
 };
 
 type ExistingBooking = {
-  bookingId: string;
   treatment: string | null;
   whenISO: string;
 };
@@ -208,26 +207,7 @@ export const SarahChat = () => {
     greetedRef.current = true;
   };
 
-  // Send confirmation email (fire-and-forget; chat continues either way)
-  const sendConfirmationEmail = async (kind: "booking" | "reschedule" | "cancellation", payload: Record<string, unknown>) => {
-    try {
-      await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName:
-            kind === "booking"
-              ? "booking-confirmation"
-              : kind === "reschedule"
-              ? "booking-reschedule"
-              : "booking-cancellation",
-          recipientEmail: data.email,
-          idempotencyKey: `${kind}-${payload.bookingId ?? Date.now()}`,
-          templateData: payload,
-        },
-      });
-    } catch {
-      // best-effort
-    }
-  };
+  // Email is sent server-side by the patient-actions edge function.
 
   const lookupEmail = async (email: string) => {
     const { data: rpc, error } = await supabase.functions.invoke("patient-actions", {
@@ -237,11 +217,9 @@ export const SarahChat = () => {
     return rpc as {
       found: boolean;
       name?: string;
-      phone?: string;
       has_active_booking?: boolean;
       next_appointment_at?: string;
       next_treatment?: string | null;
-      next_booking_id?: string;
     } | null;
   };
 
@@ -260,10 +238,9 @@ export const SarahChat = () => {
       setData((d) => ({ ...d, email: v }));
       const res = await lookupEmail(v);
       if (res?.found) {
-        setData((d) => ({ ...d, name: res.name ?? "", phone: res.phone }));
-        if (res.has_active_booking && res.next_appointment_at && res.next_booking_id) {
+        setData((d) => ({ ...d, name: res.name ?? "" }));
+        if (res.has_active_booking && res.next_appointment_at) {
           setExisting({
-            bookingId: res.next_booking_id,
             treatment: res.next_treatment ?? null,
             whenISO: res.next_appointment_at,
           });
@@ -408,35 +385,25 @@ export const SarahChat = () => {
     const treatmentValue = data.treatment ? TREATMENT_MAP[data.treatment] : null;
     const preferred = new Date(`${data.date}T${data.time}:00`).toISOString();
 
-    const { data: inserted, error } = await supabase
-      .from("bookings")
-      .insert({
+    const { data: res, error } = await supabase.functions.invoke("patient-actions", {
+      body: {
+        action: "book",
         name: data.name,
         phone: data.phone!,
         email: data.email,
         treatment: treatmentValue,
-        preferred_datetime: preferred,
+        preferredDatetime: preferred,
         message: data.notes ?? null,
-      })
-      .select("id")
-      .single();
+      },
+    });
 
-    if (error) {
+    if (error || !(res as any)?.success) {
       setStep("error");
       await sendBot(COPY.errorRetry);
       return;
     }
 
     setStep("done");
-    await sendConfirmationEmail("booking", {
-      bookingId: inserted.id,
-      name: data.name,
-      treatment: treatmentValue,
-      whenISO: preferred,
-      whenPretty: formatWhen(data.date!, data.time!),
-      phone: data.phone,
-      notes: data.notes ?? null,
-    });
     await sendBot(COPY.success(formatWhen(data.date!, data.time!)));
   };
 
@@ -501,7 +468,6 @@ export const SarahChat = () => {
       body: {
         action: "reschedule",
         email: data.email,
-        bookingId: existing.bookingId,
         newDatetime: newISO,
       },
     });
@@ -511,13 +477,6 @@ export const SarahChat = () => {
       return;
     }
     setStep("rescheduled");
-    await sendConfirmationEmail("reschedule", {
-      bookingId: existing.bookingId,
-      name: data.name,
-      treatment: existing.treatment,
-      whenISO: newISO,
-      whenPretty: formatWhen(data.date!, data.time!),
-    });
     await sendBot(COPY.rescheduleDone(formatWhen(data.date!, data.time!)));
   };
 
@@ -529,7 +488,6 @@ export const SarahChat = () => {
       body: {
         action: "cancel",
         email: data.email,
-        bookingId: existing.bookingId,
       },
     });
     if (error || !(res as any)?.success) {
@@ -538,13 +496,6 @@ export const SarahChat = () => {
       return;
     }
     setStep("cancelled");
-    await sendConfirmationEmail("cancellation", {
-      bookingId: existing.bookingId,
-      name: data.name,
-      treatment: existing.treatment,
-      whenISO: existing.whenISO,
-      whenPretty: formatISOWhen(existing.whenISO),
-    });
     await sendBot(COPY.cancelDone);
   };
 
