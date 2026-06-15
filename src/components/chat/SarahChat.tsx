@@ -109,6 +109,7 @@ export const SarahChat = () => {
   const [input, setInput] = useState("");
   const [data, setData] = useState<Data>({ email: "", name: "" });
   const [existing, setExisting] = useState<ExistingBooking | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const greetedRef = useRef(false);
@@ -174,6 +175,7 @@ export const SarahChat = () => {
     if (
       open &&
       (step === "ask_email" ||
+        step === "ask_otp" ||
         step === "ask_name" ||
         step === "ask_phone" ||
         step === "ask_notes" ||
