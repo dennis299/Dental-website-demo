@@ -68,7 +68,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
     font-weight: 700;
@@ -90,9 +90,7 @@
   .container-narrow { @apply mx-auto w-full max-w-6xl px-6; }
   .container-wide { @apply mx-auto w-full max-w-7xl px-6; }
   .tracking-display { letter-spacing: -0.025em; }
-  .marquee {
-    animation: marquee 40s linear infinite;
-  }
+  .marquee { animation: marquee 40s linear infinite; }
   @keyframes marquee {
     from { transform: translateY(0); }
     to { transform: translateY(-50%); }
@@ -101,4 +99,114 @@
     .marquee { animation: none; }
     html { scroll-behavior: auto; }
   }
+
+  /* ===== Brand-aligned hover micro-interactions ===== */
+
+  /* Primary CTA: soft lift + teal glow + diagonal sheen sweep */
+  .btn-shine {
+    @apply relative overflow-hidden isolate transition-all duration-300 ease-out;
+  }
+  .btn-shine::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 30%,
+      hsl(0 0% 100% / 0.28) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.7s ease;
+    pointer-events: none;
+  }
+  .btn-shine:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -16px hsl(var(--primary) / 0.55);
+  }
+  .btn-shine:hover::before { transform: translateX(120%); }
+
+  /* Outline / secondary: teal fill rises from bottom */
+  .btn-fill {
+    @apply relative overflow-hidden isolate transition-colors duration-300;
+  }
+  .btn-fill > * { position: relative; z-index: 1; }
+  .btn-fill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: hsl(var(--primary));
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+  }
+  .btn-fill:hover { color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+  .btn-fill:hover::after { transform: translateY(0); }
+
+  /* Card: lift, deeper shadow, image zoom + teal overlay, arrow slide */
+  .card-hover {
+    @apply transition-all duration-500 ease-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-elegant);
+  }
+  .card-img-wrap { @apply relative overflow-hidden; }
+  .card-img {
+    @apply h-full w-full object-cover transition-transform duration-700 ease-out;
+  }
+  .card-hover:hover .card-img { transform: scale(1.05); }
+  .card-img-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, hsl(var(--primary) / 0.18));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .card-hover:hover .card-img-wrap::after { opacity: 1; }
+  .card-arrow {
+    @apply inline-flex items-center gap-1.5 transition-all duration-300;
+  }
+  .card-hover:hover .card-arrow { color: hsl(var(--primary)); gap: 0.5rem; }
+  .card-hover:hover .card-arrow svg { transform: translate(2px, -2px); }
+  .card-arrow svg { @apply transition-transform duration-300; }
+
+  /* Nav link: animated teal underline */
+  .nav-link {
+    @apply relative inline-block transition-colors duration-200;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    height: 2px;
+    width: 100%;
+    background: hsl(var(--primary));
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.3s ease;
+  }
+  .nav-link:hover { color: hsl(var(--primary)); }
+  .nav-link:hover::after,
+  .nav-link[data-active="true"]::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  /* Subtle chip / pill hover */
+  .chip-hover { @apply transition-all duration-300; }
+  .chip-hover:hover {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.08);
+  }
+
+  /* Image-only hover lift */
+  .img-hover { @apply overflow-hidden; }
+  .img-hover img {
+    @apply transition-transform duration-700 ease-out;
+  }
+  .img-hover:hover img { transform: scale(1.04); }
 }
