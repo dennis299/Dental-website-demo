@@ -53,6 +53,17 @@ export const Footer = () => {
             <span>GDC registered clinicians</span>
           </div>
         </div>
+        <div className="container-wide pb-6 text-xs text-foreground/55">
+          Built by{" "}
+          <a
+            href="https://www.instagram.com/meridiantech.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-foreground/80 hover:text-foreground transition underline-offset-4 hover:underline"
+          >
+            MTS / Revenue Infrastructure
+          </a>
+        </div>
       </div>
     </footer>
   );
