@@ -1,6 +1,17 @@
 // Server-side entry point for all booking interactions from the public site.
 // Holds the service-role key, so no privileged data or email-sending capability
 // is exposed to the browser.
+//
+// Ownership model: callers must prove they control the email address before any
+// PII is returned or any booking is mutated. Flow is:
+//   1) request_otp  -> we email a 6-digit code
+//   2) lookup       -> caller submits otp; on success we return PII + a short-lived
+//                      session_token tied to that email
+//   3) reschedule/cancel -> caller submits session_token (no need to re-enter code)
+//
+// `book` does NOT require an OTP — it is for new bookings keyed to the email the
+// caller is actively typing in. The confirmation email serves as ownership proof
+// for any later mutation.
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
@@ -18,10 +29,15 @@ const json = (body: unknown, status = 200) =>
 
 const isEmail = (s: unknown) =>
   typeof s === 'string' && s.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
-const isIso = (s: unknown) =>
-  typeof s === 'string' && !isNaN(Date.parse(s))
-const isFutureIso = (s: unknown) =>
-  isIso(s) && Date.parse(s as string) > Date.now()
+const isIso = (s: unknown) => typeof s === 'string' && !isNaN(Date.parse(s))
+const isFutureIso = (s: unknown) => isIso(s) && Date.parse(s as string) > Date.now()
+const isOtp = (s: unknown) => typeof s === 'string' && /^\d{6}$/.test(s)
+const isSessionToken = (s: unknown) =>
+  typeof s === 'string' && s.length >= 32 && s.length <= 128 && /^[A-Za-z0-9_-]+$/.test(s)
+
+const OTP_TTL_MIN = 10
+const SESSION_TTL_MIN = 15
+const MAX_OTP_ATTEMPTS = 5
 
 function prettyWhen(iso: string): string {
   return new Date(iso).toLocaleString('en-GB', {
@@ -33,6 +49,26 @@ function prettyWhen(iso: string): string {
   })
 }
 
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+function generateOtp(): string {
+  const arr = new Uint32Array(1)
+  crypto.getRandomValues(arr)
+  return String(arr[0] % 1_000_000).padStart(6, '0')
+}
+
+function generateSessionToken(): string {
+  const arr = new Uint8Array(32)
+  crypto.getRandomValues(arr)
+  // base64url
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
@@ -42,13 +78,10 @@ Deno.serve(async (req) => {
   if (!url || !key) return json({ error: 'server_misconfigured' }, 500)
   const supabase = createClient(url, key)
 
-  // Best-effort client IP for per-IP throttling.
   const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim()
     || req.headers.get('cf-connecting-ip')
     || 'unknown'
 
-  // Returns a 429 Response if over any supplied limit, otherwise null.
-  // Fails open on infrastructure error so legit users aren't blocked.
   const rateLimit = async (
     limits: Array<{ bucket: string; max: number; windowSec: number }>,
   ): Promise<Response | null> => {
@@ -81,9 +114,12 @@ Deno.serve(async (req) => {
     return null
   }
 
-  // Helper — send a booking email via the locked-down service-role function.
   const sendEmail = async (
-    templateName: 'booking-confirmation' | 'booking-reschedule' | 'booking-cancellation',
+    templateName:
+      | 'booking-confirmation'
+      | 'booking-reschedule'
+      | 'booking-cancellation'
+      | 'booking-otp',
     recipient: string,
     idempotencyKey: string,
     templateData: Record<string, unknown>,
@@ -97,25 +133,122 @@ Deno.serve(async (req) => {
     }
   }
 
+  // Verify a session token issued by a successful lookup. Returns the email
+  // it was issued for, or null if invalid/expired.
+  const verifySession = async (token: string): Promise<string | null> => {
+    const { data, error } = await supabase
+      .from('booking_otps')
+      .select('email, session_expires_at')
+      .eq('session_token', token)
+      .maybeSingle()
+    if (error || !data) return null
+    if (!data.session_expires_at) return null
+    if (new Date(data.session_expires_at).getTime() < Date.now()) return null
+    return (data.email as string).toLowerCase().trim()
+  }
+
   let body: any
   try { body = await req.json() } catch { return json({ error: 'invalid_json' }, 400) }
   const action = body?.action
 
   try {
-    // ---------- LOOKUP ----------
-    // Returns only what the chat needs to greet the patient and decide
-    // which menu to show. Crucially does NOT return the booking id —
-    // the booking id is the credential used to reschedule/cancel, and
-    // leaking it to anyone who guesses an email enables hijacking.
-    if (action === 'lookup') {
+    // ---------- REQUEST OTP ----------
+    // Always returns success regardless of whether the email belongs to a
+    // patient — prevents email enumeration.
+    if (action === 'request_otp') {
       if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
       const email = (body.email as string).toLowerCase().trim()
 
       const limited = await rateLimit([
-        { bucket: `pa:lookup:ip:${ip}`, max: 5, windowSec: 60 },
-        { bucket: `pa:lookup:email:${email}`, max: 10, windowSec: 3600 },
+        { bucket: `pa:otp:ip:${ip}`, max: 5, windowSec: 60 },
+        { bucket: `pa:otp:ip:${ip}:hr`, max: 20, windowSec: 3600 },
+        { bucket: `pa:otp:email:${email}`, max: 5, windowSec: 600 },
       ])
       if (limited) return limited
+
+      const code = generateOtp()
+      const codeHash = await sha256Hex(code)
+      const expiresAt = new Date(Date.now() + OTP_TTL_MIN * 60_000).toISOString()
+
+      // Invalidate any prior unconsumed codes for this email.
+      await supabase
+        .from('booking_otps')
+        .update({ consumed_at: new Date().toISOString() })
+        .eq('email', email)
+        .is('consumed_at', null)
+
+      const { error: insErr } = await supabase
+        .from('booking_otps')
+        .insert({ email, code_hash: codeHash, expires_at: expiresAt })
+      if (insErr) {
+        console.error('otp_insert_failed', insErr)
+        return json({ error: 'otp_failed' }, 500)
+      }
+
+      await sendEmail('booking-otp', email, `otp-${email}-${Date.now()}`, {
+        code,
+        expiresMinutes: OTP_TTL_MIN,
+      })
+
+      return json({ success: true, expires_in_seconds: OTP_TTL_MIN * 60 })
+    }
+
+    // ---------- LOOKUP ----------
+    // Requires a valid OTP. On success, issues a session token usable for
+    // reschedule/cancel within SESSION_TTL_MIN.
+    if (action === 'lookup') {
+      if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
+      if (!isOtp(body.otp)) return json({ error: 'invalid_otp' }, 400)
+      const email = (body.email as string).toLowerCase().trim()
+
+      const limited = await rateLimit([
+        { bucket: `pa:lookup:ip:${ip}`, max: 10, windowSec: 60 },
+        { bucket: `pa:lookup:email:${email}`, max: 10, windowSec: 600 },
+      ])
+      if (limited) return limited
+
+      // Find the most recent unconsumed, unexpired OTP row for this email.
+      const { data: otpRow, error: otpErr } = await supabase
+        .from('booking_otps')
+        .select('id, code_hash, attempts, expires_at')
+        .eq('email', email)
+        .is('consumed_at', null)
+        .gt('expires_at', new Date().toISOString())
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (otpErr) return json({ error: 'verify_failed' }, 500)
+      if (!otpRow) return json({ error: 'invalid_otp' }, 401)
+
+      if (otpRow.attempts >= MAX_OTP_ATTEMPTS) {
+        await supabase
+          .from('booking_otps')
+          .update({ consumed_at: new Date().toISOString() })
+          .eq('id', otpRow.id)
+        return json({ error: 'otp_locked' }, 429)
+      }
+
+      const submittedHash = await sha256Hex(body.otp as string)
+      if (submittedHash !== otpRow.code_hash) {
+        await supabase
+          .from('booking_otps')
+          .update({ attempts: otpRow.attempts + 1 })
+          .eq('id', otpRow.id)
+        return json({ error: 'invalid_otp' }, 401)
+      }
+
+      // OTP correct — consume it and issue a session token.
+      const sessionToken = generateSessionToken()
+      const sessionExpiresAt = new Date(Date.now() + SESSION_TTL_MIN * 60_000).toISOString()
+      const { error: upErr } = await supabase
+        .from('booking_otps')
+        .update({
+          consumed_at: new Date().toISOString(),
+          session_token: sessionToken,
+          session_expires_at: sessionExpiresAt,
+        })
+        .eq('id', otpRow.id)
+      if (upErr) return json({ error: 'verify_failed' }, 500)
 
       const { data: patient, error: pErr } = await supabase
         .from('patients')
@@ -123,7 +256,13 @@ Deno.serve(async (req) => {
         .eq('email', email)
         .maybeSingle()
       if (pErr) return json({ error: 'lookup_failed' }, 500)
-      if (!patient) return json({ found: false })
+      if (!patient) {
+        return json({
+          found: false,
+          session_token: sessionToken,
+          session_expires_in_seconds: SESSION_TTL_MIN * 60,
+        })
+      }
 
       const { data: booking, error: bErr } = await supabase
         .from('bookings')
@@ -142,10 +281,14 @@ Deno.serve(async (req) => {
         has_active_booking: Boolean(booking),
         next_appointment_at: booking?.preferred_datetime ?? null,
         next_treatment: booking?.treatment ?? null,
+        session_token: sessionToken,
+        session_expires_in_seconds: SESSION_TTL_MIN * 60,
       })
     }
 
     // ---------- BOOK ----------
+    // No OTP — this is for new appointments. The confirmation email is the
+    // ownership credential for any later mutation.
     if (action === 'book') {
       const name = typeof body.name === 'string' ? body.name.trim() : ''
       const phone = typeof body.phone === 'string' ? body.phone.trim() : ''
@@ -164,8 +307,6 @@ Deno.serve(async (req) => {
       ])
       if (limited) return limited
 
-
-      // One active booking per patient.
       const { data: existing, error: exErr } = await supabase
         .from('bookings')
         .select('id')
@@ -203,12 +344,12 @@ Deno.serve(async (req) => {
     }
 
     // ---------- RESCHEDULE ----------
-    // Looks up the active booking by email server-side — never trusts a
-    // client-supplied booking id, so a leaked id can't be used to hijack.
     if (action === 'reschedule') {
-      if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
+      if (!isSessionToken(body.sessionToken)) return json({ error: 'unauthorized' }, 401)
       if (!isFutureIso(body.newDatetime)) return json({ error: 'invalid_datetime' }, 400)
-      const email = (body.email as string).toLowerCase().trim()
+
+      const email = await verifySession(body.sessionToken)
+      if (!email) return json({ error: 'unauthorized' }, 401)
 
       const limited = await rateLimit([
         { bucket: `pa:reschedule:ip:${ip}`, max: 3, windowSec: 60 },
@@ -248,8 +389,10 @@ Deno.serve(async (req) => {
 
     // ---------- CANCEL ----------
     if (action === 'cancel') {
-      if (!isEmail(body.email)) return json({ error: 'invalid_email' }, 400)
-      const email = (body.email as string).toLowerCase().trim()
+      if (!isSessionToken(body.sessionToken)) return json({ error: 'unauthorized' }, 401)
+
+      const email = await verifySession(body.sessionToken)
+      if (!email) return json({ error: 'unauthorized' }, 401)
 
       const limited = await rateLimit([
         { bucket: `pa:cancel:ip:${ip}`, max: 3, windowSec: 60 },
