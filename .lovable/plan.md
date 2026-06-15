@@ -1,55 +1,79 @@
-## 1. Position Sarah on the right
+## Goal
+Convert the single-page site into a professional multi-page experience with premium, brand-aligned hover feedback and smooth page transitions — while keeping the home page laser-focused on conversion.
 
-The launcher and panel already use `right-5`, but the screenshot shows the panel on the left — caused by the mobile-first classes `inset-x-0 bottom-0` not being properly reset on desktop (`md:inset-x-auto` is being overridden in some viewports). Fix by:
+## 1. Routing & page structure (hybrid, conversion-first)
 
-- Splitting mobile vs desktop classes cleanly: use `right-0 left-0 bottom-0` for mobile (`max-md:`) and `md:left-auto md:right-5 md:bottom-5` for desktop.
-- Same treatment for the launcher to guarantee bottom-right on all breakpoints.
+Home stays a punchy landing (Hero → Trust bar → Services teaser → Before/After teaser → Testimonials teaser → Final CTA). Every section ends with a button into its full page. Header nav links route to the new pages (no more anchor scroll).
 
-## 2. Realistic availability (no Sunday, day-aware hours)
+New routes (React Router, lazy-loaded):
 
-Clinic hours (from footer): Mon–Fri 8:30am–6:00pm, Sat 9:00am–2:00pm, Sunday closed.
+- `/` — Home (trimmed, conversion-focused)
+- `/services` — Overview grid of all 6 treatments
+- `/services/:slug` — Mini-page per treatment (see §2)
+- `/about` — Practice story, values, clinic photos
+- `/team` — Meet the dentists (split out from About)
+- `/results` — Full Before & After gallery
+- `/reviews` — Full testimonials wall + Google rating block
+- `/contact` — Map, hours, form, directions
+- `/book` — Standalone booking page (the form currently in the modal)
 
-Changes in `SarahChat.tsx` + `script.ts`:
+Header keeps the "Book Appointment" CTA; Sarah chat persists across all routes via the root layout.
 
-- **Date picker**: add an `onChange` validator. If the picked date is a Sunday → reject with a friendly message ("We're closed on Sundays — would Saturday or Monday work?") and don't advance.
-- Keep `min={todayISO()}` and also block past dates.
-- **Time slots become dynamic** based on the selected weekday:
-  - Mon–Fri: `["09:00","10:30","12:00","14:00","15:30","17:00"]`
-  - Sat: `["09:00","10:00","11:00","12:00","13:00"]`
-  - Sun: n/a (date rejected)
-- Replace the static `TIME_SLOTS` export with a `getTimeSlots(dateISO)` helper.
-- Also filter out times earlier than "now + 1h" when the chosen date is today, so same-day bookings stay realistic.
+## 2. Per-treatment mini-page (`/services/:slug`)
 
-## 3. Enhanced Invisalign flow (image + why + steps + consultation CTA)
+Treatments: `invisalign`, `veneers`, `whitening`, `implants`, `smile-makeover`, `general`.
 
-When the user picks **Invisalign**:
+Each page sections, top to bottom:
 
-1. Sarah sends an Invisalign photo (generated asset `src/assets/invisalign.jpg`, ~1024×768, clean studio shot of clear aligners — generated with imagegen).
-2. Sarah follows with a short multi-part message:
-   - **Why Invisalign is a great choice** (3 bullet points: nearly invisible, removable, predictable results).
-   - **Your journey, step by step**:
-     1. Free in-clinic consultation & 3D scan
-     2. Custom treatment plan + digital smile preview
-     3. Receive your aligner sets
-     4. Check-ins every 6–8 weeks
-     5. Reveal + retainers to keep your new smile
-   - **Note**: "Everyone starts with a quick in-person consultation so we can check your suitability."
-3. Quick replies: **"Book my consultation"** (continues to email step) and **"View Before & After"** (existing behaviour).
+1. **Hero** — treatment name, one-line promise, hero image, primary CTA "Book consultation" + secondary "Chat with Sarah".
+2. **Why it works** — 3 benefit cards with brand icons.
+3. **Your journey** — 4–5 numbered steps (e.g. Invisalign: Consult → 3D scan → Aligners → Check-ins → Reveal).
+4. **Transparent pricing** — 2–3 plan cards (e.g. *Express*, *Complete*, *Premium*) with price-from, what's included, "Choose plan" button. "No surprises — taxes and fees included. Cancel anytime."
+5. **FAQ accordion** — collapsible Q&As ("What's included?", "How is pricing structured?", "Is there a consultation/trial?", "How do I get started?", "Aftercare?").
+6. **Sticky/repeat CTA** — "Ready to start? Book your consultation" + "Prefer a quick chat? Chat with Sarah" (opens Sarah).
 
-Implementation details:
-- Add a new step `treatment_info_invisalign` (or branch inside `treatment_info`) that renders an image bubble above the text.
-- Extend the `Msg` type with an optional `image?: string` field; render `<img>` inside bot bubbles when present.
-- Add `INVISALIGN_DETAIL` copy to `script.ts` with the structured content above.
-- Other treatments keep current short blurb behaviour (no change).
+Pricing & FAQ content stored in a single `src/data/treatments.ts` so every page is data-driven and easy to edit.
 
-## Files touched
+## 3. Hover & micro-interactions (brand-aligned)
 
-- `src/components/chat/SarahChat.tsx` — positioning, date/time validation, dynamic time slots, image-bubble support, Invisalign branch.
-- `src/components/chat/script.ts` — `getTimeSlots(dateISO)`, Invisalign rich content, Sunday/closed copy.
-- `src/assets/invisalign.jpg` — generated illustrative photo of clear aligners on a clean background.
+Brand: teal primary, warm neutrals, elegant serif headings. Hover language stays calm and premium — never bouncy.
 
-## Out of scope
+- **Primary buttons** — soft lift (`-translate-y-0.5`), teal glow shadow grow, gradient sheen sweep left→right (subtle, 600ms).
+- **Secondary/outline buttons** — fill animates in from left (teal background slides up under text).
+- **Treatment / Before&After / Team cards** — image scales to 1.04 with a teal-tinted overlay fading in, title nudges up, arrow icon slides in from the left edge.
+- **Nav links** — animated teal underline (existing `story-link` utility, restyled to brand).
+- **Logo & icon CTAs** — gentle scale to 1.05.
+- **Stat / trust chips** — border brightens to teal, soft inner glow.
+- **Images sitewide** — `transition-transform duration-500` so any image hover feels intentional.
 
-- No DB/schema changes (`bookings` table already supports everything).
-- No changes to `BookingModal`/`BookingProvider`.
-- No admin-side availability config — hard-coded to the clinic's published hours; can be made data-driven later if you want.
+All implemented with existing Tailwind tokens (`primary`, `shadow-elegant`, `gradient-primary`) — no hardcoded colors — so it reads as one premium brand system.
+
+## 4. Page transitions
+
+- Wrap routes in `AnimatePresence` with a shared `PageTransition` component: 250ms fade + 8px y-slide on enter/exit.
+- `ScrollToTop` already exists — keep it, fire on route change.
+- Header link active state fades; mobile menu closes on navigation.
+
+## 5. SEO & polish per page
+
+Each page sets its own `<title>`, meta description, canonical, and JSON-LD (`Dentist` schema on home/contact, `MedicalProcedure` schema on each treatment page, `Review` schema on `/reviews`). Single H1 per page. OG tags per page.
+
+## 6. Technical notes
+
+- Files added: `src/pages/Services.tsx`, `src/pages/ServiceDetail.tsx`, `src/pages/About.tsx`, `src/pages/Team.tsx`, `src/pages/Results.tsx`, `src/pages/Reviews.tsx`, `src/pages/Contact.tsx`, `src/pages/Book.tsx`, `src/components/PageTransition.tsx`, `src/components/layout/SiteLayout.tsx`, `src/data/treatments.ts`.
+- Files edited: `src/App.tsx` (route map + layout), `src/components/sections/Header.tsx` (nav → `<Link>`), `src/index.css` (hover utility classes), `src/components/sections/*` (extract reusable section components used both on Home teasers and full pages).
+- Existing sections (`Services`, `BeforeAfter`, `Testimonials`, `About`, `Team`, `Contact`) become reusable — Home imports a short variant, full pages render the long variant.
+- Sarah chat stays mounted at the layout level so booking still works from any page.
+
+## Out of scope (will not be touched this turn)
+
+- Database / backend schema.
+- Actual pricing numbers — I'll use sensible placeholders (e.g. "From £1,950") with a clear `// TODO: confirm pricing` so you can swap in real figures.
+- Real photography swaps for new pages — existing assets reused; new sections that need imagery will use brand-aligned existing hero/before-after images.
+
+## Two last sanity checks before I build
+
+1. **Placeholder pricing OK?** I'll use realistic London-clinic ranges as placeholders (e.g. Invisalign from £2,500, Veneers from £950/tooth, Whitening from £350). You can correct any after.
+2. **Booking entry point** — keep the existing modal on every "Book" button AND add `/book` as a standalone page? Or replace the modal entirely with a route push to `/book`? Default I'll ship: keep the modal (faster conversion) + `/book` exists for direct links/SEO.
+
+Reply with any tweaks, otherwise approve and I'll build it.
