@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_otps: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          session_expires_at: string | null
+          session_token: string | null
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          session_expires_at?: string | null
+          session_token?: string | null
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          session_expires_at?: string | null
+          session_token?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           confirmation_token: string
