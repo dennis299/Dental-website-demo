@@ -42,6 +42,45 @@ Deno.serve(async (req) => {
   if (!url || !key) return json({ error: 'server_misconfigured' }, 500)
   const supabase = createClient(url, key)
 
+  // Best-effort client IP for per-IP throttling.
+  const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim()
+    || req.headers.get('cf-connecting-ip')
+    || 'unknown'
+
+  // Returns a 429 Response if over any supplied limit, otherwise null.
+  // Fails open on infrastructure error so legit users aren't blocked.
+  const rateLimit = async (
+    limits: Array<{ bucket: string; max: number; windowSec: number }>,
+  ): Promise<Response | null> => {
+    for (const l of limits) {
+      const { data, error } = await supabase.rpc('check_rate_limit', {
+        _bucket: l.bucket,
+        _max_hits: l.max,
+        _window_seconds: l.windowSec,
+      })
+      if (error) {
+        console.error('rate_limit_check_failed', { bucket: l.bucket, error })
+        continue
+      }
+      if (data && (data as any).allowed === false) {
+        const retry = (data as any).retry_after ?? l.windowSec
+        console.warn('rate_limited', { bucket: l.bucket, ip })
+        return new Response(
+          JSON.stringify({ error: 'rate_limited', retry_after: retry }),
+          {
+            status: 429,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json',
+              'Retry-After': String(retry),
+            },
+          },
+        )
+      }
+    }
+    return null
+  }
+
   // Helper — send a booking email via the locked-down service-role function.
   const sendEmail = async (
     templateName: 'booking-confirmation' | 'booking-reschedule' | 'booking-cancellation',
