@@ -161,7 +161,7 @@ export const SarahChat = () => {
 
   const handleClose = () => {
     setOpen(false);
-    sessionStorage.setItem("sarah_dismissed", "1");
+    sessionStorage.setItem("sarah_last_dismissed_at", String(Date.now()));
   };
 
   const resetChat = async () => {
