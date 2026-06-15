@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { BrandLogo } from "@/components/BrandLogo";
 import { useBooking } from "@/components/services/BookingProvider";
 
@@ -25,8 +26,8 @@ export const Footer = () => {
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-foreground/50">Contact</div>
           <ul className="mt-4 space-y-2 text-sm text-foreground/75">
-            <li><a className="hover:text-link" href="tel:+442079460123" aria-label="Call Evergreen Dental on 020 7946 0123">020 7946 0123</a></li>
-            <li><a className="hover:text-link" href="mailto:hello@evergreendental.com" aria-label="Email Evergreen Dental">hello@evergreendental.com</a></li>
+            <li><a className="nav-link" href="tel:+442079460123">020 7946 0123</a></li>
+            <li><a className="nav-link" href="mailto:hello@evergreendental.com">hello@evergreendental.com</a></li>
             <li>Mon–Fri · 8:30am – 6:00pm</li>
             <li>Saturday · 9:00am – 2:00pm</li>
           </ul>
@@ -34,10 +35,11 @@ export const Footer = () => {
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-foreground/50">Practice</div>
           <ul className="mt-4 space-y-2 text-sm text-foreground/75">
-            <li><a href="#services" className="hover:text-link">Treatments</a></li>
-            <li><a href="#results" className="hover:text-link">Before & after</a></li>
-            <li><a href="#reviews" className="hover:text-link">Reviews</a></li>
-            <li><button type="button" onClick={() => openBooking()} className="hover:text-link text-left">Book appointment</button></li>
+            <li><Link to="/services" className="nav-link">Treatments</Link></li>
+            <li><Link to="/results" className="nav-link">Before & after</Link></li>
+            <li><Link to="/reviews" className="nav-link">Reviews</Link></li>
+            <li><Link to="/about" className="nav-link">About us</Link></li>
+            <li><button type="button" onClick={() => openBooking()} className="nav-link text-left">Book appointment</button></li>
           </ul>
         </div>
       </div>
@@ -45,9 +47,9 @@ export const Footer = () => {
         <div className="container-wide py-6 flex flex-col md:flex-row justify-between gap-3 text-xs text-foreground/55">
           <div>© {new Date().getFullYear()} Evergreen Dental. All rights reserved.</div>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-foreground">Privacy</a>
-            <a href="#" className="hover:text-foreground">Cookies</a>
-            <a href="#" className="hover:text-foreground">Complaints</a>
+            <a href="#" className="hover:text-foreground transition">Privacy</a>
+            <a href="#" className="hover:text-foreground transition">Cookies</a>
+            <a href="#" className="hover:text-foreground transition">Complaints</a>
             <span>GDC registered clinicians</span>
           </div>
         </div>

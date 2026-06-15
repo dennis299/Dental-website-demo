@@ -83,7 +83,15 @@ export const SarahChat = () => {
   const greetedRef = useRef(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem("sarah_dismissed")) return;
+    const openExternally = () => {
+      sessionStorage.removeItem("sarah_dismissed");
+      setOpen(true);
+    };
+    window.addEventListener("open-sarah", openExternally);
+
+    if (sessionStorage.getItem("sarah_dismissed")) {
+      return () => window.removeEventListener("open-sarah", openExternally);
+    }
     let opened = false;
     const trigger = () => {
       if (opened) return;
@@ -99,6 +107,7 @@ export const SarahChat = () => {
     return () => {
       clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("open-sarah", openExternally);
     };
   }, []);
 
