@@ -51,7 +51,7 @@ const Unsubscribe = () => {
 
   return (
     <main className="container max-w-lg py-20">
-      <SEO title="Unsubscribe — My Dental" description="Manage your email preferences." />
+      <SEO title="Unsubscribe — My Dental" description="Manage your email preferences." path="/unsubscribe" />
       <h1 className="text-3xl font-semibold mb-4">Email preferences</h1>
       {state === "loading" && <p className="text-muted-foreground">Checking your link…</p>}
       {state === "ready" && (
