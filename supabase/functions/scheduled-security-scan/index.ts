@@ -25,12 +25,7 @@ function fp(check_id: string, subject: string) {
 async function runScan(supabase: ReturnType<typeof createClient>): Promise<Finding[]> {
   const findings: Finding[] = []
 
-  // 1. RLS audit: every public table must have RLS enabled
-  const { data: rlsRows } = await supabase.rpc('exec_security_check_rls').catch(() => ({ data: null }))
-  // Fallback: query through information_schema via REST is not possible; use direct SQL via a helper RPC.
-  // The helper RPC is created in the migration alongside the table.
-
-  // 2-4 are implemented via the SQL helper that returns a normalized json array
+  // Scan via the SQL helper that returns a normalized json array
   const { data: scanRows, error } = await supabase.rpc('run_security_scan_checks')
   if (error) {
     console.error('run_security_scan_checks failed', error)
