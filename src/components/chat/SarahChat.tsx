@@ -495,13 +495,14 @@ export const SarahChat = () => {
       return;
     }
     const d = new Date(`${date}T00:00:00`);
+    const lastText = messages[messages.length - 1]?.text;
     if (d.getDay() === 0) {
-      await sendBot(COPY.closedSunday);
+      if (lastText !== COPY.closedSunday) await sendBot(COPY.closedSunday);
       return;
     }
     const slots = getTimeSlots(date);
     if (slots.length === 0) {
-      await sendBot(COPY.noSlotsToday);
+      if (lastText !== COPY.noSlotsToday) await sendBot(COPY.noSlotsToday);
       return;
     }
     const pretty = d.toLocaleDateString(undefined, {
@@ -514,6 +515,7 @@ export const SarahChat = () => {
     setStep("reschedule_time");
     await sendBot(COPY.askTime);
   };
+
 
   const pickRescheduleTime = async (time: string) => {
     sendUser(time);
