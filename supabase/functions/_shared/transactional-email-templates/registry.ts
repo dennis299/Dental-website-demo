@@ -3,6 +3,7 @@ import { template as bookingConfirmation } from './booking-confirmation.tsx'
 import { template as bookingReschedule } from './booking-reschedule.tsx'
 import { template as bookingCancellation } from './booking-cancellation.tsx'
 import { template as bookingOtp } from './booking-otp.tsx'
+import { template as securityAlert } from './security-alert.tsx'
 
 export interface TemplateEntry {
   component: (props: any) => React.ReactElement
@@ -17,4 +18,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-reschedule': bookingReschedule,
   'booking-cancellation': bookingCancellation,
   'booking-otp': bookingOtp,
+  'security-alert': securityAlert,
 }
