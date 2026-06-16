@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, lazy, Suspense, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { BookingModal } from "@/components/services/BookingModal";
-import { SarahChat } from "@/components/chat/SarahChat";
+
+const SarahChat = lazy(() => import("@/components/chat/SarahChat").then((m) => ({ default: m.SarahChat })));
 
 export const TREATMENTS = [
   "General Dentistry",
