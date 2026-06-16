@@ -777,19 +777,37 @@ export const SarahChat = () => {
                   </div>
                 )}
 
-                {!typing && (step === "ask_date" || step === "reschedule_date") && (
-                  <div className="pt-1 pl-9">
-                    <Input
-                      type="date"
-                      min={todayISO()}
-                      onChange={(e) =>
-                        e.target.value &&
-                        (step === "ask_date" ? pickDate(e.target.value) : pickRescheduleDate(e.target.value))
-                      }
-                      className="rounded-full max-w-[220px]"
-                    />
-                  </div>
-                )}
+                {!typing && (step === "ask_date" || step === "reschedule_date") && (() => {
+                  const lastText = messages[messages.length - 1]?.text;
+                  const showTomorrowShortcut =
+                    lastText === COPY.noSlotsToday || lastText === COPY.closedSunday;
+                  const shortcutISO = nextNonSundayISO(1);
+                  const shortcutLabel = new Date(`${shortcutISO}T00:00:00`).toLocaleDateString(
+                    undefined,
+                    { weekday: "long", day: "numeric", month: "long" },
+                  );
+                  const handler = step === "ask_date" ? pickDate : pickRescheduleDate;
+                  return (
+                    <div className="pt-1 pl-9 flex flex-wrap gap-2 items-center">
+                      <Input
+                        type="date"
+                        min={minBookingISO()}
+                        onChange={(e) => e.target.value && handler(e.target.value)}
+                        className="rounded-full max-w-[220px]"
+                      />
+                      {showTomorrowShortcut && (
+                        <Button
+                          size="sm"
+                          onClick={() => handler(shortcutISO)}
+                          className="rounded-full"
+                        >
+                          Pick {shortcutLabel}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
+
 
                 {!typing && (step === "ask_time" || step === "reschedule_time") && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
