@@ -1,0 +1,25 @@
+# Evergreen Dental
+
+> A modern private dental practice in Marylebone, London offering Invisalign, veneers, whitening, implants and family dentistry with calm, premium care.
+
+Evergreen Dental is a London-based private dentist serving patients across the city. The site lets visitors explore treatments, browse before-and-after results, read patient reviews, meet the clinical team and book a consultation.
+
+## Pages
+
+- [Home](/): Practice overview, services and booking.
+- [About](/about): Practice story, values and approach.
+- [Team](/team): Clinicians and support staff.
+- [Services](/services): Full list of treatments offered.
+- [Results](/results): Before-and-after case gallery.
+- [Reviews](/reviews): Patient testimonials.
+- [Contact](/contact): Address, hours and contact details.
+- [Book](/book): Book a consultation.
+
+## Treatments
+
+- [Invisalign](/services/invisalign): Clear aligner orthodontics.
+- [Veneers](/services/veneers): Porcelain and composite veneers.
+- [Whitening](/services/whitening): Professional teeth whitening.
+- [Implants](/services/implants): Single and multiple tooth implants.
+- [Smile Makeover](/services/smile-makeover): Combined cosmetic plans.
+- [General Dentistry](/services/general): Check-ups, hygiene and routine care.
