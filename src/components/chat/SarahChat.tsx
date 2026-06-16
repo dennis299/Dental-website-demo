@@ -85,6 +85,22 @@ const formatISOWhen = (iso: string) => {
 };
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
+const addDaysISO = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+const nextNonSundayISO = (startOffset: number) => {
+  for (let i = startOffset; i < startOffset + 7; i++) {
+    const iso = addDaysISO(i);
+    if (new Date(`${iso}T00:00:00`).getDay() !== 0) return iso;
+  }
+  return addDaysISO(startOffset);
+};
+const minBookingISO = () => {
+  // Lazy import-safe: getTimeSlots imported at top
+  return getTimeSlots(todayISO()).length > 0 ? todayISO() : nextNonSundayISO(1);
+};
 
 type Data = {
   email: string;
