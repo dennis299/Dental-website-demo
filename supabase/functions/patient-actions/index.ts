@@ -299,6 +299,8 @@ Deno.serve(async (req) => {
       if (!phone || phone.length < 7 || phone.length > 20) return json({ error: 'invalid_phone' }, 400)
       if (!isEmail(email)) return json({ error: 'invalid_email' }, 400)
       if (!isFutureIso(body.preferredDatetime)) return json({ error: 'invalid_datetime' }, 400)
+      if (treatment !== null && treatment.length > 200) return json({ error: 'invalid_treatment' }, 400)
+      if (message !== null && message.length > 2000) return json({ error: 'invalid_message' }, 400)
 
       const limited = await rateLimit([
         { bucket: `pa:book:ip:${ip}`, max: 3, windowSec: 60 },
