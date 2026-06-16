@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
+import { PageHero } from "@/components/PageHero";
 import { About as AboutSection } from "@/components/sections/About";
 import { Team } from "@/components/sections/Team";
 
@@ -9,6 +10,11 @@ const About = () => (
       title="About Evergreen Dental | Premium Care in Marylebone"
       description="A modern London dental practice built around how you feel in the chair. Twenty years of calm, considered family dentistry."
       path="/about"
+    />
+    <PageHero
+      eyebrow="About Evergreen Dental"
+      title="Premium private dentistry in the heart of Marylebone"
+      subtitle="For over two decades we've cared for London families with a calm, considered approach to modern dentistry — built around how you feel in the chair."
     />
     <AboutSection />
     <section className="py-12 bg-gradient-soft border-y border-border">
