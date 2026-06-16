@@ -85,6 +85,22 @@ const formatISOWhen = (iso: string) => {
 };
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
+const addDaysISO = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+const nextNonSundayISO = (startOffset: number) => {
+  for (let i = startOffset; i < startOffset + 7; i++) {
+    const iso = addDaysISO(i);
+    if (new Date(`${iso}T00:00:00`).getDay() !== 0) return iso;
+  }
+  return addDaysISO(startOffset);
+};
+const minBookingISO = () => {
+  // Lazy import-safe: getTimeSlots imported at top
+  return getTimeSlots(todayISO()).length > 0 ? todayISO() : nextNonSundayISO(1);
+};
 
 type Data = {
   email: string;
@@ -390,13 +406,14 @@ export const SarahChat = () => {
       return;
     }
     const d = new Date(`${date}T00:00:00`);
+    const lastText = messages[messages.length - 1]?.text;
     if (d.getDay() === 0) {
-      await sendBot(COPY.closedSunday);
+      if (lastText !== COPY.closedSunday) await sendBot(COPY.closedSunday);
       return;
     }
     const slots = getTimeSlots(date);
     if (slots.length === 0) {
-      await sendBot(COPY.noSlotsToday);
+      if (lastText !== COPY.noSlotsToday) await sendBot(COPY.noSlotsToday);
       return;
     }
     const pretty = d.toLocaleDateString(undefined, {
@@ -409,6 +426,7 @@ export const SarahChat = () => {
     setStep("ask_time");
     await sendBot(COPY.askTime);
   };
+
 
   const pickTime = async (time: string) => {
     sendUser(time);
@@ -477,13 +495,14 @@ export const SarahChat = () => {
       return;
     }
     const d = new Date(`${date}T00:00:00`);
+    const lastText = messages[messages.length - 1]?.text;
     if (d.getDay() === 0) {
-      await sendBot(COPY.closedSunday);
+      if (lastText !== COPY.closedSunday) await sendBot(COPY.closedSunday);
       return;
     }
     const slots = getTimeSlots(date);
     if (slots.length === 0) {
-      await sendBot(COPY.noSlotsToday);
+      if (lastText !== COPY.noSlotsToday) await sendBot(COPY.noSlotsToday);
       return;
     }
     const pretty = d.toLocaleDateString(undefined, {
@@ -496,6 +515,7 @@ export const SarahChat = () => {
     setStep("reschedule_time");
     await sendBot(COPY.askTime);
   };
+
 
   const pickRescheduleTime = async (time: string) => {
     sendUser(time);
@@ -757,19 +777,37 @@ export const SarahChat = () => {
                   </div>
                 )}
 
-                {!typing && (step === "ask_date" || step === "reschedule_date") && (
-                  <div className="pt-1 pl-9">
-                    <Input
-                      type="date"
-                      min={todayISO()}
-                      onChange={(e) =>
-                        e.target.value &&
-                        (step === "ask_date" ? pickDate(e.target.value) : pickRescheduleDate(e.target.value))
-                      }
-                      className="rounded-full max-w-[220px]"
-                    />
-                  </div>
-                )}
+                {!typing && (step === "ask_date" || step === "reschedule_date") && (() => {
+                  const lastText = messages[messages.length - 1]?.text;
+                  const showTomorrowShortcut =
+                    lastText === COPY.noSlotsToday || lastText === COPY.closedSunday;
+                  const shortcutISO = nextNonSundayISO(1);
+                  const shortcutLabel = new Date(`${shortcutISO}T00:00:00`).toLocaleDateString(
+                    undefined,
+                    { weekday: "long", day: "numeric", month: "long" },
+                  );
+                  const handler = step === "ask_date" ? pickDate : pickRescheduleDate;
+                  return (
+                    <div className="pt-1 pl-9 flex flex-wrap gap-2 items-center">
+                      <Input
+                        type="date"
+                        min={minBookingISO()}
+                        onChange={(e) => e.target.value && handler(e.target.value)}
+                        className="rounded-full max-w-[220px]"
+                      />
+                      {showTomorrowShortcut && (
+                        <Button
+                          size="sm"
+                          onClick={() => handler(shortcutISO)}
+                          className="rounded-full"
+                        >
+                          Pick {shortcutLabel}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
+
 
                 {!typing && (step === "ask_time" || step === "reschedule_time") && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
