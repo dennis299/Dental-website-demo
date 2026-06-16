@@ -235,6 +235,51 @@ export type Database = {
         }
         Relationships: []
       }
+      security_findings: {
+        Row: {
+          check_id: string
+          created_at: string
+          description: string
+          fingerprint: string
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          remediation: string
+          resolved_at: string | null
+          severity: string
+          subject: string
+          title: string
+        }
+        Insert: {
+          check_id: string
+          created_at?: string
+          description: string
+          fingerprint: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          remediation: string
+          resolved_at?: string | null
+          severity: string
+          subject: string
+          title: string
+        }
+        Update: {
+          check_id?: string
+          created_at?: string
+          description?: string
+          fingerprint?: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          remediation?: string
+          resolved_at?: string | null
+          severity?: string
+          subject?: string
+          title?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -302,6 +347,7 @@ export type Database = {
         Args: { _booking_id: string; _email: string; _new_datetime: string }
         Returns: boolean
       }
+      run_security_scan_checks: { Args: never; Returns: Json }
     }
     Enums: {
       [_ in never]: never
