@@ -36,11 +36,23 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [preselect, setPreselect] = useState<string | undefined>();
   const [prefill, setPrefill] = useState<BookingPrefill | undefined>();
+  const [showChat, setShowChat] = useState(false);
 
   const openBooking = useCallback((p?: string, pf?: BookingPrefill) => {
     setPreselect(p);
     setPrefill(pf);
     setOpen(true);
+  }, []);
+
+  useEffect(() => {
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number };
+    const trigger = () => setShowChat(true);
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(trigger, { timeout: 3500 });
+    } else {
+      const t = window.setTimeout(trigger, 2500);
+      return () => window.clearTimeout(t);
+    }
   }, []);
 
   return (
@@ -53,7 +65,11 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
         preselect={preselect}
         prefill={prefill}
       />
-      <SarahChat />
+      {showChat && (
+        <Suspense fallback={null}>
+          <SarahChat />
+        </Suspense>
+      )}
     </BookingContext.Provider>
   );
 };
