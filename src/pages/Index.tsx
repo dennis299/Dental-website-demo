@@ -12,22 +12,17 @@ const Index = () => (
   <>
     <SEO
       title="Evergreen Dental — Premium Private Dentistry in London"
-      description="A modern private practice in Marylebone offering Invisalign, veneers, whitening, implants and family dentistry. Calm, expert care for every smile."
+      description="Modern private dental practice in Marylebone, London. Invisalign, veneers, whitening, implants and family dentistry. Calm, expert care for every smile."
       path="/"
       jsonLd={{
         "@context": "https://schema.org",
-        "@type": "Dentist",
-        name: "Evergreen Dental",
-        url: "https://premium-smile-guide.lovable.app/",
-        telephone: "+44 20 7946 0123",
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: "42 Marylebone High Street",
-          addressLocality: "London",
-          postalCode: "W1U 5HP",
-          addressCountry: "GB",
-        },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "120" },
+        "@type": "WebPage",
+        name: "Evergreen Dental — Premium Private Dentistry in London",
+        url: "https://my-dental.space/",
+        isPartOf: { "@id": "https://my-dental.space/#website" },
+        about: { "@id": "https://my-dental.space/#business" },
+        primaryImageOfPage: "https://my-dental.space/og-image.jpg",
+        inLanguage: "en-GB",
       }}
     />
     <Hero />

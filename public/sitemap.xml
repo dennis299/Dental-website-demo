@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://my-dental.space/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://my-dental.space/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://my-dental.space/services/invisalign</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://my-dental.space/services/veneers</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://my-dental.space/services/whitening</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://my-dental.space/services/implants</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://my-dental.space/services/smile-makeover</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://my-dental.space/services/general</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://my-dental.space/about</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://my-dental.space/team</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://my-dental.space/results</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://my-dental.space/reviews</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://my-dental.space/contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://my-dental.space/book</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://my-dental.space/</loc><lastmod>2026-06-17</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://my-dental.space/services</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://my-dental.space/services/invisalign</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://my-dental.space/services/veneers</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://my-dental.space/services/whitening</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://my-dental.space/services/implants</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://my-dental.space/services/smile-makeover</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://my-dental.space/services/general</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://my-dental.space/about</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-dental.space/team</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-dental.space/results</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-dental.space/reviews</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-dental.space/contact</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-dental.space/book</loc><lastmod>2026-06-17</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
 </urlset>

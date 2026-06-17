@@ -11,8 +11,29 @@ const Services = () => {
     <>
       <SEO
         title="Dental Treatments in London | Evergreen Dental"
-        description="Explore our full range of treatments — Invisalign, veneers, whitening, implants, smile makeovers and family dentistry. Transparent pricing on every plan."
+        description="Explore Invisalign, veneers, whitening, implants, smile makeovers and family dentistry in Marylebone. Transparent pricing on every treatment plan."
         path="/services"
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://my-dental.space/" },
+              { "@type": "ListItem", position: 2, name: "Treatments", item: "https://my-dental.space/services" },
+            ],
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: "Dental treatments in London",
+            itemListElement: TREATMENTS_DATA.map((t, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              url: `https://my-dental.space/services/${t.slug}`,
+              name: t.name,
+            })),
+          },
+        ]}
       />
       <PageHero
         eyebrow="Our treatments"
@@ -31,8 +52,9 @@ const Services = () => {
               <div className="card-img-wrap aspect-[4/3] bg-muted">
                 <img
                   src={t.image}
-                  alt={`${t.name} at Evergreen Dental`}
+                  alt={`${t.name} treatment at Evergreen Dental, Marylebone London`}
                   loading="lazy"
+                  decoding="async"
                   className="card-img"
                 />
               </div>
