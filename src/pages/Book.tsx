@@ -14,9 +14,17 @@ const Book = () => {
   return (
     <>
       <SEO
-        title="Book Your Appointment | Evergreen Dental"
-        description="Book a consultation with Evergreen Dental online. Calm, premium private dentistry in Marylebone, London."
+        title="Book an Appointment | Evergreen Dental Marylebone"
+        description="Book a private dental consultation at Evergreen Dental online. Calm, premium dentistry in Marylebone, London. Same-week appointments available."
         path="/book"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://my-dental.space/" },
+            { "@type": "ListItem", position: 2, name: "Book", item: "https://my-dental.space/book" },
+          ],
+        }}
       />
       <PageHero
         eyebrow="Book an appointment"

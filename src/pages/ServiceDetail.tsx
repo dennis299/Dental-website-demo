@@ -29,8 +29,8 @@ const ServiceDetail = () => {
   return (
     <>
       <SEO
-        title={`${t.name} in London | Evergreen Dental`}
-        description={`${t.short} Transparent pricing from ${t.priceFrom}. Book a free consultation with Evergreen Dental in Marylebone.`}
+        title={`${t.name} in London | Evergreen Dental Marylebone`}
+        description={`${t.short} Transparent pricing from ${t.priceFrom}. Book a free consultation at Evergreen Dental, Marylebone, London.`}
         path={`/services/${t.slug}`}
         jsonLd={[
           {
@@ -38,14 +38,36 @@ const ServiceDetail = () => {
             "@type": "MedicalProcedure",
             name: t.name,
             description: t.short,
-            provider: { "@type": "Dentist", name: "Evergreen Dental" },
+            procedureType: "https://schema.org/TherapeuticProcedure",
+            bodyLocation: "Teeth",
+            provider: { "@id": "https://my-dental.space/#business" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            serviceType: t.name,
+            provider: { "@id": "https://my-dental.space/#business" },
+            areaServed: { "@type": "City", name: "London" },
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "GBP",
+              price: String(t.priceFrom).replace(/[^0-9.]/g, "") || undefined,
+              priceSpecification: {
+                "@type": "PriceSpecification",
+                priceCurrency: "GBP",
+                price: String(t.priceFrom).replace(/[^0-9.]/g, "") || undefined,
+                valueAddedTaxIncluded: true,
+              },
+              availability: "https://schema.org/InStock",
+              url: `https://my-dental.space/services/${t.slug}`,
+            },
           },
           {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Home", item: "https://my-dental.space/" },
-              { "@type": "ListItem", position: 2, name: "Services", item: "https://my-dental.space/services" },
+              { "@type": "ListItem", position: 2, name: "Treatments", item: "https://my-dental.space/services" },
               { "@type": "ListItem", position: 3, name: t.name, item: `https://my-dental.space/services/${t.slug}` },
             ],
           },
@@ -103,9 +125,11 @@ const ServiceDetail = () => {
             <div className="card-img-wrap rounded-[2rem] overflow-hidden shadow-elegant img-hover">
               <img
                 src={t.image}
-                alt={`${t.name} — Evergreen Dental`}
+                alt={`${t.name} treatment at Evergreen Dental, Marylebone London`}
                 className="w-full h-[440px] object-cover"
                 loading="eager"
+                fetchPriority="high"
+                decoding="async"
               />
             </div>
           </div>

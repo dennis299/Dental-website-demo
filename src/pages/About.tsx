@@ -8,8 +8,25 @@ const About = () => (
   <>
     <SEO
       title="About Evergreen Dental | Premium Care in Marylebone"
-      description="A modern London dental practice built around how you feel in the chair. Twenty years of calm, considered family dentistry."
+      description="A modern London dental practice built around how you feel in the chair. Two decades of calm, considered private and family dentistry in Marylebone."
       path="/about"
+      jsonLd={[
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://my-dental.space/" },
+            { "@type": "ListItem", position: 2, name: "About", item: "https://my-dental.space/about" },
+          ],
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          name: "About Evergreen Dental",
+          url: "https://my-dental.space/about",
+          about: { "@id": "https://my-dental.space/#business" },
+        },
+      ]}
     />
     <PageHero
       eyebrow="About Evergreen Dental"
