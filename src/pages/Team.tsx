@@ -19,9 +19,12 @@ const teamMembers = [
 const TeamPage = () => (
   <>
     <SEO
-      title="Meet the Team | Evergreen Dental Marylebone"
-      description="Meet the GDC-registered dentists, hygienists and nurses behind Evergreen Dental in Marylebone, London — a calm, experienced private dental team."
+      title="Meet Our Dentists & Hygienists | Marylebone London"
+      description="Meet the GDC-registered dentists, hygienists and nurses at Evergreen Dental in Marylebone, London — a calm, experienced private dental team."
       path="/team"
+      keywords="Marylebone dentist team, London cosmetic dentist, GDC registered dentist Marylebone, hygienist London"
+      ogTitle="The Team Behind Evergreen Dental, Marylebone"
+      ogDescription="Friendly, GDC-registered clinicians and warm support staff — here to make every visit calm, clear and reassuring."
       jsonLd={[
         {
           "@context": "https://schema.org",

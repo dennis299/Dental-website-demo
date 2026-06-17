@@ -7,9 +7,12 @@ import { Team } from "@/components/sections/Team";
 const About = () => (
   <>
     <SEO
-      title="About Evergreen Dental | Premium Care in Marylebone"
-      description="A modern London dental practice built around how you feel in the chair. Two decades of calm, considered private and family dentistry in Marylebone."
+      title="About Evergreen Dental | Marylebone London Practice"
+      description="Two decades of calm, considered private and family dentistry in Marylebone, London. Discover the team and values behind Evergreen Dental."
       path="/about"
+      keywords="about Evergreen Dental, Marylebone dental practice, private dentist London, family dentist Marylebone"
+      ogTitle="About Evergreen Dental — Marylebone's Calm Private Practice"
+      ogDescription="A modern London dental practice built around how you feel in the chair. Meet the people behind Evergreen Dental in Marylebone."
       jsonLd={[
         {
           "@context": "https://schema.org",

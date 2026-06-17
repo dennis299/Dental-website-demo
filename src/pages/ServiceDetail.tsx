@@ -11,6 +11,51 @@ import {
 } from "@/components/ui/accordion";
 import NotFound from "@/pages/NotFound";
 
+const SERVICE_META: Record<string, { title: string; description: string; ogTitle: string; ogDescription: string; keywords: string }> = {
+  invisalign: {
+    title: "Invisalign in Marylebone London | Clear Aligners",
+    description: "Invisalign clear aligners in Marylebone, London from £2,450. Free smile preview, 0% finance and expert care at Evergreen Dental.",
+    ogTitle: "Invisalign Clear Aligners — Marylebone, London",
+    ogDescription: "Straighten your smile invisibly with Invisalign at Evergreen Dental Marylebone. From £2,450 with 0% finance.",
+    keywords: "Invisalign Marylebone, Invisalign London, clear aligners London, invisible braces Marylebone, Invisalign cost London",
+  },
+  veneers: {
+    title: "Porcelain Veneers in Marylebone London | From £950",
+    description: "Bespoke porcelain veneers in Marylebone, London from £950 per tooth. Digital smile design, master ceramists, 10–15+ year results.",
+    ogTitle: "Porcelain Veneers in Marylebone, London",
+    ogDescription: "Hand-crafted porcelain veneers in Marylebone — natural-looking results designed around your face. From £950.",
+    keywords: "porcelain veneers London, veneers Marylebone, composite veneers London, smile design Marylebone, cosmetic dentist London",
+  },
+  whitening: {
+    title: "Teeth Whitening in Marylebone London | From £380",
+    description: "Professional dentist-supervised teeth whitening in Marylebone, London from £380. Up to 8 shades brighter — safely, in a single visit.",
+    ogTitle: "Professional Teeth Whitening — Marylebone, London",
+    ogDescription: "Brighten your smile by up to 8 shades with dentist-led whitening at Evergreen Dental Marylebone. From £380.",
+    keywords: "teeth whitening London, teeth whitening Marylebone, professional whitening London, Enlighten whitening Marylebone",
+  },
+  implants: {
+    title: "Dental Implants in Marylebone London | From £2,850",
+    description: "Premium dental implants in Marylebone, London from £2,850. CBCT-planned single, multiple and All-on-4 implants with 0% finance.",
+    ogTitle: "Dental Implants — Marylebone, London",
+    ogDescription: "Replace missing teeth with implants that look, feel and function like the real thing. Implant consultations in Marylebone from £2,850.",
+    keywords: "dental implants London, dental implants Marylebone, single tooth implant London, All-on-4 implants Marylebone, implant dentist London",
+  },
+  "smile-makeover": {
+    title: "Smile Makeover in Marylebone London | From £1,950",
+    description: "Bespoke smile makeovers in Marylebone, London from £1,950. Blends Invisalign, whitening and veneers into one tailored transformation.",
+    ogTitle: "Bespoke Smile Makeover — Marylebone, London",
+    ogDescription: "A fully personalised smile makeover plan, designed around your face, lifestyle and goals. From £1,950 in Marylebone.",
+    keywords: "smile makeover London, smile makeover Marylebone, cosmetic dentistry London, full smile design Marylebone",
+  },
+  general: {
+    title: "Family Dentist in Marylebone London | Check-Ups £65",
+    description: "Calm, family-friendly general dentistry in Marylebone, London. Check-ups from £65, hygiene visits and gentle care for anxious patients.",
+    ogTitle: "Family & General Dentistry — Marylebone, London",
+    ogDescription: "Thorough, unhurried check-ups, hygiene and everyday care for the whole family at Evergreen Dental Marylebone. From £65.",
+    keywords: "family dentist Marylebone, general dentist London, dental check up Marylebone, hygienist London, NHS alternative dentist London",
+  },
+};
+
 const ServiceDetail = () => {
   const { slug } = useParams();
   const treatment = findTreatment(slug);
@@ -18,6 +63,13 @@ const ServiceDetail = () => {
 
   if (!treatment) return <NotFound />;
   const t = treatment;
+  const meta = SERVICE_META[t.slug] ?? {
+    title: `${t.name} in Marylebone London | Evergreen Dental`,
+    description: `${t.short} Transparent pricing from ${t.priceFrom}. Book a free consultation at Evergreen Dental, Marylebone.`,
+    ogTitle: `${t.name} — Evergreen Dental, Marylebone London`,
+    ogDescription: `${t.short} From ${t.priceFrom} at Evergreen Dental Marylebone.`,
+    keywords: `${t.name} London, ${t.name} Marylebone, private dentist London`,
+  };
 
   const openSarah = () => {
     sessionStorage.removeItem("sarah_dismissed");
@@ -29,8 +81,11 @@ const ServiceDetail = () => {
   return (
     <>
       <SEO
-        title={`${t.name} in London | Evergreen Dental Marylebone`}
-        description={`${t.short} Transparent pricing from ${t.priceFrom}. Book a free consultation at Evergreen Dental, Marylebone, London.`}
+        title={meta.title}
+        description={meta.description}
+        ogTitle={meta.ogTitle}
+        ogDescription={meta.ogDescription}
+        keywords={meta.keywords}
         path={`/services/${t.slug}`}
         jsonLd={[
           {
