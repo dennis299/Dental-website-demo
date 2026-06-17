@@ -1,5 +1,11 @@
 export const GA_MEASUREMENT_ID = "G-EM2KVT3F2Y";
 
+function getGtag(): typeof window.gtag | undefined {
+  return typeof window !== "undefined"
+    ? (window as any).gtag
+    : undefined;
+}
+
 /**
  * Send a Google Analytics 4 event via gtag.
  */
@@ -7,9 +13,8 @@ export function gtagEvent(
   eventName: string,
   params?: Record<string, string | number | boolean | undefined>
 ) {
-  if (typeof window !== "undefined" && typeof window.gtag === "function") {
-    window.gtag("event", eventName, params);
-  }
+  const gtag = getGtag();
+  if (gtag) gtag("event", eventName, params);
 }
 
 /**
@@ -20,11 +25,13 @@ export function gtagPageView(
   pageTitle?: string,
   pageLocation?: string
 ) {
-  if (typeof window !== "undefined" && typeof window.gtag === "function") {
-    window.gtag("config", GA_MEASUREMENT_ID, {
+  const gtag = getGtag();
+  if (gtag) {
+    gtag("config", GA_MEASUREMENT_ID, {
       page_path: pagePath,
       page_title: pageTitle || document.title,
       page_location: pageLocation || window.location.href,
     });
   }
 }
+
