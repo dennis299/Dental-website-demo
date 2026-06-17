@@ -10,9 +10,12 @@ const Services = () => {
   return (
     <>
       <SEO
-        title="Dental Treatments in London | Evergreen Dental"
-        description="Explore Invisalign, veneers, whitening, implants, smile makeovers and family dentistry in Marylebone. Transparent pricing on every treatment plan."
+        title="Dental Treatments in Marylebone London | Evergreen Dental"
+        description="Explore Invisalign, veneers, whitening, implants, smile makeovers & family dentistry in Marylebone. Transparent pricing on every treatment plan."
         path="/services"
+        keywords="dental treatments London, Invisalign Marylebone, porcelain veneers London, teeth whitening Marylebone, dental implants London, smile makeover Marylebone"
+        ogTitle="Premium Dental Treatments in Marylebone, London"
+        ogDescription="Invisalign, veneers, whitening, implants and family dentistry — bespoke plans with transparent pricing at Evergreen Dental Marylebone."
         jsonLd={[
           {
             "@context": "https://schema.org",
