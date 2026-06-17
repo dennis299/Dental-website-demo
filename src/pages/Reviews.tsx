@@ -4,9 +4,12 @@ import { Testimonials } from "@/components/sections/Testimonials";
 const Reviews = () => (
   <>
     <SEO
-      title="Patient Reviews | Evergreen Dental London"
-      description="Read real patient reviews of Evergreen Dental in Marylebone, London. Rated 4.9/5 on Google from 120+ verified reviews — calm, premium private dentistry."
+      title="Patient Reviews 4.9★ | Evergreen Dental Marylebone"
+      description="Read 120+ verified 5-star reviews of Evergreen Dental in Marylebone, London. Calm, premium private dentistry rated 4.9/5 by real patients."
       path="/reviews"
+      keywords="Evergreen Dental reviews, Marylebone dentist reviews, best dentist London reviews, private dentist Marylebone testimonials"
+      ogTitle="Patient Reviews — Evergreen Dental, Marylebone London"
+      ogDescription="Rated 4.9/5 from 120+ verified patient reviews. See what Londoners say about their experience at Evergreen Dental in Marylebone."
       jsonLd={[
         {
           "@context": "https://schema.org",
