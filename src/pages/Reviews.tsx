@@ -21,37 +21,27 @@ const Reviews = () => (
         },
         {
           "@context": "https://schema.org",
-          "@type": "Dentist",
-          "@id": "https://my-dental.space/#business",
-          name: "Evergreen Dental",
-          url: "https://my-dental.space/",
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: "4.9",
-            reviewCount: "120",
-            bestRating: "5",
-            worstRating: "1",
-          },
-          review: [
-            {
-              "@type": "Review",
-              author: { "@type": "Person", name: "Sophia A." },
-              reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-              reviewBody: "From the moment I walked in I felt completely at ease. Honestly the best dental experience I've ever had.",
-            },
-            {
-              "@type": "Review",
-              author: { "@type": "Person", name: "James W." },
-              reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-              reviewBody: "I've been anxious about dentists my whole life. The team made the whole visit calm and stress-free.",
-            },
-            {
-              "@type": "Review",
-              author: { "@type": "Person", name: "Priya S." },
-              reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-              reviewBody: "I'm halfway through Invisalign and the results are already incredible.",
-            },
-          ],
+          "@type": "Review",
+          itemReviewed: { "@id": "https://my-dental.space/#business" },
+          author: { "@type": "Person", name: "Sophia A." },
+          reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+          reviewBody: "From the moment I walked in I felt completely at ease. Honestly the best dental experience I've ever had.",
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Review",
+          itemReviewed: { "@id": "https://my-dental.space/#business" },
+          author: { "@type": "Person", name: "James W." },
+          reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+          reviewBody: "I've been anxious about dentists my whole life. The team made the whole visit calm and stress-free.",
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Review",
+          itemReviewed: { "@id": "https://my-dental.space/#business" },
+          author: { "@type": "Person", name: "Priya S." },
+          reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+          reviewBody: "I'm halfway through Invisalign and the results are already incredible.",
         },
       ]}
     />
