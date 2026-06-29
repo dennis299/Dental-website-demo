@@ -810,6 +810,63 @@ export const SarahChat = () => {
                   </div>
                 )}
 
+                {!typing && step === "menu" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" onClick={() => startBookingFlow("📅 Book an appointment")} className="rounded-full shadow-elegant">
+                      📅 Book an appointment
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={openFaq} className="rounded-full">
+                      ❓ Ask a question
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "faq_category" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    {FAQ_CATEGORIES.map((c) => (
+                      <button
+                        key={c.key}
+                        onClick={() => pickFaqCategory(c.key)}
+                        className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                      >
+                        {c.emoji} {c.label}
+                      </button>
+                    ))}
+                    <Button size="sm" onClick={() => startBookingFlow("📅 Book an appointment")} className="rounded-full shadow-elegant">
+                      📅 Book an appointment
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "faq_answer" && faqCategory && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    {FAQ_TREE[faqCategory].map((item) => (
+                      <button
+                        key={item.q}
+                        onClick={() => pickFaqQuestion(item.q, item.a)}
+                        className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                      >
+                        {item.q}
+                      </button>
+                    ))}
+                    {faqCategory === "emergency" && (
+                      <a
+                        href={`tel:${CLINIC.phoneTel}`}
+                        className="text-xs px-3 py-1.5 rounded-full bg-destructive text-destructive-foreground hover:opacity-90 transition-opacity font-medium"
+                      >
+                        📞 Call {CLINIC.phone}
+                      </a>
+                    )}
+                    <Button size="sm" variant="outline" onClick={backToCategories} className="rounded-full">
+                      ← Other topics
+                    </Button>
+                    <Button size="sm" onClick={() => startBookingFlow("📅 Book an appointment")} className="rounded-full shadow-elegant">
+                      📅 Book an appointment
+                    </Button>
+                  </div>
+                )}
+
+
                 {!typing && step === "returning_menu" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
                     <Button size="sm" onClick={startReschedule} className="rounded-full">Reschedule</Button>
