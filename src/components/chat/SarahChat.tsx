@@ -353,9 +353,18 @@ export const SarahChat = () => {
       await goToConfirm({ ...data, notes: v || undefined });
     } else if (step === "question_open") {
       sendUser(v);
-      await sendBot(
-        "Thanks — I've passed that on to the team and they'll follow up by email shortly. Anything else I can help with?",
-      );
+      const intent = detectIntent(v);
+      if (intent === "emergency") {
+        await sendBot(COPY.emergencyPrompt);
+        setStep("faq_answer");
+        setFaqCategory("emergency");
+        return;
+      }
+      if (intent === "booking") {
+        await startBookingFlow("Book an appointment");
+        return;
+      }
+      await sendBot(COPY.faqOutOfScope);
     }
   };
 
