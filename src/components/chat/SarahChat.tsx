@@ -9,12 +9,17 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import {
   COPY,
+  CLINIC,
+  FAQ_CATEGORIES,
+  FAQ_TREE,
   INVISALIGN_STEPS,
   INVISALIGN_WHY,
   TREATMENT_INFO,
   TREATMENT_MAP,
   TREATMENT_OPTIONS,
+  detectIntent,
   getTimeSlots,
+  type FaqCategoryKey,
   type TreatmentKey,
 } from "./script";
 
