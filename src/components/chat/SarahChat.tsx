@@ -474,7 +474,7 @@ export const SarahChat = () => {
       await sendBot(COPY.errorRetry);
       return;
     }
-
+    try { localStorage.setItem("sarah_booked", "1"); } catch { /* ignore */ }
     setStep("done");
     await sendBot(COPY.success(formatWhen(data.date!, data.time!)));
   };
