@@ -24,6 +24,9 @@ import {
 } from "./script";
 
 type Step =
+  | "menu"
+  | "faq_category"
+  | "faq_answer"
   | "ask_email"
   | "ask_otp"
   | "ask_name"
