@@ -71,6 +71,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
       {showChat && (
         <Suspense fallback={null}>
           <SarahChat />
+          <EngagementOrchestrator />
         </Suspense>
       )}
     </BookingContext.Provider>
