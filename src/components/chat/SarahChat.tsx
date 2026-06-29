@@ -231,10 +231,12 @@ export const SarahChat = () => {
     setData({ email: "", name: "" });
     setExisting(null);
     setSessionToken(null);
+    setFaqCategory(null);
+    setFaqAnsweredCount(0);
     setMessages([]);
-    setStep("ask_email");
+    setStep("menu");
     greetedRef.current = false;
-    await sendBot(COPY.greetingAskEmail);
+    await sendBot(COPY.greetingMenu);
     greetedRef.current = true;
   };
 
