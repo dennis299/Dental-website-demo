@@ -497,9 +497,54 @@ export const SarahChat = () => {
 
   const askQuestion = async () => {
     sendUser("I have a question");
-    setStep("question_open");
-    await sendBot(COPY.askQuestion);
+    setStep("faq_category");
+    await sendBot(COPY.faqPickCategory);
   };
+
+  // --- Menu / FAQ handlers -------------------------------------------------
+  const startBookingFlow = async (userLabel = "Book an appointment") => {
+    sendUser(userLabel);
+    setStep("ask_email");
+    await sendBot(COPY.greetingAskEmail);
+  };
+
+  const openFaq = async () => {
+    sendUser("Ask a question");
+    setStep("faq_category");
+    await sendBot(COPY.faqPickCategory);
+  };
+
+  const pickFaqCategory = async (key: FaqCategoryKey) => {
+    const cat = FAQ_CATEGORIES.find((c) => c.key === key);
+    sendUser(cat ? `${cat.emoji} ${cat.label}` : key);
+    setFaqCategory(key);
+    setStep("faq_answer");
+    if (key === "emergency") {
+      await sendBot(COPY.emergencyPrompt);
+    } else {
+      await sendBot("Here are the most common questions — tap one:");
+    }
+  };
+
+  const pickFaqQuestion = async (q: string, a: string) => {
+    sendUser(q);
+    await sendBot(a);
+    const next = faqAnsweredCount + 1;
+    setFaqAnsweredCount(next);
+    if (next >= 2 && next % 2 === 0) {
+      await sendBot(COPY.faqBookingNudge);
+    } else {
+      await sendBot(COPY.faqAnythingElse);
+    }
+  };
+
+  const backToCategories = async () => {
+    sendUser("Other topics");
+    setFaqCategory(null);
+    setStep("faq_category");
+    await sendBot(COPY.faqPickCategory);
+  };
+
 
   const pickRescheduleDate = async (date: string) => {
     if (date < todayISO()) {
