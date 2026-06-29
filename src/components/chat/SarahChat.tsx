@@ -129,9 +129,11 @@ export const SarahChat = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
-  const [step, setStep] = useState<Step>("ask_email");
+  const [step, setStep] = useState<Step>("menu");
   const [input, setInput] = useState("");
   const [data, setData] = useState<Data>({ email: "", name: "" });
+  const [faqCategory, setFaqCategory] = useState<FaqCategoryKey | null>(null);
+  const [faqAnsweredCount, setFaqAnsweredCount] = useState(0);
   const [existing, setExisting] = useState<ExistingBooking | null>(null);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
