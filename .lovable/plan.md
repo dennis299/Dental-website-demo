@@ -1,68 +1,89 @@
-# Upgrade Sarah → Website Assistant
+# Chatbot Engagement Redesign + Dental Concern Checker
 
-Keep the existing OTP booking flow untouched. Add a new **"Ask a question"** mode that opens before the email gate, powered by a scripted FAQ tree with quick-reply buttons. Zero ongoing cost, fully predictable answers, no hallucination risk.
+## Recommended modal frequency
+**Once per 24 hours (localStorage), suppressed after booking or after the user opens Sarah.** Rationale: one-time-per-session is too aggressive for returning visitors who bounce and come back; exit-intent-only loses mobile entirely. A 24h cap balances reach with restraint, and we already track `sarah_booked` to permanently silence converted users.
 
-## What changes for the visitor
+---
 
-When Sarah opens, instead of jumping straight to "what's your email?", she greets with:
+## Part 1 — Replace auto-popup with notification toast
 
-> 👋 Hi! I'm Sarah. I can answer quick questions about the clinic, or book you an appointment in under a minute. What would you like to do?
+**File:** `src/components/chat/SarahChat.tsx` (+ small new `SarahNotification.tsx`)
 
-Two primary buttons: **📅 Book an appointment** · **❓ Ask a question**
+- Remove the current auto-open behavior (the 6s/scroll auto-expand).
+- Keep the floating chat bubble (bottom-right), add a small **unread badge "1"** when a pending notification exists.
+- After **7s** on site (first visit only), render a compact toast *above* the bubble:
+  - Avatar + "Sarah" label + one rotating message from a small pool:
+    - "Hi! Need help choosing the right treatment?"
+    - "Have a dental question? I'm here to help."
+    - "Want to book in under 60 seconds?"
+  - Auto-dismiss after **8s**; manual close (×) supported.
+  - Click → opens Sarah, clears badge.
+- **Re-trigger rules** (only one of these fires the next toast, then cooldown 90s):
+  - Scroll passes 45% of page height, OR
+  - 45s additional dwell since last dismiss, OR
+  - 3+ section views (IntersectionObserver on `<section>`), OR
+  - Desktop exit-intent (`mouseleave` top edge).
+- **Suppression:** never show again if `sarah_booked=true`, if Sarah is currently open, or after 3 toasts in one session.
+- **Mobile:** toast is a small pill above the bubble (max 280px), never full-width, never blocks content. No auto-modal on mobile.
 
-- "Book" → existing OTP flow, unchanged.
-- "Ask" → FAQ menu with category chips. Every answer ends with a soft booking nudge + a **Book now** button.
+## Part 2 — Engagement modal
 
-## FAQ structure (scripted, quick-reply driven)
+**New file:** `src/components/engagement/EngagementModal.tsx`
 
-Six category chips → each shows 3–5 sub-questions as buttons → tapping shows the answer + back/book buttons.
+- Trigger: **25s dwell OR 40% scroll**, whichever first. Independent of Sarah toast.
+- Frequency: once per 24h via `localStorage.engagement_modal_shown_at`. Skip if `sarah_booked` or Sarah is open.
+- Premium centered dialog (shadcn `Dialog`), backdrop blur, brand tokens only.
+- Headline: "How can we help you today?" / Subtitle: "Choose the option that best fits your needs."
+- Two large cards side-by-side (stacked on mobile):
+  1. 💬 **Chat with Sarah** → "Start Chat" → opens SarahChat, closes modal.
+  2. 🦷 **Dental Concern Checker** → "Start Assessment" → opens checker modal, closes this one.
 
-**Appointments** — How do I book? · Reschedule? · Cancel? · How long does it take?
-**Clinic** — Services offered · New patients · Location · Opening hours · Contact
-**Pricing** — Free consultations · Starting prices · Payment plans · Consultation cost
-**Insurance** — Accepted providers (Bupa, AXA, Vitality, Aviva, Cigna — confirm with reception)
-**Emergency** — Same-day slots Mon–Sat → **Call 020 7946 0123** button (tel: link)
-**Website** — How online booking works · Data security
+## Part 3 — Dental Concern Checker (modal-only, no route)
 
-All answers are pulled from facts already on the site (`src/data/treatments.ts`, footer, contact section) so nothing is invented. Pricing answers cite real "from £X" figures from treatments.ts. Anything off-script (e.g. medical question) returns:
+**New files:**
+- `src/components/concern-checker/ConcernCheckerModal.tsx` (wizard shell)
+- `src/components/concern-checker/ToothMap.tsx` (SVG with all 32 teeth selectable)
+- `src/components/concern-checker/steps/` — `Step1Teeth.tsx`, `Step2Symptoms.tsx`, `Step3Details.tsx`, `Step4Summary.tsx`
+- `src/components/concern-checker/types.ts`
 
-> I can't answer that one — best to ring the clinic on 020 7946 0123 so our team can help properly. Shall I book you an appointment?
+**Wizard steps:**
 
-## Conversation rules baked in
+1. **Tooth selector** — full upper + lower arch SVG, all 32 adult teeth as individual `<path>` regions (FDI numbered 11–48). Multi-select with hover/active states. Quick chips below: "Upper Left / Upper Right / Lower Left / Lower Right / Front Teeth / Gums / Jaw" — each selects the matching tooth set. Disclaimer banner at top: *"This assessment is for guidance only and does not provide a medical diagnosis."*
+2. **Symptom type** (multi-select chips): Pain, Sensitivity, Swelling, Bleeding, Broken Tooth, Loose Tooth, Cosmetic Concern, Missing Tooth, Other.
+3. **Details:**
+   - Pain level slider 1–10
+   - Onset: Today / This week / This month / Longer
+   - Hot/cold sensitivity (yes/no/unsure)
+   - Visible swelling (yes/no)
+   - Emergency? (yes/no) — if yes, summary surfaces "call reception" CTA prominently.
+4. **Summary** — friendly, **no diagnosis, no treatment, no disease names**. Template:
+   > "Thanks for sharing. Based on what you've told us, we recommend scheduling an examination with one of our dentists so they can take a proper look. Sarah can help you book the most appropriate appointment."
+   - Buttons: **Book Appointment** (opens Sarah with prefill) · **Chat with Sarah** (opens Sarah with prefill).
 
-- All answers ≤ 3 sentences.
-- Every answer ends with a booking CTA button.
-- Emergency / pain keywords detected in free-text → immediate "Call us now" + "Book emergency slot" buttons.
-- No medical advice — fallback copy redirects to clinic.
-- Mobile-first: quick replies instead of typing.
+## Part 4 — Assessment → Sarah handoff (prefill + skip to booking)
 
-## Lead-generation hooks
+**File:** `src/components/chat/SarahChat.tsx` + `src/components/chat/script.ts`
 
-- Persistent **Book an appointment** button at the bottom of the FAQ panel.
-- After any 2 answered questions, Sarah proactively offers: *"Would you like me to schedule a consultation while we're chatting?"*
-- Pain/urgency keywords in free-text input ("hurts", "broken", "emergency", "pain") → immediate transition into booking flow with emergency tag.
+- New imperative API: `openSarah({ prefill?: ConcernSummary })` via a small Zustand store or window event (`sarah:open`).
+- When `prefill` present, Sarah's first message becomes:
+  > "Thanks for completing the assessment — here's what I have: **[teeth] · [symptoms] · pain [n]/10 · [emergency?]**. Let's get you booked. What's your email?"
+- Branch directly into existing **booking flow** (email → OTP if returning, else collect name/phone → date/time → confirm). Skip the FAQ greeting menu entirely when prefill is set.
+- Store the assessment JSON on the created booking via `patient-actions` (new optional `assessment` field, JSONB column on `bookings`). Returning patients still verify via OTP — no security regression.
 
-## Technical details
+## Part 5 — Backend (minimal)
 
-**Files touched**
-- `src/components/chat/script.ts` — add `FAQ_TREE` constant (categories → questions → answers, all strings), plus `EMERGENCY_KEYWORDS` and `BOOKING_INTENT_KEYWORDS` arrays. Add new COPY strings for the greeting menu and fallback.
-- `src/components/chat/SarahChat.tsx` —
-  - Add new `Step` values: `"menu"` (initial), `"faq_category"`, `"faq_answer"`.
-  - Change initial step from `"ask_email"` to `"menu"`; greet with new menu copy.
-  - Add renderers for FAQ category chips and question chips (reuse the existing chip button pattern used for treatments/dates).
-  - Add `goToBooking()` helper that transitions from any FAQ state into `"ask_email"` (preserving the existing OTP flow).
-  - Add keyword scanner on free-text submit in FAQ mode: emergency → emergency CTA; booking intent → jump to booking; otherwise → "I'll let the team know" fallback.
-- No backend changes. No new dependencies. No AI calls.
+**Migration:** add `assessment jsonb` column to `bookings` (nullable). Update `patient-actions` `create_booking` and `reschedule` to accept and persist it.
 
-**Out of scope**
-- LLM integration (kept as future option if scripted answers prove insufficient).
-- Editing the booking state machine, OTP flow, or `patient-actions` edge function.
-- New analytics events (existing GA setup already tracks chat opens).
+---
 
-## Verification
+## Technical notes
+- All triggers in a single `useEngagementTriggers` hook so toast + modal don't double-fire on the same scroll event.
+- Tooth SVG: use an existing public-domain dental chart as reference; ~32 hand-tuned `<path>` regions with `data-tooth="11"` etc., colored via design tokens (`--primary`, `--muted`). Pinch-zoom enabled on mobile via CSS `touch-action: pan-x pan-y`.
+- Analytics: fire `sarah_notification_shown`, `sarah_notification_clicked`, `engagement_modal_shown`, `engagement_modal_choice` (chat|checker), `concern_checker_completed`, `concern_checker_to_booking` via existing `src/lib/analytics.ts`.
+- Accessibility: toast is `role="status"` polite; modal traps focus; tooth SVG regions are `<button>`s with aria-labels ("Upper right central incisor, tooth 11").
+- No new dependencies.
 
-- Open chat → see menu with two buttons.
-- Tap "Ask a question" → category chips → pick "Pricing" → "Free consultations" → answer + Book button.
-- Tap "Book an appointment" anywhere → lands in existing email step, OTP + booking flow works unchanged.
-- Type "my tooth really hurts" → emergency CTA appears with phone link.
-- Mobile viewport: all chips wrap, no overflow, panel scrolls.
+## Out of scope
+- No dedicated `/concern-checker` route (modal-only per your choice).
+- No changes to existing OTP, rate-limiting, or email infra.
+- No diagnostic logic — summary is a single friendly template.
