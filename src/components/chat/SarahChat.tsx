@@ -9,16 +9,24 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import {
   COPY,
+  CLINIC,
+  FAQ_CATEGORIES,
+  FAQ_TREE,
   INVISALIGN_STEPS,
   INVISALIGN_WHY,
   TREATMENT_INFO,
   TREATMENT_MAP,
   TREATMENT_OPTIONS,
+  detectIntent,
   getTimeSlots,
+  type FaqCategoryKey,
   type TreatmentKey,
 } from "./script";
 
 type Step =
+  | "menu"
+  | "faq_category"
+  | "faq_answer"
   | "ask_email"
   | "ask_otp"
   | "ask_name"
@@ -121,9 +129,11 @@ export const SarahChat = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
-  const [step, setStep] = useState<Step>("ask_email");
+  const [step, setStep] = useState<Step>("menu");
   const [input, setInput] = useState("");
   const [data, setData] = useState<Data>({ email: "", name: "" });
+  const [faqCategory, setFaqCategory] = useState<FaqCategoryKey | null>(null);
+  const [faqAnsweredCount, setFaqAnsweredCount] = useState(0);
   const [existing, setExisting] = useState<ExistingBooking | null>(null);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -179,7 +189,7 @@ export const SarahChat = () => {
   useEffect(() => {
     if (open && !greetedRef.current) {
       greetedRef.current = true;
-      sendBot(COPY.greetingAskEmail);
+      sendBot(COPY.greetingMenu);
     }
   }, [open]);
 
@@ -221,10 +231,12 @@ export const SarahChat = () => {
     setData({ email: "", name: "" });
     setExisting(null);
     setSessionToken(null);
+    setFaqCategory(null);
+    setFaqAnsweredCount(0);
     setMessages([]);
-    setStep("ask_email");
+    setStep("menu");
     greetedRef.current = false;
-    await sendBot(COPY.greetingAskEmail);
+    await sendBot(COPY.greetingMenu);
     greetedRef.current = true;
   };
 
@@ -341,9 +353,18 @@ export const SarahChat = () => {
       await goToConfirm({ ...data, notes: v || undefined });
     } else if (step === "question_open") {
       sendUser(v);
-      await sendBot(
-        "Thanks — I've passed that on to the team and they'll follow up by email shortly. Anything else I can help with?",
-      );
+      const intent = detectIntent(v);
+      if (intent === "emergency") {
+        await sendBot(COPY.emergencyPrompt);
+        setStep("faq_answer");
+        setFaqCategory("emergency");
+        return;
+      }
+      if (intent === "booking") {
+        await startBookingFlow("Book an appointment");
+        return;
+      }
+      await sendBot(COPY.faqOutOfScope);
     }
   };
 
@@ -485,9 +506,54 @@ export const SarahChat = () => {
 
   const askQuestion = async () => {
     sendUser("I have a question");
-    setStep("question_open");
-    await sendBot(COPY.askQuestion);
+    setStep("faq_category");
+    await sendBot(COPY.faqPickCategory);
   };
+
+  // --- Menu / FAQ handlers -------------------------------------------------
+  const startBookingFlow = async (userLabel = "Book an appointment") => {
+    sendUser(userLabel);
+    setStep("ask_email");
+    await sendBot(COPY.greetingAskEmail);
+  };
+
+  const openFaq = async () => {
+    sendUser("Ask a question");
+    setStep("faq_category");
+    await sendBot(COPY.faqPickCategory);
+  };
+
+  const pickFaqCategory = async (key: FaqCategoryKey) => {
+    const cat = FAQ_CATEGORIES.find((c) => c.key === key);
+    sendUser(cat ? `${cat.emoji} ${cat.label}` : key);
+    setFaqCategory(key);
+    setStep("faq_answer");
+    if (key === "emergency") {
+      await sendBot(COPY.emergencyPrompt);
+    } else {
+      await sendBot("Here are the most common questions — tap one:");
+    }
+  };
+
+  const pickFaqQuestion = async (q: string, a: string) => {
+    sendUser(q);
+    await sendBot(a);
+    const next = faqAnsweredCount + 1;
+    setFaqAnsweredCount(next);
+    if (next >= 2 && next % 2 === 0) {
+      await sendBot(COPY.faqBookingNudge);
+    } else {
+      await sendBot(COPY.faqAnythingElse);
+    }
+  };
+
+  const backToCategories = async () => {
+    sendUser("Other topics");
+    setFaqCategory(null);
+    setStep("faq_category");
+    await sendBot(COPY.faqPickCategory);
+  };
+
 
   const pickRescheduleDate = async (date: string) => {
     if (date < todayISO()) {
@@ -743,6 +809,63 @@ export const SarahChat = () => {
                     </Button>
                   </div>
                 )}
+
+                {!typing && step === "menu" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    <Button size="sm" onClick={() => startBookingFlow("📅 Book an appointment")} className="rounded-full shadow-elegant">
+                      📅 Book an appointment
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={openFaq} className="rounded-full">
+                      ❓ Ask a question
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "faq_category" && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    {FAQ_CATEGORIES.map((c) => (
+                      <button
+                        key={c.key}
+                        onClick={() => pickFaqCategory(c.key)}
+                        className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                      >
+                        {c.emoji} {c.label}
+                      </button>
+                    ))}
+                    <Button size="sm" onClick={() => startBookingFlow("📅 Book an appointment")} className="rounded-full shadow-elegant">
+                      📅 Book an appointment
+                    </Button>
+                  </div>
+                )}
+
+                {!typing && step === "faq_answer" && faqCategory && (
+                  <div className="flex flex-wrap gap-2 pt-1 pl-9">
+                    {FAQ_TREE[faqCategory].map((item) => (
+                      <button
+                        key={item.q}
+                        onClick={() => pickFaqQuestion(item.q, item.a)}
+                        className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                      >
+                        {item.q}
+                      </button>
+                    ))}
+                    {faqCategory === "emergency" && (
+                      <a
+                        href={`tel:${CLINIC.phoneTel}`}
+                        className="text-xs px-3 py-1.5 rounded-full bg-destructive text-destructive-foreground hover:opacity-90 transition-opacity font-medium"
+                      >
+                        📞 Call {CLINIC.phone}
+                      </a>
+                    )}
+                    <Button size="sm" variant="outline" onClick={backToCategories} className="rounded-full">
+                      ← Other topics
+                    </Button>
+                    <Button size="sm" onClick={() => startBookingFlow("📅 Book an appointment")} className="rounded-full shadow-elegant">
+                      📅 Book an appointment
+                    </Button>
+                  </div>
+                )}
+
 
                 {!typing && step === "returning_menu" && (
                   <div className="flex flex-wrap gap-2 pt-1 pl-9">
