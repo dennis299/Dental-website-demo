@@ -29,6 +29,16 @@ const dispatchOpenSarah = (prefill?: string) => {
   window.dispatchEvent(new CustomEvent("open-sarah", { detail: prefill ? { prefill } : undefined }));
 };
 
+if (typeof window !== "undefined") {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("reset-engagement") === "1") {
+    try {
+      localStorage.removeItem("sarah_booked");
+      localStorage.removeItem("engagement_modal_shown_at");
+    } catch { /* ignore */ }
+  }
+}
+
 export const EngagementOrchestrator = () => {
   const [notifMsg, setNotifMsg] = useState<string | null>(null);
   const [notifCount, setNotifCount] = useState(0);
