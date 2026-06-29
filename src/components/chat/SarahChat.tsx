@@ -189,7 +189,7 @@ export const SarahChat = () => {
   useEffect(() => {
     if (open && !greetedRef.current) {
       greetedRef.current = true;
-      sendBot(COPY.greetingAskEmail);
+      sendBot(COPY.greetingMenu);
     }
   }, [open]);
 
