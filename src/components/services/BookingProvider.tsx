@@ -2,6 +2,9 @@ import { createContext, lazy, Suspense, useCallback, useContext, useEffect, useS
 import { BookingModal } from "@/components/services/BookingModal";
 
 const SarahChat = lazy(() => import("@/components/chat/SarahChat").then((m) => ({ default: m.SarahChat })));
+const EngagementOrchestrator = lazy(() =>
+  import("@/components/engagement/EngagementOrchestrator").then((m) => ({ default: m.EngagementOrchestrator })),
+);
 
 export const TREATMENTS = [
   "General Dentistry",
