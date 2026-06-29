@@ -139,40 +139,16 @@ export const SarahChat = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const greetedRef = useRef(false);
+  const prefillRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const COOLDOWN_MS = 20_000;
-    const SCROLL_THRESHOLD = 0.25;
-
-    const lastDismissed = () =>
-      Number(sessionStorage.getItem("sarah_last_dismissed_at") || "0");
-
-    const openExternally = () => {
-      sessionStorage.removeItem("sarah_last_dismissed_at");
+    const openExternally = (e: Event) => {
+      const detail = (e as CustomEvent<{ prefill?: string } | undefined>).detail;
+      if (detail?.prefill) prefillRef.current = detail.prefill;
       setOpen(true);
     };
     window.addEventListener("open-sarah", openExternally);
-
-    const tryOpen = () => {
-      if (Date.now() - lastDismissed() < COOLDOWN_MS) return;
-      setOpen((o) => o || true);
-    };
-
-    const timer = setTimeout(() => {
-      if (!lastDismissed()) tryOpen();
-    }, 6000);
-
-    const onScroll = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (max > 0 && window.scrollY / max >= SCROLL_THRESHOLD) tryOpen();
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("open-sarah", openExternally);
-    };
+    return () => window.removeEventListener("open-sarah", openExternally);
   }, []);
 
   useEffect(() => {
@@ -189,7 +165,19 @@ export const SarahChat = () => {
   useEffect(() => {
     if (open && !greetedRef.current) {
       greetedRef.current = true;
-      sendBot(COPY.greetingMenu);
+      const prefill = prefillRef.current;
+      if (prefill) {
+        prefillRef.current = null;
+        setData((d) => ({ ...d, notes: `Concern checker — ${prefill}` }));
+        setStep("ask_email");
+        (async () => {
+          await sendBot(
+            `Thanks for completing the assessment — here's what I have:\n\n${prefill}\n\nLet's get you booked. What's your email?`,
+          );
+        })();
+      } else {
+        sendBot(COPY.greetingMenu);
+      }
     }
   }, [open]);
 
