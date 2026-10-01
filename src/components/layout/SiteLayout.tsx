@@ -7,6 +7,7 @@ import { MobileCallBanner } from "@/components/MobileCallBanner";
 import { BookingProvider } from "@/components/services/BookingProvider";
 import { PageTransition } from "@/components/PageTransition";
 import { useEffect } from "react";
+import { CookieBanner } from "@/components/CookieBanner";
 
 const ScrollToTopOnNav = () => {
   const { pathname } = useLocation();
@@ -33,6 +34,7 @@ export const SiteLayout = () => {
         <Footer />
         <MobileCallBanner />
         <ScrollToTop />
+        <CookieBanner />
       </div>
     </BookingProvider>
   );
