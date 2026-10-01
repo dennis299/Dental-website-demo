@@ -5,16 +5,37 @@ import { toast } from "sonner";
 export const Contact = () => {
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const get = (k: string) => String(fd.get(k) ?? "");
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      (e.target as HTMLFormElement).reset();
-      toast.success("Thank you — we'll be in touch shortly.", {
-        description: "Our reception team will call you back within one working day.",
+    try {
+      const res = await fetch("https://n8n.meridiantechai.com/webhook/sdr-intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: get("name"),
+          phone: get("phone"),
+          email: get("email"),
+          treatment: get("treatment"),
+          day: get("day"),
+          message: get("message"),
+          hp: get("hp"),
+          page: window.location.pathname + window.location.search,
+        }),
       });
-    }, 700);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      form.reset();
+      toast.success("Thank you — we'll be in touch shortly.", {
+        description: "Sarah from our team will give you a quick call shortly.",
+      });
+    } catch {
+      toast.error("Something went wrong — please call us on +44 7426 905180.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +53,14 @@ export const Contact = () => {
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 grid gap-4">
+            <input
+              type="text"
+              name="hp"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute left-[-9999px] h-px w-px overflow-hidden opacity-0"
+            />
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Full name" name="name" required />
               <Field label="Phone number" name="phone" type="tel" required />
