@@ -33,15 +33,15 @@ export const TREATMENT_INFO: Record<TreatmentKey, string> = {
   "Teeth Whitening":
     "Our professional whitening brightens your smile by several shades in just one visit, safely and gently, perfect before a big event or just to feel your best.",
   "Dental Implants":
-    "Implants are the gold-standard for replacing missing teeth, they look, feel and function just like natural teeth, and last for decades with proper care.",
+    "Implants are the gold-standard for replacing missing teeth. They look, feel and function just like natural teeth, and last for decades with proper care.",
   "Smile Makeover":
-    "A smile makeover blends the best of cosmetic dentistry, whitening, veneers, alignment, into one personalised plan to give you the smile you've always wanted.",
+    "A smile makeover blends the best of cosmetic dentistry (whitening, veneers, alignment) into one personalised plan to give you the smile you've always wanted.",
   "General Consultation":
-    "A great place to start! We'll do a friendly check-up, listen to your goals, and build a treatment plan tailored to you, no pressure, ever.",
+    "A great place to start! We'll do a friendly check-up, listen to your goals, and build a treatment plan tailored to you. No pressure, ever.",
 };
 
 export const INVISALIGN_WHY =
-  "✨ Why patients love Invisalign:\n\n• Nearly invisible, most people won't notice you're wearing them\n• Removable for eating, drinking and brushing\n• Predictable results with a digital smile preview before you start\n• Comfortable smooth aligners, no metal brackets or wires";
+  "✨ Why patients love Invisalign:\n\n• Nearly invisible: most people won't notice you're wearing them\n• Removable for eating, drinking and brushing\n• Predictable results with a digital smile preview before you start\n• Comfortable smooth aligners with no metal brackets or wires";
 
 export const INVISALIGN_STEPS =
   "Here's your Invisalign journey, step by step:\n\n1. In-clinic consultation & 3D scan (free)\n2. Custom treatment plan + digital smile preview\n3. Receive your set of clear aligners\n4. Quick check-ins every 6–8 weeks\n5. Reveal your new smile + retainers to keep it perfect\n\nEveryone starts with a quick in-person consultation so our clinicians can confirm Invisalign is the right fit for you. Shall I book yours?";
