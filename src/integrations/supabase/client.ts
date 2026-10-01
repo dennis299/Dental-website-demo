@@ -3,8 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { brokeredPreviewStorage } from './previewAuthStorage';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Fallbacks keep the site rendering when the build has no .env.
+// The publishable (anon) key is public by design; data is protected by RLS.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://wqshrpybtgpxcbatzfaf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indxc2hycHlidGdweGNiYXR6ZmFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NzgyMDMsImV4cCI6MjA5NTI1NDIwM30.xgN-V_gXgutt7iN65farJNNdqo5DVPByTyUe05-rrWE";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
