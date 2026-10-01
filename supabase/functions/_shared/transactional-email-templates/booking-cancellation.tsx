@@ -9,7 +9,7 @@ interface Props {
   bookingId?: string
 }
 
-const CLINIC = { name: 'My Dental', phone: '+44 20 7946 0123' }
+const CLINIC = { name: 'My Dental', phone: '+44 7426 905180' }
 
 const Email = (p: Props) => (
   <Html lang="en" dir="ltr">

@@ -48,10 +48,10 @@ export const Header = () => {
         </nav>
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="tel:+442079460123"
+            href="tel:+447426905180"
             className="nav-link flex items-center gap-2 text-sm font-medium text-foreground/80"
           >
-            <Phone className="h-4 w-4" /> 020 7946 0123
+            <Phone className="h-4 w-4" /> +44 7426 905180
           </a>
           <button
             type="button"
@@ -82,8 +82,8 @@ export const Header = () => {
                 {l.label}
               </Link>
             ))}
-            <a href="tel:+442079460123" className="py-2 text-base font-medium flex items-center gap-2">
-              <Phone className="h-4 w-4" /> 020 7946 0123
+            <a href="tel:+447426905180" className="py-2 text-base font-medium flex items-center gap-2">
+              <Phone className="h-4 w-4" /> +44 7426 905180
             </a>
             <button
               type="button"

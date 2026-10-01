@@ -27,7 +27,7 @@ export const Footer = () => {
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-foreground/50">Contact</div>
           <ul className="mt-4 space-y-2 text-sm text-foreground/75">
-            <li><a className="nav-link" href="tel:+442079460123">020 7946 0123</a></li>
+            <li><a className="nav-link" href="tel:+447426905180">+44 7426 905180</a></li>
             <li><a className="nav-link" href="mailto:hello@evergreendental.com">hello@evergreendental.com</a></li>
             <li>Mon–Fri · 8:30am – 6:00pm</li>
             <li>Saturday · 9:00am – 2:00pm</li>
