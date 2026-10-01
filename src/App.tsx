@@ -16,6 +16,7 @@ import ContactPage from "./pages/Contact.tsx";
 import Book from "./pages/Book.tsx";
 import Unsubscribe from "./pages/Unsubscribe.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Cookies from "./pages/Cookies.tsx";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/book" element={<Book />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/cookies" element={<Cookies />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

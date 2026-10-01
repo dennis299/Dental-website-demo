@@ -46,10 +46,10 @@ export const Footer = () => {
       </div>
       <div className="border-t border-border">
         <div className="container-wide py-6 flex flex-col md:flex-row justify-between gap-3 text-xs text-foreground/55">
-          <div>© {new Date().getFullYear()} Evergreen Dental. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} Evergreen Dental. All rights reserved. <span className="font-semibold text-foreground/75">This is a demo website — not a real dental practice.</span></div>
           <div className="flex gap-5">
             <a href="#" className="hover:text-foreground transition">Privacy</a>
-            <a href="#" className="hover:text-foreground transition">Cookies</a>
+            <Link to="/cookies" className="hover:text-foreground transition">Cookies</Link>
             <a href="#" className="hover:text-foreground transition">Complaints</a>
             <span>GDC registered clinicians</span>
           </div>
@@ -57,10 +57,10 @@ export const Footer = () => {
         <div className="container-wide pb-6 flex items-center gap-2 text-xs text-foreground/55">
           <span>Built by</span>
           <a
-            href="https://www.instagram.com/meridiantech.ai/"
+            href="https://mtsgrowth.com/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="MTS / Revenue Infrastructure on Instagram"
+            aria-label="MTS / Revenue Infrastructure website"
             className="inline-flex items-center gap-2 font-medium text-foreground/80 hover:text-foreground transition"
           >
             <img
