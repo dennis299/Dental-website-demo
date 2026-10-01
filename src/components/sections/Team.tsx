@@ -56,7 +56,7 @@ export const Team = () => {
               <div className="aspect-[3/4] overflow-hidden bg-muted">
                 <img
                   src={m.image}
-                  alt={`${m.name} — ${m.role} at Evergreen Dental`}
+                  alt={`${m.name} | ${m.role} at Evergreen Dental`}
                   loading="lazy"
                   className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
                 />

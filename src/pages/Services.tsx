@@ -15,7 +15,7 @@ const Services = () => {
         path="/services"
         keywords="dental treatments London, Invisalign Marylebone, porcelain veneers London, teeth whitening Marylebone, dental implants London, smile makeover Marylebone"
         ogTitle="Premium Dental Treatments in Marylebone, London"
-        ogDescription="Invisalign, veneers, whitening, implants and family dentistry — bespoke plans with transparent pricing at Evergreen Dental Marylebone."
+        ogDescription="Invisalign, veneers, whitening, implants and family dentistry, bespoke plans with transparent pricing at Evergreen Dental Marylebone."
         jsonLd={[
           {
             "@context": "https://schema.org",
@@ -41,7 +41,7 @@ const Services = () => {
       <PageHero
         eyebrow="Our treatments"
         title={<>Premium dentistry, <span className="text-foreground/55">tailored to you.</span></>}
-        subtitle="Every plan starts with a careful conversation. Browse our most-requested treatments below — each comes with a clear pricing breakdown and a no-pressure consultation."
+        subtitle="Every plan starts with a careful conversation. Browse our most-requested treatments below | each comes with a clear pricing breakdown and a no-pressure consultation."
       />
 
       <section className="py-20">
@@ -87,7 +87,7 @@ const Services = () => {
         <div className="container-wide mt-16 rounded-3xl border border-border bg-gradient-soft p-10 md:p-14 text-center shadow-card">
           <h2 className="text-3xl md:text-4xl font-bold tracking-display">Not sure which is right for you?</h2>
           <p className="mt-3 text-foreground/65 max-w-xl mx-auto">
-            Book a free 15-minute consultation and we'll help you pick the best plan — no pressure.
+            Book a free 15-minute consultation and we'll help you pick the best plan, no pressure.
           </p>
           <button
             type="button"

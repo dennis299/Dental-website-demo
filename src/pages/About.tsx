@@ -11,7 +11,7 @@ const About = () => (
       description="Two decades of calm, considered private and family dentistry in Marylebone, London. Discover the team and values behind Evergreen Dental."
       path="/about"
       keywords="about Evergreen Dental, Marylebone dental practice, private dentist London, family dentist Marylebone"
-      ogTitle="About Evergreen Dental — Marylebone's Calm Private Practice"
+      ogTitle="About Evergreen Dental | Marylebone's Calm Private Practice"
       ogDescription="A modern London dental practice built around how you feel in the chair. Meet the people behind Evergreen Dental in Marylebone."
       jsonLd={[
         {
@@ -34,7 +34,7 @@ const About = () => (
     <PageHero
       eyebrow="About Evergreen Dental"
       title="Premium private dentistry in the heart of Marylebone"
-      subtitle="For over two decades we've cared for London families with a calm, considered approach to modern dentistry — built around how you feel in the chair."
+      subtitle="For over two decades we've cared for London families with a calm, considered approach to modern dentistry | built around how you feel in the chair."
     />
     <AboutSection />
     <section className="py-12 bg-gradient-soft border-y border-border">

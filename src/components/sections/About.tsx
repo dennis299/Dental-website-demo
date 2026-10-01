@@ -14,7 +14,7 @@ export const About = () => {
       <div className="container-wide grid lg:grid-cols-2 gap-14 items-center">
         <div className="relative">
           <div className="rounded-[2rem] overflow-hidden shadow-elegant">
-            <img src={waiting} alt="Modern, calming waiting area at Evergreen Dental — a premium private practice in London" loading="lazy" decoding="async" className="w-full h-[440px] lg:h-[520px] object-cover" />
+            <img src={waiting} alt="Modern, calming waiting area at Evergreen Dental | a premium private practice in London" loading="lazy" decoding="async" className="w-full h-[440px] lg:h-[520px] object-cover" />
           </div>
           <div className="hidden md:grid absolute -bottom-8 -right-6 grid-cols-3 gap-3 bg-background rounded-2xl p-4 shadow-elegant border border-border">
             <Stat value="4.9" label="Google rating" />

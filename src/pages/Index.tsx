@@ -15,12 +15,12 @@ const Index = () => (
       description="Premium private dentist in Marylebone, London. Invisalign, veneers, whitening, implants & family dentistry. Calm care, same-week appointments."
       path="/"
       keywords="private dentist Marylebone, dentist London, Invisalign London, veneers Marylebone, teeth whitening London, dental implants Marylebone, cosmetic dentist London"
-      ogTitle="Evergreen Dental — Premium Private Dentistry in Marylebone"
-      ogDescription="Calm, expert private dentistry in the heart of Marylebone. Invisalign, veneers, whitening & implants — book your free consultation today."
+      ogTitle="Evergreen Dental | Premium Private Dentistry in Marylebone"
+      ogDescription="Calm, expert private dentistry in the heart of Marylebone. Invisalign, veneers, whitening & implants, book your free consultation today."
       jsonLd={{
         "@context": "https://schema.org",
         "@type": "WebPage",
-        name: "Evergreen Dental — Premium Private Dentistry in London",
+        name: "Evergreen Dental | Premium Private Dentistry in London",
         url: "https://my-dental.space/",
         isPartOf: { "@id": "https://my-dental.space/#website" },
         about: { "@id": "https://my-dental.space/#business" },
