@@ -130,15 +130,15 @@ export const COPY = {
   faqBookingNudge:
     "While we're chatting — would you like me to schedule a consultation for you? It only takes a minute.",
   faqOutOfScope:
-    "That's a great question, but it's best answered by our clinical team — give us a ring on 020 7946 0123 and we'll help straight away. In the meantime, would you like to book an appointment?",
+    "That's a great question, but it's best answered by our clinical team — give us a ring on +44 7426 905180 and we'll help straight away. In the meantime, would you like to book an appointment?",
   emergencyPrompt:
-    "If you're in pain or have a dental emergency, please call us right now on 020 7946 0123 — we keep same-day emergency slots Monday to Saturday. I can also book you in here:",
+    "If you're in pain or have a dental emergency, please call us right now on +44 7426 905180 — we keep same-day emergency slots Monday to Saturday. I can also book you in here:",
 };
 
 // Clinic facts used by FAQ answers — kept centralised so nothing is invented.
 export const CLINIC = {
-  phone: "020 7946 0123",
-  phoneTel: "+442079460123",
+  phone: "+44 7426 905180",
+  phoneTel: "+447426905180",
   address: "42 Marylebone High Street, London, W1U 5HP",
   hours: "Mon–Fri 8:30am–6:00pm · Saturday 9:00am–2:00pm · Closed Sundays",
   instagram: "https://www.instagram.com/meridiantech.ai/",
@@ -205,7 +205,7 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
   appointments: [
     {
       q: "How do I book?",
-      a: "You can book right here with me in under a minute, or call reception on 020 7946 0123. I'll just need your email, a treatment and a preferred time.",
+      a: "You can book right here with me in under a minute, or call reception on +44 7426 905180. I'll just need your email, a treatment and a preferred time.",
     },
     {
       q: "Can I reschedule?",
@@ -213,7 +213,7 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
     },
     {
       q: "Can I cancel?",
-      a: "Of course. Verify your email here and I'll cancel it for you, or call us on 020 7946 0123. We just ask for 24 hours' notice where possible.",
+      a: "Of course. Verify your email here and I'll cancel it for you, or call us on +44 7426 905180. We just ask for 24 hours' notice where possible.",
     },
     {
       q: "How long does an appointment take?",
@@ -239,7 +239,7 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
     },
     {
       q: "How can I contact the clinic?",
-      a: "Call reception on 020 7946 0123 (Mon–Sat) or use the contact form on our site. I can also book you in right here.",
+      a: "Call reception on +44 7426 905180 (Mon–Sat) or use the contact form on our site. I can also book you in right here.",
     },
   ],
   pricing: [
@@ -267,13 +267,13 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
     },
     {
       q: "Which providers?",
-      a: "Bupa, AXA, Vitality, Aviva and Cigna are the most common. Please confirm cover with reception on 020 7946 0123 before your visit, as plans vary.",
+      a: "Bupa, AXA, Vitality, Aviva and Cigna are the most common. Please confirm cover with reception on +44 7426 905180 before your visit, as plans vary.",
     },
   ],
   emergency: [
     {
       q: "What if I have a dental emergency?",
-      a: "Please call us on 020 7946 0123 — we keep same-day emergency slots Monday to Saturday. If you're in severe pain or bleeding, ring straight away.",
+      a: "Please call us on +44 7426 905180 — we keep same-day emergency slots Monday to Saturday. If you're in severe pain or bleeding, ring straight away.",
     },
   ],
   website: [

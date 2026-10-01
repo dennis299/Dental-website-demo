@@ -25,7 +25,7 @@ interface Props {
 const CLINIC = {
   name: 'My Dental',
   address: '12 Harley Mews, London W1G 9PG, United Kingdom',
-  phone: '+44 20 7946 0123',
+  phone: '+44 7426 905180',
   mapUrl: 'https://maps.google.com/?q=12+Harley+Mews+London+W1G+9PG',
   site: 'https://my-dental.space',
 }

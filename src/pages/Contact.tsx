@@ -5,11 +5,11 @@ const ContactPage = () => (
   <>
     <SEO
       title="Contact Evergreen Dental | Marylebone High St London"
-      description="Visit Evergreen Dental at 42 Marylebone High Street, London W1U 5HP. Call 020 7946 0123 or request a consultation online — open Mon–Sat."
+      description="Visit Evergreen Dental at 42 Marylebone High Street, London W1U 5HP. Call +44 7426 905180 or request a consultation online — open Mon–Sat."
       path="/contact"
       keywords="contact dentist Marylebone, Evergreen Dental phone number, dentist 42 Marylebone High Street, dental clinic W1U"
       ogTitle="Contact Evergreen Dental — Marylebone High Street, London"
-      ogDescription="Call 020 7946 0123 or book online. We're at 42 Marylebone High Street, London W1U 5HP — open Monday to Saturday."
+      ogDescription="Call +44 7426 905180 or book online. We're at 42 Marylebone High Street, London W1U 5HP — open Monday to Saturday."
       jsonLd={[
         {
           "@context": "https://schema.org",
@@ -29,7 +29,7 @@ const ContactPage = () => (
             "@type": "Dentist",
             "@id": "https://my-dental.space/#business",
             name: "Evergreen Dental",
-            telephone: "+44-20-7946-0123",
+            telephone: "+44-7426-905180",
             email: "hello@my-dental.space",
             address: {
               "@type": "PostalAddress",
@@ -41,7 +41,7 @@ const ContactPage = () => (
             },
             contactPoint: {
               "@type": "ContactPoint",
-              telephone: "+44-20-7946-0123",
+              telephone: "+44-7426-905180",
               contactType: "reservations",
               areaServed: "GB",
               availableLanguage: ["English"],

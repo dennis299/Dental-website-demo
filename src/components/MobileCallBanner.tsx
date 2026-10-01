@@ -27,8 +27,8 @@ export const MobileCallBanner = () => {
     >
       <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-background/85 backdrop-blur-md border border-border shadow-elegant p-1.5">
         <a
-          href="tel:+442079460123"
-          aria-label="Call Evergreen Dental on 020 7946 0123"
+          href="tel:+447426905180"
+          aria-label="Call Evergreen Dental on +44 7426 905180"
           className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-foreground/90 px-4 py-3 text-sm font-semibold text-background hover:bg-foreground transition-colors"
         >
           <Phone className="h-4 w-4" /> Call now

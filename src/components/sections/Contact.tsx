@@ -60,7 +60,7 @@ export const Contact = () => {
             <h3 className="text-xl font-bold">Visit Evergreen Dental</h3>
             <div className="mt-5 space-y-4 text-sm">
               <Row icon={MapPin} title="42 Marylebone High Street" sub="London, W1U 5HP, United Kingdom" />
-              <Row icon={Phone} title={<a href="tel:+442079460123" className="hover:text-link">020 7946 0123</a>} sub="Reception, Mon–Sat" />
+              <Row icon={Phone} title={<a href="tel:+447426905180" className="hover:text-link">+44 7426 905180</a>} sub="Reception, Mon–Sat" />
               <Row icon={Mail} title={<a href="mailto:hello@evergreendental.com" className="hover:text-link">hello@evergreendental.com</a>} sub="We reply within one working day" />
               <Row icon={Clock} title="Mon–Fri · 8:30am – 6:00pm" sub="Saturday · 9:00am – 2:00pm" />
             </div>
