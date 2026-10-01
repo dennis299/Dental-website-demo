@@ -9,7 +9,7 @@ const reviews: Testimonial[] = [
     role: "Marylebone",
   },
   {
-    text: "I've been anxious about dentists my whole life. The team here are so kind and patient — they took time to understand my worries and made the whole visit calm and stress-free.",
+    text: "I've been anxious about dentists my whole life. The team here are so kind and patient, they took time to understand my worries and made the whole visit calm and stress-free.",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150",
     name: "James W.",
     role: "Camden",
@@ -39,13 +39,13 @@ const reviews: Testimonial[] = [
     role: "Marylebone",
   },
   {
-    text: "Booked an emergency appointment and was seen the same day. Calm, kind and completely judgement-free — exactly what I needed.",
+    text: "Booked an emergency appointment and was seen the same day. Calm, kind and completely judgement-free, exactly what I needed.",
     image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150",
     name: "Amelia C.",
     role: "Soho",
   },
   {
-    text: "Lovely modern practice with brilliant staff from reception to the dentist. Clear pricing and no pressure — just honest advice.",
+    text: "Lovely modern practice with brilliant staff from reception to the dentist. Clear pricing and no pressure, just honest advice.",
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150",
     name: "Tom B.",
     role: "Fitzrovia",
@@ -81,7 +81,7 @@ export const Testimonials = () => {
             Trusted by families across <span className="text-foreground/60">London.</span>
           </>
         }
-        subtitle="Real feedback from real patients — calm, professional, family-friendly care, every visit."
+        subtitle="Real feedback from real patients | calm, professional, family-friendly care, every visit."
         testimonials={reviews}
       />
     </section>

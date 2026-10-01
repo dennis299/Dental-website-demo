@@ -49,12 +49,12 @@ export const TREATMENTS_DATA: Treatment[] = [
     short:
       "Clear, removable aligners that gently straighten teeth without disrupting your lifestyle.",
     long:
-      "Invisalign uses a series of custom-made, near-invisible aligners to move your teeth into their ideal position. Most patients see visible progress within weeks — and no one needs to know you're wearing them.",
+      "Invisalign uses a series of custom-made, near-invisible aligners to move your teeth into their ideal position. Most patients see visible progress within weeks, and no one needs to know you're wearing them.",
     image: invisalignImg,
     icon: AlignHorizontalDistributeCenter,
     benefits: [
       { title: "Nearly invisible", body: "Smooth, clear aligners most people will never notice." },
-      { title: "Removable", body: "Take them out to eat, drink and brush — no diet restrictions." },
+      { title: "Removable", body: "Take them out to eat, drink and brush | no diet restrictions." },
       { title: "Predictable results", body: "See a digital preview of your new smile before you start." },
     ],
     steps: [
@@ -103,7 +103,7 @@ export const TREATMENTS_DATA: Treatment[] = [
     faqs: [
       {
         q: "What's included in the price?",
-        a: "Every Invisalign plan includes your initial consultation, 3D scan, all aligner stages, in-clinic check-ins and a set of retainers — no surprise add-ons.",
+        a: "Every Invisalign plan includes your initial consultation, 3D scan, all aligner stages, in-clinic check-ins and a set of retainers, no surprise add-ons.",
       },
       {
         q: "How is pricing structured?",
@@ -111,7 +111,7 @@ export const TREATMENTS_DATA: Treatment[] = [
       },
       {
         q: "Is there a free consultation?",
-        a: "Yes — your first in-clinic consultation is free. You'll meet your dentist, see a smile preview and get a transparent written quote.",
+        a: "Yes, your first in-clinic consultation is free. You'll meet your dentist, see a smile preview and get a transparent written quote.",
       },
       {
         q: "How do I get started?",
@@ -132,7 +132,7 @@ export const TREATMENTS_DATA: Treatment[] = [
     short:
       "Ultra-thin porcelain shells custom-crafted to transform colour, shape and symmetry.",
     long:
-      "Veneers are a transformative cosmetic treatment — hand-crafted by master ceramists to reshape your smile while preserving natural tooth structure.",
+      "Veneers are a transformative cosmetic treatment, hand-crafted by master ceramists to reshape your smile while preserving natural tooth structure.",
     image: case1After,
     icon: Sparkles,
     benefits: [
@@ -159,20 +159,20 @@ export const TREATMENTS_DATA: Treatment[] = [
         price: "£5,400",
         cadence: "from",
         highlight: true,
-        includes: ["6 upper veneers — full smile line", "Digital smile preview", "Free whitening on completion", "12-month review"],
+        includes: ["6 upper veneers, full smile line", "Digital smile preview", "Free whitening on completion", "12-month review"],
       },
       {
         name: "Full Arch (10)",
         price: "£8,800",
         cadence: "from",
-        includes: ["10 veneers — complete arch", "Master ceramist", "Bite analysis & night guard", "Lifetime relationship plan"],
+        includes: ["10 veneers, complete arch", "Master ceramist", "Bite analysis & night guard", "Lifetime relationship plan"],
       },
     ],
     faqs: [
       { q: "What's included?", a: "Design consultation, digital mock-up, premium porcelain veneers, final fit and a free post-op review." },
       { q: "How is pricing structured?", a: "Per tooth, with package pricing for full smile lines. 0% finance available over 12 months." },
-      { q: "Is the procedure painful?", a: "No — we use gentle anaesthesia and modern minimal-prep techniques. Most patients describe it as completely comfortable." },
-      { q: "How do I get started?", a: "Book a smile design consultation — we'll discuss your goals and show you a digital preview." },
+      { q: "Is the procedure painful?", a: "No, we use gentle anaesthesia and modern minimal-prep techniques. Most patients describe it as completely comfortable." },
+      { q: "How do I get started?", a: "Book a smile design consultation, we'll discuss your goals and show you a digital preview." },
       { q: "How long do they last?", a: "10–15+ years with good hygiene and a soft-bite night guard if recommended." },
     ],
     priceFrom: "£950",
@@ -183,9 +183,9 @@ export const TREATMENTS_DATA: Treatment[] = [
     bookingKey: "Cosmetic Dentistry",
     tagline: "Brighter, in a single visit.",
     short:
-      "Professional whitening that brightens your smile by several shades — safely and gently.",
+      "Professional whitening that brightens your smile by several shades, safely and gently.",
     long:
-      "We use clinically-proven whitening systems delivered by a qualified dentist — far safer and more effective than over-the-counter alternatives.",
+      "We use clinically-proven whitening systems delivered by a qualified dentist, far safer and more effective than over-the-counter alternatives.",
     image: case2After,
     icon: Activity,
     benefits: [
@@ -196,7 +196,7 @@ export const TREATMENTS_DATA: Treatment[] = [
     steps: [
       { title: "Shade & health check", body: "We confirm your teeth and gums are ready for whitening." },
       { title: "Custom trays", body: "Bespoke trays made from a precise impression." },
-      { title: "Whitening", body: "Take-home or in-clinic — your choice." },
+      { title: "Whitening", body: "Take-home or in-clinic | your choice." },
       { title: "Reveal & review", body: "A final review to confirm your new shade and aftercare." },
     ],
     plans: [
@@ -222,8 +222,8 @@ export const TREATMENTS_DATA: Treatment[] = [
       { q: "What's included?", a: "Consultation, custom trays, premium whitening gel and a final shade review." },
       { q: "How is pricing structured?", a: "Flat per-package pricing with no hidden fees. Top-ups available from £75." },
       { q: "Is there a trial?", a: "We offer a complimentary 15-minute consultation so you can ask anything before booking." },
-      { q: "How do I get started?", a: "Book a shade & health check — most patients can begin within a week." },
-      { q: "Is it safe?", a: "Yes — dentist-supervised whitening is the safest and most effective option." },
+      { q: "How do I get started?", a: "Book a shade & health check, most patients can begin within a week." },
+      { q: "Is it safe?", a: "Yes, dentist-supervised whitening is the safest and most effective option." },
     ],
     priceFrom: "£380",
   },
@@ -235,7 +235,7 @@ export const TREATMENTS_DATA: Treatment[] = [
     short:
       "Replace missing teeth with implants that look, feel and function like the real thing.",
     long:
-      "A titanium implant integrates with your jawbone to support a crown, bridge or denture — restoring full function, comfort and confidence for decades.",
+      "A titanium implant integrates with your jawbone to support a crown, bridge or denture, restoring full function, comfort and confidence for decades.",
     image: case1After,
     icon: Wrench,
     benefits: [
@@ -248,7 +248,7 @@ export const TREATMENTS_DATA: Treatment[] = [
       { title: "Treatment plan", body: "A clear, written plan and transparent quote." },
       { title: "Implant placement", body: "A short, gentle procedure under local anaesthetic." },
       { title: "Healing phase", body: "3–4 months for the implant to integrate fully." },
-      { title: "Final crown", body: "Your bespoke crown is fitted — and you're done." },
+      { title: "Final crown", body: "Your bespoke crown is fitted | and you're done." },
     ],
     plans: [
       {
@@ -273,8 +273,8 @@ export const TREATMENTS_DATA: Treatment[] = [
     faqs: [
       { q: "What's included?", a: "Diagnostics, surgery, implant components, the crown and all reviews. No hidden costs." },
       { q: "How is pricing structured?", a: "Per implant, with reduced pricing on multi-implant cases. 0% finance over 12 months." },
-      { q: "Is there a consultation?", a: "Yes — your implant consultation includes a CBCT scan and a written plan." },
-      { q: "How do I get started?", a: "Book an implant consultation — we'll discuss your case and timeline." },
+      { q: "Is there a consultation?", a: "Yes, your implant consultation includes a CBCT scan and a written plan." },
+      { q: "How do I get started?", a: "Book an implant consultation, we'll discuss your case and timeline." },
       { q: "Is it painful?", a: "Most patients describe the procedure as easier than a tooth extraction. We use gentle anaesthesia and offer sedation if you'd prefer." },
     ],
     priceFrom: "£2,850",
@@ -287,19 +287,19 @@ export const TREATMENTS_DATA: Treatment[] = [
     short:
       "A personalised plan that blends whitening, alignment and veneers into one transformation.",
     long:
-      "A smile makeover is a fully bespoke plan combining the cosmetic and restorative treatments that suit you — designed around your face, lifestyle and goals.",
+      "A smile makeover is a fully bespoke plan combining the cosmetic and restorative treatments that suit you, designed around your face, lifestyle and goals.",
     image: case3After,
     icon: Smile,
     benefits: [
       { title: "Tailored to you", body: "A plan built around what you actually want." },
-      { title: "Holistic results", body: "Alignment, brightness and shape — together." },
+      { title: "Holistic results", body: "Alignment, brightness and shape | together." },
       { title: "Phased & flexible", body: "Spread treatment across stages that suit your life." },
     ],
     steps: [
       { title: "Smile vision consultation", body: "Free 60-min consultation with photos and discussion." },
       { title: "Digital smile design", body: "See a 3D mock-up of your new smile." },
-      { title: "Phase 1 — alignment / whitening", body: "Foundation steps first." },
-      { title: "Phase 2 — veneers / shaping", body: "Final shaping and polish." },
+      { title: "Phase 1 | alignment / whitening", body: "Foundation steps first." },
+      { title: "Phase 2 | veneers / shaping", body: "Final shaping and polish." },
       { title: "Reveal & maintain", body: "Your finished smile with a long-term care plan." },
     ],
     plans: [
@@ -323,9 +323,9 @@ export const TREATMENTS_DATA: Treatment[] = [
       },
     ],
     faqs: [
-      { q: "What's included?", a: "A consultation, digital smile design, all stages of treatment and reviews — clearly listed in your written quote." },
+      { q: "What's included?", a: "A consultation, digital smile design, all stages of treatment and reviews, clearly listed in your written quote." },
       { q: "How is pricing structured?", a: "Three tiered packages with optional add-ons. Pay in phases if it suits you. 0% finance available." },
-      { q: "Is there a free consultation?", a: "Yes — your first smile vision consultation is complimentary." },
+      { q: "Is there a free consultation?", a: "Yes, your first smile vision consultation is complimentary." },
       { q: "How do I get started?", a: "Book a smile vision consultation. You'll leave with a plan and a transparent quote." },
       { q: "How long does it take?", a: "Most makeovers take 3–12 months depending on the plan." },
     ],
@@ -339,13 +339,13 @@ export const TREATMENTS_DATA: Treatment[] = [
     short:
       "Friendly check-ups, hygiene and everyday care to keep your smile healthy for life.",
     long:
-      "Whether you're due a check-up or new to the practice, we offer thorough, unhurried general dentistry in a calm environment — perfect for the whole family.",
+      "Whether you're due a check-up or new to the practice, we offer thorough, unhurried general dentistry in a calm environment, perfect for the whole family.",
     image: waitingImg,
     icon: Stethoscope,
     benefits: [
       { title: "Thorough check-ups", body: "Including oral cancer screening and digital X-rays." },
       { title: "Family-friendly", body: "Gentle care for every age, including anxious patients." },
-      { title: "Transparent pricing", body: "Clear written estimates — no surprises." },
+      { title: "Transparent pricing", body: "Clear written estimates | no surprises." },
     ],
     steps: [
       { title: "Welcome & check-up", body: "We listen, examine and discuss what matters to you." },
@@ -375,9 +375,9 @@ export const TREATMENTS_DATA: Treatment[] = [
     faqs: [
       { q: "What's included in a check-up?", a: "A full oral examination, X-rays if needed, oral cancer screening and a written plan." },
       { q: "How is pricing structured?", a: "Per visit, with family discounts. We also offer monthly care plans from £24/month." },
-      { q: "Is there a new-patient offer?", a: "Yes — our new-patient exam includes everything above for £95." },
-      { q: "How do I get started?", a: "Book online or chat with Sarah — we usually have appointments within a few days." },
-      { q: "Do you see children?", a: "Absolutely — children's check-ups are free with a parent's appointment." },
+      { q: "Is there a new-patient offer?", a: "Yes, our new-patient exam includes everything above for £95." },
+      { q: "How do I get started?", a: "Book online or chat with Sarah, we usually have appointments within a few days." },
+      { q: "Do you see children?", a: "Absolutely, children's check-ups are free with a parent's appointment." },
     ],
     priceFrom: "£65",
   },

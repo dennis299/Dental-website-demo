@@ -38,7 +38,7 @@ const buildIcsUrl = (p: Props) => {
     d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
   const params = new URLSearchParams({
     action: 'TEMPLATE',
-    text: `${p.treatment ?? 'Dental appointment'} — ${CLINIC.name}`,
+    text: `${p.treatment ?? 'Dental appointment'} | ${CLINIC.name}`,
     dates: `${fmt(start)}/${fmt(end)}`,
     location: CLINIC.address,
     details: `Your appointment at ${CLINIC.name}. Booking #${p.bookingId ?? ''}`,
@@ -61,7 +61,7 @@ const Email = (p: Props) => (
           <Text style={cardRow}><strong>Treatment:</strong> {p.treatment ?? 'Consultation'}</Text>
           <Text style={cardRow}><strong>When:</strong> {p.whenPretty ?? 'See booking'}</Text>
           <Text style={cardRow}><strong>Where:</strong> {CLINIC.address}</Text>
-          <Text style={cardRow}><strong>Booking #:</strong> {p.bookingId ?? '—'}</Text>
+          <Text style={cardRow}><strong>Booking #:</strong> {p.bookingId ?? ', '}</Text>
         </Section>
 
         <Section style={{ textAlign: 'center', margin: '24px 0' }}>
@@ -74,10 +74,10 @@ const Email = (p: Props) => (
 
         <Hr style={hr} />
         <Heading as="h2" style={h2}>Before your visit</Heading>
-        <Text style={text}>• Brush and floss as usual — no need to skip.</Text>
+        <Text style={text}>• Brush and floss as usual, no need to skip.</Text>
         <Text style={text}>• Arrive 5 minutes early to settle in.</Text>
         <Text style={text}>• Bring a list of current medications, if any.</Text>
-        <Text style={text}>• Let us know about anxiety — we'll go gently.</Text>
+        <Text style={text}>• Let us know about anxiety, we'll go gently.</Text>
 
         <Hr style={hr} />
         <Text style={muted}>
@@ -90,7 +90,7 @@ const Email = (p: Props) => (
 
 export const template = {
   component: Email,
-  subject: (d: Props) => `Your appointment at ${CLINIC.name} — ${d.whenPretty ?? 'confirmed'}`,
+  subject: (d: Props) => `Your appointment at ${CLINIC.name} | ${d.whenPretty ?? 'confirmed'}`,
   displayName: 'Booking confirmation',
   previewData: {
     name: 'Jane',

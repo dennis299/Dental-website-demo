@@ -56,7 +56,7 @@ const services: ServiceData[] = [
   },
   {
     icon: Siren, title: "Emergency Care",
-    description: "Same-day relief when you need it most — calm, compassionate and judgement-free.",
+    description: "Same-day relief when you need it most, calm, compassionate and judgement-free.",
     pricing: [{ label: "Emergency appointment", price: "From £95" }],
   },
 ];
@@ -87,7 +87,7 @@ export const Services = () => {
             Premium dentistry, tailored to you.
           </h2>
           <p className="mt-4 text-base sm:text-lg text-foreground/70">
-            Every plan starts with a careful conversation about your smile, your concerns and your goals — so premium private dental care feels personal from day one.
+            Every plan starts with a careful conversation about your smile, your concerns and your goals, so premium private dental care feels personal from day one.
           </p>
         </div>
 

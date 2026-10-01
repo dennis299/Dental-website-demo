@@ -40,7 +40,7 @@ const Email = (p: Props) => (
 
         <Hr style={hr} />
         <Text style={muted}>
-          If you didn't request this, you can safely ignore this email — no changes will be made to any
+          If you didn't request this, you can safely ignore this email, no changes will be made to any
           appointment.
         </Text>
       </Container>

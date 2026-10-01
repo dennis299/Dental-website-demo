@@ -15,10 +15,10 @@ const Book = () => {
     <>
       <SEO
         title="Book a Private Dentist in Marylebone | Evergreen Dental"
-        description="Book a private dental consultation at Evergreen Dental online. Calm, premium dentistry in Marylebone, London — same-week appointments available."
+        description="Book a private dental consultation at Evergreen Dental online. Calm, premium dentistry in Marylebone, London, same-week appointments available."
         path="/book"
         keywords="book dentist Marylebone, dental appointment London, private dental consultation Marylebone, book Invisalign consultation London"
-        ogTitle="Book Your Dental Consultation — Marylebone, London"
+        ogTitle="Book Your Dental Consultation | Marylebone, London"
         ogDescription="Reserve a calm, no-pressure consultation with Evergreen Dental in Marylebone. Online booking, same-week appointments."
         jsonLd={{
           "@context": "https://schema.org",

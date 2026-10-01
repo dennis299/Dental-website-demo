@@ -51,7 +51,7 @@ export const SEO = ({
       <meta property="og:description" content={ogD} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={ogImage} />
-      <meta property="og:image:alt" content="Evergreen Dental — premium private dentistry in Marylebone, London" />
+      <meta property="og:image:alt" content="Evergreen Dental, premium private dentistry in Marylebone, London" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={ogT} />
       <meta name="twitter:description" content={ogD} />

@@ -28,11 +28,11 @@ export const Contact = () => {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       form.reset();
-      toast.success("Thank you — we'll be in touch shortly.", {
+      toast.success("Thank you, we'll be in touch shortly.", {
         description: "Sarah from our team will give you a quick call shortly.",
       });
     } catch {
-      toast.error("Something went wrong — please call us on +44 7426 905180.");
+      toast.error("Something went wrong, please call us on +44 7426 905180.");
     } finally {
       setLoading(false);
     }

@@ -25,7 +25,7 @@ const Email = (p: Props) => (
           Whenever you're ready, you can book again at any time.
         </Text>
         <Hr style={hr} />
-        <Text style={muted}>Questions? Call {CLINIC.phone} — we're happy to help.</Text>
+        <Text style={muted}>Questions? Call {CLINIC.phone}, we're happy to help.</Text>
       </Container>
     </Body>
   </Html>

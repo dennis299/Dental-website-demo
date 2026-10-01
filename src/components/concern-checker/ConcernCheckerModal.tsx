@@ -107,7 +107,7 @@ export const ConcernCheckerModal = ({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Step 0 — Teeth */}
+        {/* Step 0, Teeth */}
         {step === 0 && (
           <div className="space-y-3">
             <p className="text-sm font-medium">Where are you experiencing discomfort? Tap any teeth involved.</p>
@@ -143,7 +143,7 @@ export const ConcernCheckerModal = ({
           </div>
         )}
 
-        {/* Step 1 — Symptoms */}
+        {/* Step 1, Symptoms */}
         {step === 1 && (
           <div className="space-y-3">
             <p className="text-sm font-medium">What are you experiencing? (select all that apply)</p>
@@ -169,7 +169,7 @@ export const ConcernCheckerModal = ({
           </div>
         )}
 
-        {/* Step 2 — Details */}
+        {/* Step 2, Details */}
         {step === 2 && (
           <div className="space-y-5">
             {a.symptoms.includes("Pain") && (
@@ -222,7 +222,7 @@ export const ConcernCheckerModal = ({
           </div>
         )}
 
-        {/* Step 3 — Summary */}
+        {/* Step 3, Summary */}
         {step === 3 && (
           <div className="space-y-4">
             {isEmergency && (

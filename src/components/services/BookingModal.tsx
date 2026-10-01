@@ -81,7 +81,7 @@ export const BookingModal = ({ open, onOpenChange, treatments, preselect, prefil
 
     toast({
       title: "Booking confirmed",
-      description: "Check your inbox — we've just sent a confirmation with all the details.",
+      description: "Check your inbox, we've just sent a confirmation with all the details.",
     });
     reset();
     onOpenChange(false);

@@ -46,7 +46,7 @@ export const Footer = () => {
       </div>
       <div className="border-t border-border">
         <div className="container-wide py-6 flex flex-col md:flex-row justify-between gap-3 text-xs text-foreground/55">
-          <div>© {new Date().getFullYear()} Evergreen Dental. All rights reserved. <span className="font-semibold text-foreground/75">This is a demo website — not a real dental practice.</span></div>
+          <div>© {new Date().getFullYear()} Evergreen Dental. All rights reserved. <span className="font-semibold text-foreground/75">This is a demo website | not a real dental practice.</span></div>
           <div className="flex gap-5">
             <a href="#" className="hover:text-foreground transition">Privacy</a>
             <Link to="/cookies" className="hover:text-foreground transition">Cookies</Link>

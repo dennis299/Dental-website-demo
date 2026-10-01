@@ -5,11 +5,11 @@ const ContactPage = () => (
   <>
     <SEO
       title="Contact Evergreen Dental | Marylebone High St London"
-      description="Visit Evergreen Dental at 42 Marylebone High Street, London W1U 5HP. Call +44 7426 905180 or request a consultation online — open Mon–Sat."
+      description="Visit Evergreen Dental at 42 Marylebone High Street, London W1U 5HP. Call +44 7426 905180 or request a consultation online, open Mon–Sat."
       path="/contact"
       keywords="contact dentist Marylebone, Evergreen Dental phone number, dentist 42 Marylebone High Street, dental clinic W1U"
-      ogTitle="Contact Evergreen Dental — Marylebone High Street, London"
-      ogDescription="Call +44 7426 905180 or book online. We're at 42 Marylebone High Street, London W1U 5HP — open Monday to Saturday."
+      ogTitle="Contact Evergreen Dental | Marylebone High Street, London"
+      ogDescription="Call +44 7426 905180 or book online. We're at 42 Marylebone High Street, London W1U 5HP, open Monday to Saturday."
       jsonLd={[
         {
           "@context": "https://schema.org",

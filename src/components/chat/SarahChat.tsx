@@ -168,11 +168,11 @@ export const SarahChat = () => {
       const prefill = prefillRef.current;
       if (prefill) {
         prefillRef.current = null;
-        setData((d) => ({ ...d, notes: `Concern checker — ${prefill}` }));
+        setData((d) => ({ ...d, notes: `Concern checker, ${prefill}` }));
         setStep("ask_email");
         (async () => {
           await sendBot(
-            `Thanks for completing the assessment — here's what I have:\n\n${prefill}\n\nLet's get you booked. What's your email?`,
+            `Thanks for completing the assessment, here's what I have:\n\n${prefill}\n\nLet's get you booked. What's your email?`,
           );
         })();
       } else {
@@ -519,7 +519,7 @@ export const SarahChat = () => {
     if (key === "emergency") {
       await sendBot(COPY.emergencyPrompt);
     } else {
-      await sendBot("Here are the most common questions — tap one:");
+      await sendBot("Here are the most common questions, tap one:");
     }
   };
 
@@ -968,7 +968,7 @@ export const SarahChat = () => {
                     <Button size="sm" onClick={confirmCancel} className="rounded-full">
                       Yes, cancel
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => { setStep("returning_menu"); sendBot("No problem — your appointment is still on. Anything else I can help with?"); }} className="rounded-full">
+                    <Button size="sm" variant="outline" onClick={() => { setStep("returning_menu"); sendBot("No problem | your appointment is still on. Anything else I can help with?"); }} className="rounded-full">
                       Keep my appointment
                     </Button>
                   </div>

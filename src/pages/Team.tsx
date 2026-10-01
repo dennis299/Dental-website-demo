@@ -20,11 +20,11 @@ const TeamPage = () => (
   <>
     <SEO
       title="Meet Our Dentists & Hygienists | Marylebone London"
-      description="Meet the GDC-registered dentists, hygienists and nurses at Evergreen Dental in Marylebone, London — a calm, experienced private dental team."
+      description="Meet the GDC-registered dentists, hygienists and nurses at Evergreen Dental in Marylebone, London, a calm, experienced private dental team."
       path="/team"
       keywords="Marylebone dentist team, London cosmetic dentist, GDC registered dentist Marylebone, hygienist London"
       ogTitle="The Team Behind Evergreen Dental, Marylebone"
-      ogDescription="Friendly, GDC-registered clinicians and warm support staff — here to make every visit calm, clear and reassuring."
+      ogDescription="Friendly, GDC-registered clinicians and warm support staff, here to make every visit calm, clear and reassuring."
       jsonLd={[
         {
           "@context": "https://schema.org",
@@ -46,7 +46,7 @@ const TeamPage = () => (
     <PageHero
       eyebrow="Meet the team"
       title="The people behind your smile"
-      subtitle="A close-knit team of GDC-registered clinicians and warm support staff — here to make every visit calm, clear and reassuring."
+      subtitle="A close-knit team of GDC-registered clinicians and warm support staff | here to make every visit calm, clear and reassuring."
     />
     <Team />
   </>

@@ -27,9 +27,9 @@ const Email = (p: Props) => (
         <Text style={text}>Hi {p.name ?? 'there'}, your appointment has been moved.</Text>
         <Section style={card}>
           <Text style={cardRow}><strong>Treatment:</strong> {p.treatment ?? 'Consultation'}</Text>
-          <Text style={cardRow}><strong>New time:</strong> {p.whenPretty ?? '—'}</Text>
+          <Text style={cardRow}><strong>New time:</strong> {p.whenPretty ?? ', '}</Text>
           <Text style={cardRow}><strong>Where:</strong> {CLINIC.address}</Text>
-          <Text style={cardRow}><strong>Booking #:</strong> {p.bookingId ?? '—'}</Text>
+          <Text style={cardRow}><strong>Booking #:</strong> {p.bookingId ?? ', '}</Text>
         </Section>
         <Hr style={hr} />
         <Text style={muted}>Need another change? Reply to this email or call {CLINIC.phone}.</Text>

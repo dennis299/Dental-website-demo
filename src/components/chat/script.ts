@@ -29,19 +29,19 @@ export const TREATMENT_INFO: Record<TreatmentKey, string> = {
   "Invisalign":
     "Invisalign is a discreet and comfortable way to straighten your smile without traditional braces.",
   "Veneers":
-    "Porcelain veneers are ultra-thin shells custom-crafted to transform the shape, colour and symmetry of your smile — beautifully natural and long-lasting.",
+    "Porcelain veneers are ultra-thin shells custom-crafted to transform the shape, colour and symmetry of your smile, beautifully natural and long-lasting.",
   "Teeth Whitening":
-    "Our professional whitening brightens your smile by several shades in just one visit, safely and gently — perfect before a big event or just to feel your best.",
+    "Our professional whitening brightens your smile by several shades in just one visit, safely and gently, perfect before a big event or just to feel your best.",
   "Dental Implants":
-    "Implants are the gold-standard for replacing missing teeth — they look, feel and function just like natural teeth, and last for decades with proper care.",
+    "Implants are the gold-standard for replacing missing teeth. They look, feel and function just like natural teeth, and last for decades with proper care.",
   "Smile Makeover":
-    "A smile makeover blends the best of cosmetic dentistry — whitening, veneers, alignment — into one personalised plan to give you the smile you've always wanted.",
+    "A smile makeover blends the best of cosmetic dentistry (whitening, veneers, alignment) into one personalised plan to give you the smile you've always wanted.",
   "General Consultation":
-    "A great place to start! We'll do a friendly check-up, listen to your goals, and build a treatment plan tailored to you — no pressure, ever.",
+    "A great place to start! We'll do a friendly check-up, listen to your goals, and build a treatment plan tailored to you. No pressure, ever.",
 };
 
 export const INVISALIGN_WHY =
-  "✨ Why patients love Invisalign:\n\n• Nearly invisible — most people won't notice you're wearing them\n• Removable for eating, drinking and brushing\n• Predictable results with a digital smile preview before you start\n• Comfortable smooth aligners — no metal brackets or wires";
+  "✨ Why patients love Invisalign:\n\n• Nearly invisible: most people won't notice you're wearing them\n• Removable for eating, drinking and brushing\n• Predictable results with a digital smile preview before you start\n• Comfortable smooth aligners with no metal brackets or wires";
 
 export const INVISALIGN_STEPS =
   "Here's your Invisalign journey, step by step:\n\n1. In-clinic consultation & 3D scan (free)\n2. Custom treatment plan + digital smile preview\n3. Receive your set of clear aligners\n4. Quick check-ins every 6–8 weeks\n5. Reveal your new smile + retainers to keep it perfect\n\nEveryone starts with a quick in-person consultation so our clinicians can confirm Invisalign is the right fit for you. Shall I book yours?";
@@ -75,13 +75,13 @@ export const COPY = {
   otpSent: (email: string) =>
     `For your security, I've just emailed a 6-digit verification code to ${email}. Pop it in below and we'll get going.`,
   otpResent:
-    "I've sent a fresh code — please check your inbox (and your spam folder, just in case).",
+    "I've sent a fresh code, please check your inbox (and your spam folder, just in case).",
   invalidOtp:
-    "That code doesn't look right. Please double-check the email and try again — codes are 6 digits.",
+    "That code doesn't look right. Please double-check the email and try again, codes are 6 digits.",
   otpLocked:
-    "Too many attempts. I'll need to send you a fresh code — just tap Resend.",
+    "Too many attempts. I'll need to send you a fresh code, just tap Resend.",
   newPatientAfterOtp:
-    "Thanks — you're verified ✅ I don't see an existing appointment for you yet. Let's get one set up!",
+    "Thanks, you're verified ✅ I don't see an existing appointment for you yet. Let's get one set up!",
   welcomeBackBooked: (name: string, when: string, treatment: string) =>
     `Welcome back, ${name}! 💙\n\nI can see you already have an appointment booked:\n\n• ${treatment}\n• ${when}\n\nWhat would you like to do?`,
   welcomeBackNoBooking: (name: string) =>
@@ -93,49 +93,49 @@ export const COPY = {
     `Perfect, ${name}. And the best phone number to reach you on?`,
   askDate:
     "What date would suit you best?\n\n(We're open Mon–Fri 8:30am–6pm and Saturdays 9am–2pm. Closed Sundays.)",
-  askTime: "Lovely — and which time works for you?",
-  askNotes: "Anything you'd like us to know in advance? (Optional — feel free to skip)",
+  askTime: "Lovely, and which time works for you?",
+  askNotes: "Anything you'd like us to know in advance? (Optional, feel free to skip)",
   confirm: (s: { name: string; treatment: string; email: string; phone: string; when: string }) =>
     `Just to confirm, ${s.name}:\n\n• Treatment: ${s.treatment}\n• When: ${s.when}\n• Email: ${s.email}\n• Phone: ${s.phone}\n\nShall I book this in for you?`,
   submitting: "Booking your appointment now…",
   success: (when: string) =>
     `🎉 You're all booked in for ${when}!\n\nI've just sent a confirmation to your email with the clinic address, a calendar invite, and a few notes to help you prepare. See you soon 💙`,
   rescheduleAskDate:
-    "No problem — let's find a better time. What date would suit you?",
+    "No problem, let's find a better time. What date would suit you?",
   rescheduleConfirm: (when: string) =>
     `Got it. I'll move your appointment to ${when}. Shall I confirm?`,
   rescheduleDone: (when: string) =>
-    `✅ All done — your appointment is now on ${when}. I've sent you an updated confirmation by email.`,
+    `✅ All done, your appointment is now on ${when}. I've sent you an updated confirmation by email.`,
   cancelConfirm:
     "Are you sure you'd like to cancel your current appointment?",
   cancelDone:
-    "Your appointment has been cancelled. We'll miss you — feel free to book again anytime 💙",
+    "Your appointment has been cancelled. We'll miss you, feel free to book again anytime 💙",
   askQuestion:
-    "Of course — what would you like to know? You can also call us on +44 20 1234 5678 and our team will help straight away.",
+    "Of course, what would you like to know? You can also call us on +44 20 1234 5678 and our team will help straight away.",
   errorRetry:
-    "Oh no — something went wrong on our end. Want me to try again, or you can call us directly.",
-  invalidEmail: "Hmm, that doesn't look like a valid email — mind trying again?",
+    "Oh no, something went wrong on our end. Want me to try again, or you can call us directly.",
+  invalidEmail: "Hmm, that doesn't look like a valid email, mind trying again?",
   invalidPhone: "Could you double-check that phone number for me?",
-  invalidName: "I didn't catch that — what's your first name?",
+  invalidName: "I didn't catch that | what's your first name?",
   invalidDate: "Please pick a date that's today or later.",
   closedSunday:
-    "We're closed on Sundays 🙏 — would Saturday or a weekday work instead?",
+    "We're closed on Sundays 🙏, would Saturday or a weekday work instead?",
   noSlotsToday:
-    "It's getting a bit late for today — could you pick another day so we can give you our full attention?",
+    "It's getting a bit late for today, could you pick another day so we can give you our full attention?",
   // Menu / FAQ copy
   greetingMenu:
     "👋 Hi! I'm Sarah, your treatment coordinator at Evergreen Dental. I can answer quick questions about the clinic, or book you an appointment in under a minute. What would you like to do?",
-  faqPickCategory: "Sure — what would you like to know about?",
+  faqPickCategory: "Sure, what would you like to know about?",
   faqAnythingElse: "Anything else I can help you with?",
   faqBookingNudge:
-    "While we're chatting — would you like me to schedule a consultation for you? It only takes a minute.",
+    "While we're chatting, would you like me to schedule a consultation for you? It only takes a minute.",
   faqOutOfScope:
-    "That's a great question, but it's best answered by our clinical team — give us a ring on +44 7426 905180 and we'll help straight away. In the meantime, would you like to book an appointment?",
+    "That's a great question, but it's best answered by our clinical team, give us a ring on +44 7426 905180 and we'll help straight away. In the meantime, would you like to book an appointment?",
   emergencyPrompt:
-    "If you're in pain or have a dental emergency, please call us right now on +44 7426 905180 — we keep same-day emergency slots Monday to Saturday. I can also book you in here:",
+    "If you're in pain or have a dental emergency, please call us right now on +44 7426 905180, we keep same-day emergency slots Monday to Saturday. I can also book you in here:",
 };
 
-// Clinic facts used by FAQ answers — kept centralised so nothing is invented.
+// Clinic facts used by FAQ answers, kept centralised so nothing is invented.
 export const CLINIC = {
   phone: "+44 7426 905180",
   phoneTel: "+447426905180",
@@ -209,7 +209,7 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
     },
     {
       q: "Can I reschedule?",
-      a: "Yes — pop your email in here and verify with the 6-digit code we send, and I'll move your appointment to any day that suits you better.",
+      a: "Yes, pop your email in here and verify with the 6-digit code we send, and I'll move your appointment to any day that suits you better.",
     },
     {
       q: "Can I cancel?",
@@ -227,11 +227,11 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
     },
     {
       q: "Do you accept new patients?",
-      a: "Yes — we're warmly welcoming new patients. Your first consultation includes a full check-up and a written treatment plan.",
+      a: "Yes, we're warmly welcoming new patients. Your first consultation includes a full check-up and a written treatment plan.",
     },
     {
       q: "Where are you located?",
-      a: "We're at 42 Marylebone High Street, London W1U 5HP — a 4-minute walk from Bond Street tube.",
+      a: "We're at 42 Marylebone High Street, London W1U 5HP, a 4-minute walk from Bond Street tube.",
     },
     {
       q: "What are your opening hours?",
@@ -245,7 +245,7 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
   pricing: [
     {
       q: "Do you offer free consultations?",
-      a: "Yes — your first in-clinic consultation for Invisalign, veneers and smile makeovers is complimentary. You'll leave with a smile preview and a written quote.",
+      a: "Yes, your first in-clinic consultation for Invisalign, veneers and smile makeovers is complimentary. You'll leave with a smile preview and a written quote.",
     },
     {
       q: "What is the starting price for treatments?",
@@ -253,7 +253,7 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
     },
     {
       q: "Do you have payment plans?",
-      a: "Yes — 0% finance over 12 months on most treatments, and longer interest-bearing plans so you can spread the cost comfortably.",
+      a: "Yes, 0% finance over 12 months on most treatments, and longer interest-bearing plans so you can spread the cost comfortably.",
     },
     {
       q: "How much is a consultation?",
@@ -263,7 +263,7 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
   insurance: [
     {
       q: "Do you accept insurance?",
-      a: "Yes — we work with most major UK insurers and can submit claims directly or give you a receipt to claim back.",
+      a: "Yes, we work with most major UK insurers and can submit claims directly or give you a receipt to claim back.",
     },
     {
       q: "Which providers?",
@@ -273,17 +273,17 @@ export const FAQ_TREE: Record<FaqCategoryKey, FaqQuestion[]> = {
   emergency: [
     {
       q: "What if I have a dental emergency?",
-      a: "Please call us on +44 7426 905180 — we keep same-day emergency slots Monday to Saturday. If you're in severe pain or bleeding, ring straight away.",
+      a: "Please call us on +44 7426 905180, we keep same-day emergency slots Monday to Saturday. If you're in severe pain or bleeding, ring straight away.",
     },
   ],
   website: [
     {
       q: "How does online booking work?",
-      a: "Tell me your email, verify with a 6-digit code we send you, pick a treatment, date and time — and you're booked. You'll get a confirmation email instantly.",
+      a: "Tell me your email, verify with a 6-digit code we send you, pick a treatment, date and time, and you're booked. You'll get a confirmation email instantly.",
     },
     {
       q: "Is my information secure?",
-      a: "Yes — we verify your email before sharing any booking details, and your data is stored encrypted with strict access controls. We never share it with third parties.",
+      a: "Yes, we verify your email before sharing any booking details, and your data is stored encrypted with strict access controls. We never share it with third parties.",
     },
   ],
 };
