@@ -24,6 +24,7 @@ export const Contact = () => {
           message: get("message"),
           hp: get("hp"),
           page: window.location.pathname + window.location.search,
+          ...((window as any).mtsFirstTouch?.() ?? {}),
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

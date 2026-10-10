@@ -18,6 +18,27 @@
       });
     </script>
 
+    <script>
+      (function () {
+        var KEY = "mts_first_touch";
+        try {
+          if (!sessionStorage.getItem(KEY)) {
+            var q = new URLSearchParams(location.search), t = {};
+            ["utm_source","utm_medium","utm_campaign","utm_term","utm_content","gclid","fbclid"].forEach(function (k) {
+              if (q.get(k)) t[k] = q.get(k).slice(0, 300);
+            });
+            t.landing_page = location.href.slice(0, 500);
+            t.referrer = (document.referrer || "").slice(0, 500);
+            sessionStorage.setItem(KEY, JSON.stringify(t));
+          }
+        } catch (e) {}
+        window.mtsFirstTouch = function () {
+          try { return JSON.parse(sessionStorage.getItem(KEY) || "{}"); } catch (e) { return {}; }
+        };
+      })();
+    </script>
+
+
     <title>Evergreen Dental | Premium Private Dentistry in London</title>
     <meta name="description" content="Modern private dental practice in Marylebone, London. Invisalign, veneers, whitening, implants and family dentistry. Calm, premium care." />
     <meta name="author" content="Evergreen Dental" />
