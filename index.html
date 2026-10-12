@@ -4,19 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EM2KVT3F2Y"></script>
+    <!-- Google tag (gtag.js) with Consent Mode v2: everything denied until Accept -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+      try {
+        if (localStorage.getItem('cookie_consent') === 'accepted') {
+          gtag('consent', 'update', { analytics_storage: 'granted' });
+        }
+      } catch (e) {}
       gtag('js', new Date());
       gtag('config', 'G-EM2KVT3F2Y', {
         send_page_view: false,
         cookie_flags: 'SameSite=None;Secure',
-        allow_google_signals: true,
-        allow_ad_personalization_signals: true
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false
       });
     </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EM2KVT3F2Y"></script>
 
     <script>
       (function () {

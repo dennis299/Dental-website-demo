@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { GA_MEASUREMENT_ID, gtagPageView } from "@/lib/analytics";
+import { gtagEvent, gtagPageView } from "@/lib/analytics";
 
 const SCROLL_THRESHOLDS = [25, 50, 75, 90];
 
@@ -37,8 +37,8 @@ export const GoogleAnalytics = () => {
       for (const threshold of SCROLL_THRESHOLDS) {
         if (percent >= threshold && !triggered.has(threshold)) {
           triggered.add(threshold);
-          if (typeof window.gtag === "function") {
-            window.gtag("event", "scroll", {
+          {
+            gtagEvent("scroll", {
               percent_scrolled: threshold,
               event_category: "engagement",
               event_label: `${threshold}%`,
@@ -68,8 +68,8 @@ export const GoogleAnalytics = () => {
         href.startsWith("http") &&
         !href.includes(window.location.hostname)
       ) {
-        if (typeof window.gtag === "function") {
-          window.gtag("event", "click", {
+        {
+          gtagEvent("click", {
             event_category: "outbound",
             event_label: href,
             transport_type: "beacon",
@@ -87,8 +87,8 @@ export const GoogleAnalytics = () => {
         const url = new URL(href, window.location.href);
         const ext = url.pathname.split(".").pop()?.toLowerCase();
         if (ext && downloadExts.includes(ext)) {
-          if (typeof window.gtag === "function") {
-            window.gtag("event", "file_download", {
+          {
+            gtagEvent("file_download", {
               file_name: url.pathname,
               file_extension: ext,
               link_url: href,
@@ -109,8 +109,8 @@ export const GoogleAnalytics = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get("s") || params.get("search") || params.get("q");
-    if (query && typeof window.gtag === "function") {
-      window.gtag("event", "search", {
+    if (query) {
+      gtagEvent("search", {
         search_term: query,
         event_category: "engagement",
       });

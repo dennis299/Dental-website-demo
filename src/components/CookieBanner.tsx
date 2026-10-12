@@ -1,22 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
-const KEY = "cookie_consent";
+import { CONSENT_KEY as KEY, gtagPageView } from "@/lib/analytics";
 
 export const CookieBanner = () => {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(KEY);
-    if (!saved) setShow(true);
-    else if (saved === "declined") window.gtag?.("consent", "update", { analytics_storage: "denied" });
+    if (!localStorage.getItem(KEY)) setShow(true);
   }, []);
 
   const choose = (value: "accepted" | "declined") => {
     localStorage.setItem(KEY, value);
-    window.gtag?.("consent", "update", {
-      analytics_storage: value === "accepted" ? "granted" : "denied",
-    });
+    if (value === "accepted") {
+      window.gtag?.("consent", "update", { analytics_storage: "granted" });
+      gtagPageView();
+    }
     setShow(false);
   };
 
